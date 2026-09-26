@@ -325,7 +325,7 @@
         </div>
       </div>
       <button onclick="forceSync()" class="mt-3 flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-medium text-slate-300 hover:border-ink-500 hover:text-white">
-        <i class="fa-solid fa-rotate text-[10px]"></i> Force re-sync
+        <i class="fa-solid fa-rotate text-[10px]"></i> Pull latest from server
       </button>
     </div>
 
@@ -656,7 +656,7 @@ function go(view) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   FIREBASE SYNC — per-key (no more overwriting)
+   FIREBASE SYNC — per-key with null-safe listener + polling fallback
    ═══════════════════════════════════════════════════════════════ */
 function initFirebase() {
   try {
@@ -683,24 +683,29 @@ function connectStation() {
   if (stationRef) stationRef.off();
   stationRef = fbDb.ref('stations/' + SINGLE_STATION);
 
-  // Each key listens independently — any device writing a key updates everyone
+  // Each key listens independently. Firebase converts empty arrays to null,
+  // so for lists we treat null as "empty array" instead of skipping.
   SYNC_KEYS.forEach(key => {
     stationRef.child(key).on('value', snap => {
       const val = snap.val();
-      if (val === null) return;
+
       if (key === 'settings') {
+        if (val === null) return;
         state.settings = { ...DEFAULT_SETTINGS, ...val };
-      } else if (key === 'inventory' && Array.isArray(val) && val.length) {
-        state.inventory = val;
-      } else if (key === 'loans' && Array.isArray(val)) {
-        state.loans = val;
-      } else if (key === 'history' && Array.isArray(val)) {
-        state.history = val;
-      } else if (key === 'activity' && Array.isArray(val)) {
-        state.activity = val;
+      } else if (key === 'inventory') {
+        if (val === null) return;
+        if (Array.isArray(val) && val.length) state.inventory = val;
+      } else if (key === 'loans') {
+        // ← the critical fix: null means "no active loans"
+        state.loans = Array.isArray(val) ? val : [];
+      } else if (key === 'history') {
+        state.history = Array.isArray(val) ? val : [];
+      } else if (key === 'activity') {
+        state.activity = Array.isArray(val) ? val : [];
       } else {
         return;
       }
+
       sanitizeCart();
       lastRecvAt = Date.now();
       renderAll();
@@ -713,19 +718,31 @@ function connectStation() {
     const val = snap.val();
     if (!val || !Array.isArray(val) || !val.length) {
       setTimeout(() => {
-        if (connected) {
-          publishKey('inventory');
-          publishKey('settings');
-        }
+        publishKey('inventory');
+        publishKey('settings');
       }, 800);
     }
   });
+
+  // Polling fallback — if no update received in 8s, force a pull
+  if (window._pollTimer) clearInterval(window._pollTimer);
+  window._pollTimer = setInterval(() => {
+    if (!stationRef) return;
+    if (Date.now() - lastRecvAt > 8000) pullLatest();
+  }, 5000);
+
+  // Pull when the tab regains focus or becomes visible
+  if (!window._focusBound) {
+    window._focusBound = true;
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) pullLatest(); });
+    window.addEventListener('focus', () => pullLatest());
+  }
 
   updateSyncPill();
 }
 
 function publishKey(key) {
-  if (!stationRef || !connected) return;
+  if (!stationRef) return;
   const val = state[key];
   if (val === undefined) return;
   stationRef.child(key).set(val)
@@ -734,14 +751,14 @@ function publishKey(key) {
 }
 
 function publishAll() {
-  if (!stationRef || !connected) return;
+  if (!stationRef) return;
   SYNC_KEYS.forEach(publishKey);
 }
 
 let publishTimer = null;
 let pendingKeys = new Set();
 function queuePublish(keys) {
-  if (!stationRef || !connected) return;
+  if (!stationRef) return;
   if (Array.isArray(keys)) keys.forEach(k => pendingKeys.add(k));
   else SYNC_KEYS.forEach(k => pendingKeys.add(k));
   clearTimeout(publishTimer);
@@ -750,6 +767,30 @@ function queuePublish(keys) {
     pendingKeys.clear();
     toPublish.forEach(publishKey);
   }, 200);
+}
+
+async function pullLatest() {
+  if (!stationRef) return;
+  try {
+    const snap = await stationRef.once('value');
+    const data = snap.val() || {};
+    SYNC_KEYS.forEach(key => {
+      if (key === 'settings') {
+        if (data[key]) state.settings = { ...DEFAULT_SETTINGS, ...data[key] };
+      } else if (key === 'inventory') {
+        if (Array.isArray(data[key]) && data[key].length) state.inventory = data[key];
+      } else if (key === 'loans') {
+        state.loans = Array.isArray(data[key]) ? data[key] : [];
+      } else if (key === 'history') {
+        state.history = Array.isArray(data[key]) ? data[key] : [];
+      } else if (key === 'activity') {
+        state.activity = Array.isArray(data[key]) ? data[key] : [];
+      }
+    });
+    lastRecvAt = Date.now();
+    sanitizeCart();
+    renderAll();
+  } catch (e) { console.warn('[pull]', e); }
 }
 
 function flashSync(dir) {
@@ -777,22 +818,8 @@ function updateSyncPill() {
 }
 
 function forceSync() {
-  if (!stationRef || !connected) { toast('Firebase not connected yet.', 'warn'); return; }
-  stationRef.once('value').then(snap => {
-    const data = snap.val() || {};
-    SYNC_KEYS.forEach(key => {
-      if (data[key] !== undefined && data[key] !== null) {
-        if (key === 'settings') state.settings = { ...DEFAULT_SETTINGS, ...data[key] };
-        else state[key] = data[key];
-      }
-    });
-    sanitizeCart();
-    renderAll();
-    toast('Pulled latest from server.', 'success');
-  }).catch(() => {
-    publishAll();
-    toast('State pushed to server.', 'success');
-  });
+  if (!stationRef) { toast('Firebase not connected yet.', 'warn'); return; }
+  pullLatest().then(() => toast('Pulled latest from server.', 'success'));
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -805,12 +832,10 @@ function save() {
     activity: state.activity, simOffsetMs: state.simOffsetMs
   })); } catch {}
 }
-
 function saveAndPublish(...keys) {
   save();
   if (keys.length) queuePublish(keys);
 }
-
 function load() {
   try {
     const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -1054,7 +1079,6 @@ function getJoinUrl() {
   const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
   return base + '/';
 }
-
 function renderPoster() {
   const s = state.settings;
   $('posterTitle').value = s.posterTitle;
@@ -1080,7 +1104,6 @@ function renderPoster() {
 
   $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
 }
-
 function onPosterInput() {
   state.settings.posterTitle = $('posterTitle').value;
   state.settings.posterSubtitle = $('posterSubtitle').value;
@@ -1088,7 +1111,6 @@ function onPosterInput() {
   saveAndPublish('settings');
   renderPoster();
 }
-
 async function downloadPoster() {
   const node = $('posterCanvas');
   const img = node.querySelector('#posterQrTarget img');
@@ -1098,7 +1120,6 @@ async function downloadPoster() {
     toast('Poster downloaded.', 'success');
   }).catch(() => toast('Export failed.', 'error'));
 }
-
 function showQr(itemId) {
   const item = findItem(itemId); if (!item) return;
   $('qrTitle').textContent = item.name; $('qrSku').textContent = item.id;
@@ -1126,7 +1147,6 @@ function renderSyncPage() {
     $('syncJoinQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(url)}`;
   }
 }
-
 function saveDeployUrl() {
   const url = $('syncDeployUrlInput').value.trim();
   if (!url) { toast('Enter your deployed URL.', 'warn'); return; }
@@ -1136,7 +1156,6 @@ function saveDeployUrl() {
   renderPoster();
   toast('Deploy URL saved.', 'success');
 }
-
 function copyJoinUrl() {
   const url = getJoinUrl();
   navigator.clipboard.writeText(url).then(() => toast('Join URL copied.', 'success')).catch(() => prompt('Copy:', url));
@@ -1424,7 +1443,7 @@ window.openComponentModal = openComponentModal; window.saveComponent = saveCompo
 window.deleteComponent = deleteComponent; window.saveSettings = saveSettings; window.resetDemo = resetDemo;
 window.openModal = openModal; window.closeModal = closeModal;
 window.saveDeployUrl = saveDeployUrl; window.copyJoinUrl = copyJoinUrl; window.forceSync = forceSync;
-window.exportExcel = exportExcel;
+window.exportExcel = exportExcel; window.pullLatest = pullLatest;
 </script>
 </body>
 </html>
