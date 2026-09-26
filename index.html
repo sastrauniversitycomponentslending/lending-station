@@ -23,6 +23,7 @@
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
@@ -129,7 +130,7 @@
     <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
       <div class="max-w-2xl">
         <h1 class="text-3xl font-extrabold leading-[1.1] text-white sm:text-4xl">Borrow lab hardware<br /><span class="bg-gradient-to-r from-brand-400 to-emerald-400 bg-clip-text text-transparent">in under a minute.</span></h1>
-        <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">Real-time inventory · automatic due dates · instant returns. Every device with the same station code sees the same live state.</p>
+        <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">One shared lab · every device syncs automatically. Real-time inventory, automatic due dates, instant returns.</p>
         <div class="mt-7 flex flex-wrap items-center gap-3">
           <button onclick="go('catalog')" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-500"><i class="fa-solid fa-boxes-stacked text-xs"></i> Browse catalog</button>
           <button onclick="go('sync')" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-ink-500 hover:text-white"><i class="fa-solid fa-mobile-screen-button text-xs"></i> Connect phone</button>
@@ -216,6 +217,7 @@
   <div class="flex flex-col gap-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
     <div><h1 class="text-lg font-bold text-white">Active Borrowed Items</h1><p class="mt-0.5 text-xs text-slate-500">Live timers · one-click returns</p></div>
     <div class="flex flex-wrap gap-2">
+      <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-medium text-emerald-300 transition hover:bg-emerald-500/20"><i class="fa-solid fa-file-excel text-[11px]"></i> Export Excel</button>
       <button onclick="returnAllLoans()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-500/20"><i class="fa-solid fa-rotate-left text-[11px]"></i> Return all</button>
     </div>
   </div>
@@ -241,7 +243,7 @@
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Deployed website URL</label>
         <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.vercel.app/"
                class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
-        <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">Paste the public URL where you deployed this file (Vercel, Netlify, GitHub Pages). The QR will encode this URL.</p>
+        <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">Paste the public URL where you deployed this file. The QR will encode this URL.</p>
         <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div>
       </div>
       <div>
@@ -285,70 +287,80 @@
     <div class="flex items-start gap-4">
       <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-tower-broadcast text-xl"></i></div>
       <div>
-        <h1 class="text-xl font-extrabold text-white">Live sync is active</h1>
-        <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-400">Any device using the same <strong class="text-slate-200">station code</strong> sees the same inventory, loans, and activity in real time. Firebase is built in — no setup needed on new phones.</p>
+        <h1 class="text-xl font-extrabold text-white">One shared lab · everyone syncs automatically</h1>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
+          Every device that opens this URL joins the same live station. No codes to remember.
+          Whoever borrows on their phone appears in your admin console within a second.
+        </p>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
-    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
-      <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">1</div><h2 class="text-sm font-bold text-white">Station code</h2></div>
-      <p class="mt-3 text-xs text-slate-400">Pick a short code. Anyone using the same code joins the same live station.</p>
-      <div class="mt-3 flex gap-2">
-        <input id="stationCodeInput" type="text" placeholder="LAB-421"
-               class="mono flex-1 rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-sm font-bold uppercase tracking-wider text-white placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600 focus:border-brand-500/60 focus:outline-none" />
-        <button onclick="applyStationCode()" class="rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-brand-500">Apply</button>
-      </div>
-      <div class="mt-3 flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
-        <span class="text-[10px] uppercase tracking-wider text-slate-500">Current</span>
-        <span id="syncCurrentCode" class="mono text-sm font-bold text-emerald-300">—</span>
-      </div>
-      <button onclick="generateStationCode()" class="mt-2 text-[11px] font-medium text-brand-400 hover:text-brand-300"><i class="fa-solid fa-dice mr-1"></i>Random code</button>
-    </div>
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
 
     <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
-      <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">2</div><h2 class="text-sm font-bold text-white">Deployed URL</h2></div>
-      <p class="mt-3 text-xs text-slate-400">The URL where this file is hosted. Used in the QR code.</p>
-      <input id="syncDeployUrlInput" type="text" placeholder="https://your-site.vercel.app/"
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-brand-300"><i class="fa-solid fa-link text-xs"></i></div>
+        <h2 class="text-sm font-bold text-white">Deployed URL</h2>
+      </div>
+      <p class="mt-3 text-xs text-slate-400">Where this file is hosted. The QR points here.</p>
+      <input id="syncDeployUrlInput" type="text" placeholder="https://sastrauniversity.github.io/lending-station/"
              class="mt-3 focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
       <button onclick="saveDeployUrl()" class="mt-2 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500">Save URL</button>
+      <div class="mt-4 flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+        <span class="text-[10px] uppercase tracking-wider text-slate-500">Station</span>
+        <span id="syncStatCode" class="mono text-sm font-bold text-emerald-300">LAB-MAIN</span>
+      </div>
+      <div class="mt-2 flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+        <span class="text-[10px] uppercase tracking-wider text-slate-500">Connection</span>
+        <span id="syncStatConn" class="flex items-center gap-1.5 text-xs font-bold"><span class="h-2 w-2 rounded-full bg-amber-400 pulse-dot"></span><span class="text-amber-300">Connecting…</span></span>
+      </div>
+      <div class="mt-2 grid grid-cols-2 gap-2">
+        <div class="rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Last send</div>
+          <div id="syncStatSent" class="mono mt-0.5 text-[11px] text-slate-400">never</div>
+        </div>
+        <div class="rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Last receive</div>
+          <div id="syncStatRecv" class="mono mt-0.5 text-[11px] text-slate-400">never</div>
+        </div>
+      </div>
+      <button onclick="forceSync()" class="mt-3 flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-medium text-slate-300 hover:border-ink-500 hover:text-white">
+        <i class="fa-solid fa-rotate text-[10px]"></i> Force re-sync
+      </button>
     </div>
 
     <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
-      <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">3</div><h2 class="text-sm font-bold text-white">Connect phone</h2></div>
-      <p class="mt-3 text-xs text-slate-400">Scan this with your phone camera. It opens the deployed URL with the station code attached.</p>
-      <div class="mt-3 flex justify-center rounded-xl border border-ink-700 bg-white p-3">
-        <img id="syncJoinQr" width="150" height="150" alt="Join QR" />
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-brand-300"><i class="fa-solid fa-mobile-screen-button text-xs"></i></div>
+        <h2 class="text-sm font-bold text-white">Join from any phone</h2>
       </div>
-      <button onclick="copyJoinUrl()" class="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-medium text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-link text-[10px]"></i> Copy join URL</button>
+      <p class="mt-3 text-xs text-slate-400">Scan this with the phone camera. It opens the site already connected.</p>
+      <div class="mt-3 flex justify-center rounded-xl border border-ink-700 bg-white p-4">
+        <img id="syncJoinQr" width="180" height="180" alt="Join QR" />
+      </div>
+      <button onclick="copyJoinUrl()" class="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-medium text-slate-300 hover:border-ink-500 hover:text-white">
+        <i class="fa-solid fa-link text-[10px]"></i> Copy join URL
+      </button>
+    </div>
+
+  </div>
+
+  <div class="rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-file-excel text-lg"></i></div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Export all borrow records</h3>
+          <p class="mt-0.5 text-xs text-slate-400">Download every loan (past and present) as an Excel file with three sheets: Loans, Inventory, Summary.</p>
+        </div>
+      </div>
+      <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500">
+        <i class="fa-solid fa-download text-[11px]"></i> Download .xlsx
+      </button>
     </div>
   </div>
 
-  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
-    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-signal text-xs text-brand-400"></i> Connection status</h3>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
-        <div class="text-[10px] uppercase tracking-wider text-slate-500">Station</div>
-        <div id="syncStatCode" class="mono mt-1.5 text-sm font-bold text-white">—</div>
-      </div>
-      <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
-        <div class="text-[10px] uppercase tracking-wider text-slate-500">Connection</div>
-        <div id="syncStatConn" class="mt-1.5 flex items-center gap-1.5 text-sm font-bold"><span class="h-2 w-2 rounded-full bg-amber-400"></span><span class="text-amber-300">Connecting…</span></div>
-      </div>
-      <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
-        <div class="text-[10px] uppercase tracking-wider text-slate-500">Last send</div>
-        <div id="syncStatSent" class="mono mt-1.5 text-xs text-slate-400">never</div>
-      </div>
-      <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
-        <div class="text-[10px] uppercase tracking-wider text-slate-500">Last receive</div>
-        <div id="syncStatRecv" class="mono mt-1.5 text-xs text-slate-400">never</div>
-      </div>
-    </div>
-    <div class="mt-4 flex flex-wrap gap-2">
-      <button onclick="forceSync()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-medium text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-rotate text-[10px]"></i> Force re-sync</button>
-    </div>
-  </div>
 </section>
 
 <!-- ══════════ ADMIN ══════════ -->
@@ -371,6 +383,7 @@
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
       <div><h3 class="text-sm font-bold text-white">Live Borrowed Items</h3><p class="mt-0.5 text-xs text-slate-500">Updates instantly when anyone borrows or returns.</p></div>
+      <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500"><i class="fa-solid fa-file-excel text-[11px]"></i> Export Excel</button>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
@@ -517,8 +530,9 @@ const BUILTIN_FIREBASE = {
 /* ═══════════════════════════════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════════════════════════════ */
-const STORAGE_KEY = 'cls.app.v1';
+const STORAGE_KEY = 'cls.app.v2';
 const MAX_ACTIVITY = 40;
+const SINGLE_STATION = 'LAB-MAIN';
 
 const SEED_INVENTORY = [
   { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
@@ -540,9 +554,6 @@ const DEFAULT_SETTINGS = {
   posterInstructions: 'Scan this QR code with your mobile camera to view live stock, add items to your cart, and check out hardware instantly.'
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   CLIENT ID
-   ═══════════════════════════════════════════════════════════════ */
 const CLIENT_ID = Math.random().toString(36).slice(2, 10);
 
 /* ═══════════════════════════════════════════════════════════════
@@ -560,7 +571,7 @@ function defaultState() {
 let state = defaultState();
 let isAdmin = false;
 let activeView = 'overview';
-let stationId = null;
+let stationId = SINGLE_STATION;
 let deployUrl = '';
 let serverClockOffsetMs = 0;
 let fbApp = null;
@@ -654,36 +665,19 @@ function go(view) {
 /* ═══════════════════════════════════════════════════════════════
    FIREBASE SYNC
    ═══════════════════════════════════════════════════════════════ */
-function loadFirebaseConfig() {
-  // Local override (if user pasted custom config)
-  try {
-    const local = localStorage.getItem('cls.firebase');
-    if (local) {
-      const parsed = JSON.parse(local);
-      if (parsed && parsed.databaseURL) return parsed;
-    }
-  } catch {}
-  // Fallback to built-in config — works on every device
-  return BUILTIN_FIREBASE;
-}
-
 function initFirebase() {
-  const cfg = loadFirebaseConfig();
-  if (!cfg || !cfg.databaseURL) return false;
   try {
     if (!firebase.apps.length) {
-      fbApp = firebase.initializeApp(cfg);
+      fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
     } else {
       fbApp = firebase.app();
     }
     fbDb = firebase.database();
 
-    // Server-anchored clock
     fbDb.ref('.info/serverTimeOffset').on('value', snap => {
       serverClockOffsetMs = snap.val() || 0;
     });
 
-    // Connection state
     fbDb.ref('.info/connected').on('value', snap => {
       connected = snap.val() === true;
       updateSyncPill();
@@ -696,17 +690,13 @@ function initFirebase() {
 }
 
 function connectStation() {
-  if (!fbDb || !stationId) return;
+  if (!fbDb) return;
   if (stationRef) stationRef.off();
-  stationRef = fbDb.ref('stations/' + stationId);
+  stationRef = fbDb.ref('stations/' + SINGLE_STATION);
 
   stationRef.on('value', snap => {
     const data = snap.val();
-    if (!data) {
-      // First time on this station — publish our current state
-      publishState(true);
-      return;
-    }
+    if (!data) { publishState(true); return; }
     if (data.updatedAt && data.updatedAt <= lastWriteTs) return;
     if (data.updatedBy === CLIENT_ID) return;
     applyRemote(data);
@@ -731,7 +721,7 @@ function publishState(force = false) {
     updatedBy: CLIENT_ID,
     inventory: state.inventory,
     loans: state.loans,
-    history: state.history.slice(0, 30),
+    history: state.history.slice(0, 200),
     settings: state.settings,
     activity: state.activity.slice(0, MAX_ACTIVITY)
   };
@@ -775,8 +765,7 @@ function updateSyncPill() {
   const dot = pill.querySelector('span');
 
   let cls, dotCls, label;
-  if (!stationId) { cls = 'border-slate-500/30 bg-slate-500/10 text-slate-400'; dotCls = 'bg-slate-500'; label = 'No station'; }
-  else if (connected) { cls = 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'; dotCls = 'bg-emerald-400'; label = 'Synced'; }
+  if (connected) { cls = 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'; dotCls = 'bg-emerald-400'; label = 'Synced'; }
   else { cls = 'border-amber-500/30 bg-amber-500/10 text-amber-300'; dotCls = 'bg-amber-400 pulse-dot'; label = 'Connecting…'; }
 
   pill.className = `flex items-center gap-2 rounded-xl border ${cls} px-2.5 py-1.5 text-[11px] font-medium`;
@@ -787,7 +776,7 @@ function updateSyncPill() {
 }
 
 function forceSync() {
-  if (!stationRef) { toast('Firebase not configured.', 'warn'); return; }
+  if (!stationRef) { toast('Firebase not connected yet.', 'warn'); return; }
   publishState(true);
   toast('State pushed to server.', 'success');
 }
@@ -1041,8 +1030,7 @@ async function returnAllLoans() {
    ═══════════════════════════════════════════════════════════════ */
 function getJoinUrl() {
   const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
-  const code = stationId || 'LAB-000';
-  return `${base}/?station=${code}`;
+  return base + '/';
 }
 
 function renderPoster() {
@@ -1100,12 +1088,6 @@ function showQr(itemId) {
    SYNC PAGE
    ═══════════════════════════════════════════════════════════════ */
 function renderSyncPage() {
-  const inp = $('stationCodeInput');
-  if (inp && document.activeElement !== inp) inp.value = stationId || '';
-
-  $('syncCurrentCode').textContent = stationId || '—';
-  $('syncStatCode').textContent = stationId || '—';
-
   const deployInp = $('syncDeployUrlInput');
   if (deployInp && document.activeElement !== deployInp) deployInp.value = deployUrl || '';
 
@@ -1117,30 +1099,10 @@ function renderSyncPage() {
   $('syncStatSent').textContent = lastSentAt ? relTime(lastSentAt) : 'never';
   $('syncStatRecv').textContent = lastRecvAt ? relTime(lastRecvAt) : 'never';
 
-  if (stationId && deployUrl) {
+  if (deployUrl) {
     const url = getJoinUrl();
     $('syncJoinQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(url)}`;
   }
-}
-
-function generateStationCode() {
-  const code = 'LAB-' + Math.floor(100 + Math.random()*900);
-  $('stationCodeInput').value = code;
-  toast(`Generated ${code}. Click Apply.`, 'info');
-}
-
-function applyStationCode() {
-  const raw = $('stationCodeInput').value.trim().toUpperCase();
-  const clean = raw.replace(/[^A-Z0-9-]/g, '').slice(0, 32);
-  if (!clean) { toast('Enter a valid code.', 'warn'); return; }
-  stationId = clean;
-  localStorage.setItem('cls.station', clean);
-  connectStation();
-  renderSyncPage();
-  renderPoster();
-  logActivity('system', `Joined station ${clean}`);
-  save();
-  toast(`Now syncing on station ${clean}.`, 'success');
 }
 
 function saveDeployUrl() {
@@ -1156,6 +1118,104 @@ function saveDeployUrl() {
 function copyJoinUrl() {
   const url = getJoinUrl();
   navigator.clipboard.writeText(url).then(() => toast('Join URL copied.', 'success')).catch(() => prompt('Copy:', url));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXCEL EXPORT
+   ═══════════════════════════════════════════════════════════════ */
+function exportExcel() {
+  if (!state.history.length && !state.inventory.length) { toast('No records to export yet.', 'warn'); return; }
+  const t = now();
+
+  const loanRows = state.history.map(h => {
+    const active = h.status === 'ACTIVE';
+    const endMs = active ? t : (h.returnTimeMs || h.borrowTimeMs);
+    const mins = ((endMs - h.borrowTimeMs) / 60000).toFixed(1);
+    const overdue = active ? (t > h.dueTimeMs ? 'YES' : 'NO') : (h.overdueFlag || 'NO');
+    return {
+      'Transaction ID': h.loanId,
+      'Borrower Name': h.borrowerName,
+      'Student ID / Phone': h.borrowerId,
+      'Component SKU': h.itemId,
+      'Component Name': h.itemName,
+      'Category': h.category,
+      'Quantity': h.quantity,
+      'Borrowed At': h.borrowTimeFormatted,
+      'Due At': h.dueTimeFormatted,
+      'Returned At': active ? 'STILL BORROWED' : (h.returnTimeFormatted || ''),
+      'Status': h.status,
+      'Elapsed Minutes': parseFloat(mins),
+      'Overdue': overdue
+    };
+  });
+
+  const wb = XLSX.utils.book_new();
+
+  const ws1 = XLSX.utils.json_to_sheet(loanRows.length ? loanRows : [{ 'Info': 'No loans yet' }]);
+  ws1['!cols'] = [
+    { wch: 14 }, { wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 34 },
+    { wch: 20 }, { wch: 8 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
+    { wch: 10 }, { wch: 14 }, { wch: 10 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Loans');
+
+  const invRows = state.inventory.map(i => ({
+    'SKU': i.id,
+    'Component Name': i.name,
+    'Category': i.category,
+    'Total Stock': i.totalStock,
+    'Available': availableQty(i.id),
+    'On Loan': borrowedQty(i.id),
+    'Description': i.description
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(invRows);
+  ws2['!cols'] = [{ wch: 12 }, { wch: 34 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 50 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Inventory');
+
+  const summaryRows = [
+    { Metric: 'Total SKUs', Value: state.inventory.length },
+    { Metric: 'Total units in lab', Value: state.inventory.reduce((s,i) => s + i.totalStock, 0) },
+    { Metric: 'Units currently on loan', Value: state.loans.reduce((s,l) => s + l.quantity, 0) },
+    { Metric: 'Active borrowers', Value: new Set(state.loans.map(l => l.borrowerId)).size },
+    { Metric: 'Overdue loans', Value: state.loans.filter(l => isOverdue(l, t)).length },
+    { Metric: 'Total transactions ever', Value: state.history.length },
+    { Metric: 'Report generated at', Value: fmtDateTime(t) }
+  ];
+  const ws3 = XLSX.utils.json_to_sheet(summaryRows);
+  ws3['!cols'] = [{ wch: 30 }, { wch: 22 }];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Summary');
+
+  XLSX.writeFile(wb, `component-lending-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  toast('Excel file downloaded.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CSV (kept for fallback)
+   ═══════════════════════════════════════════════════════════════ */
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function exportHistoryCSV() {
+  if (!state.history.length) { toast('No records.', 'warn'); return; }
+  const t = now();
+  const rows = [['TXN','Borrower','ID','SKU','Component','Category','Qty','Borrowed','Due','Returned','Status','Minutes','Overdue']];
+  state.history.forEach(h => {
+    const active = h.status === 'ACTIVE';
+    const end = active ? t : (h.returnTimeMs || h.borrowTimeMs);
+    rows.push([h.loanId, h.borrowerName, h.borrowerId, h.itemId, h.itemName, h.category, h.quantity, h.borrowTimeFormatted, h.dueTimeFormatted, active?'STILL BORROWED':(h.returnTimeFormatted||''), h.status, ((end-h.borrowTimeMs)/60000).toFixed(1), active?(t>h.dueTimeMs?'YES':'NO'):(h.overdueFlag||'NO')]);
+  });
+  downloadCSV(`lending-log-${new Date().toISOString().slice(0,10)}.csv`, rows);
+  toast('Log exported.', 'success');
+}
+function exportInventoryCSV() {
+  const rows = [['SKU','Name','Category','Total','Available','Out','Description']];
+  state.inventory.forEach(i => rows.push([i.id, i.name, i.category, i.totalStock, availableQty(i.id), borrowedQty(i.id), i.description]));
+  downloadCSV(`inventory-${new Date().toISOString().slice(0,10)}.csv`, rows);
+  toast('Inventory exported.', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1189,7 +1249,6 @@ function renderAdmin() {
   $('admBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
   $('admOverdue').textContent = state.loans.filter(l => isOverdue(l, t)).length;
 
-  // Ledger
   const tbody = $('ledgerBody');
   const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
   if (!loans.length) { tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`; }
@@ -1205,7 +1264,6 @@ function renderAdmin() {
     }).join('');
   }
 
-  // Inventory
   const inv = $('inventoryBody');
   inv.innerHTML = state.inventory.map(item => {
     const out = borrowedQty(item.id); const avail = availableQty(item.id);
@@ -1214,7 +1272,6 @@ function renderAdmin() {
     return `<tr class="hover:bg-ink-800/40"><td class="mono whitespace-nowrap px-4 py-3 text-[11px] text-slate-500">${esc(item.id)}</td><td class="px-4 py-3"><div class="font-semibold text-white">${esc(item.name)}</div></td><td class="px-4 py-3 text-slate-400">${esc(item.category)}</td><td class="mono px-4 py-3 text-slate-300">${item.totalStock}</td><td class="mono px-4 py-3 font-bold ${aCls}">${avail}</td><td class="mono px-4 py-3 font-bold text-amber-400">${out}</td><td class="px-4 py-3"><button onclick="showQr('${item.id}')" class="focus-ring rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/40"><i class="fa-solid fa-qrcode text-[10px]"></i></button></td><td class="px-4 py-3"><div class="flex justify-end gap-3"><button onclick="openComponentModal('${item.id}')" class="focus-ring text-[11px] font-semibold text-brand-400">Edit</button><button onclick="deleteComponent('${item.id}')" class="focus-ring text-[11px] font-semibold text-rose-400">Delete</button></div></td></tr>`;
   }).join('');
 
-  // Settings
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
   $('setAdminPin').value = state.settings.adminPin;
@@ -1283,10 +1340,9 @@ function saveSettings() {
 async function resetDemo() {
   const ok = await confirmDialog('Reset data', 'Restore sample inventory and clear all loans?', 'Reset');
   if (!ok) return;
-  const savedStation = stationId; const savedDeploy = deployUrl;
+  const savedDeploy = deployUrl;
   state = defaultState();
-  if (savedStation) { stationId = savedStation; }
-  if (savedDeploy) { deployUrl = savedDeploy; }
+  deployUrl = savedDeploy;
   save(); populateCategories(); renderAll();
   toast('Reset.', 'success');
 }
@@ -1341,19 +1397,9 @@ function tick() {
    ═══════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   load();
-  stationId = localStorage.getItem('cls.station');
+  stationId = SINGLE_STATION;
+  localStorage.setItem('cls.station', SINGLE_STATION);
   deployUrl = localStorage.getItem('cls.deployUrl') || '';
-
-  // Read ?station= from URL (phone scan)
-  const urlStation = new URLSearchParams(location.search).get('station');
-  if (urlStation) {
-    const clean = urlStation.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
-    if (clean) { stationId = clean; localStorage.setItem('cls.station', clean); }
-  }
-  if (!stationId) {
-    stationId = 'LAB-' + Math.floor(100 + Math.random()*900);
-    localStorage.setItem('cls.station', stationId);
-  }
 
   const fbOk = initFirebase();
   populateCategories();
@@ -1379,8 +1425,8 @@ window.onAdminClick = onAdminClick; window.verifyPin = verifyPin; window.lockAdm
 window.openComponentModal = openComponentModal; window.saveComponent = saveComponent;
 window.deleteComponent = deleteComponent; window.saveSettings = saveSettings; window.resetDemo = resetDemo;
 window.openModal = openModal; window.closeModal = closeModal;
-window.applyStationCode = applyStationCode; window.generateStationCode = generateStationCode;
 window.saveDeployUrl = saveDeployUrl; window.copyJoinUrl = copyJoinUrl; window.forceSync = forceSync;
+window.exportExcel = exportExcel; window.exportHistoryCSV = exportHistoryCSV; window.exportInventoryCSV = exportInventoryCSV;
 </script>
 </body>
 </html>
