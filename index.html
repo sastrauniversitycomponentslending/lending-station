@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Component Lending Station</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b62f6'/%3E%3Cpath d='M30 34h40v8H30zm0 12h40v8H30zm0 12h26v8H30z' fill='white'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'], mono: ['JetBrains Mono','ui-monospace','monospace'] },
+      colors: {
+        ink: { 950:'#05080f',900:'#0a0f1a',850:'#0e1421',800:'#131b2a',750:'#182233',700:'#1e2a3d',600:'#2b3a52',500:'#3d4f6b' },
+        brand: { 50:'#eff4ff',100:'#dbe6ff',200:'#bdd0ff',300:'#90aeff',400:'#5b83fc',500:'#3b62f6',600:'#2544eb',700:'#1d33d8',800:'#1e2caf',900:'#1e2b8a' }
+      },
+      boxShadow: { card:'0 1px 2px rgba(0,0,0,.35), 0 8px 24px -12px rgba(0,0,0,.6)', lift:'0 4px 12px rgba(0,0,0,.35), 0 16px 40px -16px rgba(0,0,0,.7)', glow:'0 0 0 1px rgba(59,98,246,.35), 0 8px 24px -8px rgba(59,98,246,.45)' }
+    }}
+  };
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
+
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  .mono { font-family:'JetBrains Mono',monospace; font-variant-numeric: tabular-nums; }
+  .glass { background: linear-gradient(180deg, rgba(19,27,42,.72), rgba(14,20,33,.72)); backdrop-filter: blur(14px) saturate(140%); }
+  .grid-bg { background-image: linear-gradient(rgba(148,163,184,.035) 1px,transparent 1px), linear-gradient(90deg,rgba(148,163,184,.035) 1px,transparent 1px); background-size:48px 48px; }
+  .fade-up { animation: fadeUp .2s cubic-bezier(.16,1,.3,1); }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+  .scale-in { animation: scaleIn .16s cubic-bezier(.16,1,.3,1); }
+  @keyframes scaleIn { from { opacity:0; transform: scale(.97); } to { opacity:1; transform:none; } }
+  @keyframes pulseRing { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.45); } 50% { box-shadow: 0 0 0 12px rgba(244,63,94,0); } }
+  .overdue-pulse { animation: pulseRing 2s infinite; }
+  .nav-btn { position: relative; }
+  .nav-btn::after { content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:2px; background: linear-gradient(90deg,#3b62f6,#5b83fc); border-radius:2px; transform: scaleX(0); transition: transform .22s cubic-bezier(.16,1,.3,1); }
+  .nav-btn.active::after { transform: scaleX(1); }
+  .kbd { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 5px; font-size:10px; font-weight:600; font-family:'JetBrains Mono',monospace; color:#94a3b8; background:#131b2a; border:1px solid #2b3a52; border-radius:5px; }
+  .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+  input[type=number] { -moz-appearance:textfield; }
+  .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px #0a0f1a, 0 0 0 4px #3b62f6; }
+  @keyframes pulseDot { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+  .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
+  @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
+</style>
+</head>
+
+<body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased selection:bg-brand-500/30 selection:text-white">
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="glass sticky top-0 z-50 border-b border-ink-700/60">
+  <div class="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 lg:px-6">
+
+    <button onclick="go('overview')" class="focus-ring flex shrink-0 items-center gap-3 rounded-xl p-1">
+      <div class="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700">
+        <i class="fa-solid fa-microchip text-sm text-white"></i>
+      </div>
+      <div class="hidden leading-tight sm:block">
+        <div class="text-[13px] font-bold text-white">Component Lending</div>
+        <div class="text-[10px] text-slate-500">Lab Hardware Portal</div>
+      </div>
+    </button>
+
+    <nav class="ml-2 hidden items-center gap-0.5 lg:flex">
+      <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-gauge-high mr-2 text-xs"></i>Overview</button>
+      <button data-nav="catalog" onclick="go('catalog')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-boxes-stacked mr-2 text-xs"></i>Catalog</button>
+      <button data-nav="loans" onclick="go('loans')" class="nav-btn focus-ring relative rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200">
+        <i class="fa-solid fa-clock-rotate-left mr-2 text-xs"></i>My Loans
+        <span id="navLoanDot" class="ml-1.5 hidden rounded-full bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-300"></span>
+      </button>
+      <button data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
+      <button data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
+      <button id="navAdmin" data-nav="admin" onclick="go('admin')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-sliders mr-2 text-xs"></i>Admin</button>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2">
+
+      <div id="syncPill" class="flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-2.5 py-1.5 text-[11px] font-medium text-slate-400">
+        <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span>
+        <span id="syncPillText">Offline</span>
+      </div>
+
+      <div class="hidden items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3 py-1.5 md:flex">
+        <i class="fa-regular fa-clock text-[11px] text-amber-400"></i>
+        <div class="leading-none">
+          <div id="clockTime" class="mono text-[12px] font-semibold text-amber-300">--:--:--</div>
+          <div id="clockDate" class="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-500">--</div>
+        </div>
+      </div>
+
+      <button onclick="openCart()" class="focus-ring relative flex items-center gap-2 rounded-xl bg-brand-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-brand-500 active:scale-[.97]">
+        <i class="fa-solid fa-cart-shopping text-[11px]"></i>
+        <span class="hidden sm:inline">Cart</span>
+        <span id="cartCount" class="hidden min-w-[18px] rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-extrabold leading-none">0</span>
+      </button>
+
+      <button id="adminBtn" onclick="onAdminClick()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-brand-500/50 hover:text-white">
+        <i id="adminIcon" class="fa-solid fa-lock text-[11px] text-amber-400"></i>
+        <span id="adminLabel" class="hidden sm:inline">Unlock</span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="flex gap-1 overflow-x-auto border-t border-ink-700/60 px-3 py-2 lg:hidden">
+    <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Overview</button>
+    <button data-nav="catalog"  onclick="go('catalog')"  class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Catalog</button>
+    <button data-nav="loans"    onclick="go('loans')"    class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Loans</button>
+    <button data-nav="poster"   onclick="go('poster')"   class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Poster</button>
+    <button data-nav="sync"     onclick="go('sync')"     class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Sync</button>
+    <button data-nav="admin"    onclick="go('admin')"    class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400" id="navAdminMobile">Admin</button>
+  </nav>
+</header>
+
+<main class="mx-auto w-full max-w-[1400px] px-4 py-6 lg:px-6 lg:py-8">
+
+<!-- ══════════ OVERVIEW ══════════ -->
+<section id="view-overview" class="space-y-6">
+  <div class="grid-bg relative overflow-hidden rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-6 sm:p-9">
+    <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-500/10 blur-3xl"></div>
+    <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div class="max-w-2xl">
+        <h1 class="text-3xl font-extrabold leading-[1.1] text-white sm:text-4xl">Borrow lab hardware<br /><span class="bg-gradient-to-r from-brand-400 to-emerald-400 bg-clip-text text-transparent">in under a minute.</span></h1>
+        <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">Real-time inventory · automatic due dates · instant returns. Every device with the same station code sees the same live state.</p>
+        <div class="mt-7 flex flex-wrap items-center gap-3">
+          <button onclick="go('catalog')" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-500"><i class="fa-solid fa-boxes-stacked text-xs"></i> Browse catalog</button>
+          <button onclick="go('sync')" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-ink-500 hover:text-white"><i class="fa-solid fa-mobile-screen-button text-xs"></i> Connect phone</button>
+        </div>
+      </div>
+      <div class="w-full shrink-0 lg:w-[380px]">
+        <div class="rounded-2xl border border-ink-700/70 bg-ink-900/70 p-5 backdrop-blur">
+          <div class="mb-4 flex items-center justify-between">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Live station status</span>
+            <span class="mono text-[10px] text-slate-600" id="heroSyncLabel">—</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-ink-700/60 bg-ink-850/60 p-3.5">
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Available</div>
+              <div class="mono mt-2 text-2xl font-bold text-white" id="heroAvailable">0</div>
+            </div>
+            <div class="rounded-xl border border-ink-700/60 bg-ink-850/60 p-3.5">
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">On loan</div>
+              <div class="mono mt-2 text-2xl font-bold text-amber-300" id="heroOnLoan">0</div>
+            </div>
+          </div>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center justify-between text-xs"><span class="text-slate-500">Utilization</span><span class="mono font-semibold text-slate-300" id="heroUtil">0%</span></div>
+            <div class="h-1.5 overflow-hidden rounded-full bg-ink-750"><div id="heroUtilBar" class="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400 transition-all duration-700" style="width:0%"></div></div>
+          </div>
+          <div id="heroOverdueChip" class="mt-4 hidden items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5">
+            <i class="fa-solid fa-triangle-exclamation text-xs text-rose-400"></i>
+            <span class="text-xs font-medium text-rose-300"><span id="heroOverdueCount">0</span> overdue loan(s)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5"><div class="mono text-2xl font-bold text-white" id="kpiSkus">0</div><div class="mt-1 text-xs text-slate-500">Component SKUs</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5"><div class="mono text-2xl font-bold text-amber-300" id="kpiLoans">0</div><div class="mt-1 text-xs text-slate-500">Open loans</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5"><div class="mono text-2xl font-bold text-brand-300" id="kpiBorrowers">0</div><div class="mt-1 text-xs text-slate-500">Borrowers</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5"><div class="mono text-2xl font-bold text-rose-400" id="kpiOverdue">0</div><div class="mt-1 text-xs text-slate-500">Overdue</div></div>
+  </div>
+
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
+    <div class="flex items-center justify-between border-b border-ink-700/60 px-5 py-4">
+      <div class="flex items-center gap-2.5"><i class="fa-solid fa-wave-square text-xs text-brand-400"></i><h2 class="text-sm font-bold text-white">Recent activity</h2></div>
+      <span class="mono text-[10px] text-slate-600">live</span>
+    </div>
+    <div id="activityFeed" class="max-h-[340px] overflow-y-auto p-2"></div>
+  </div>
+</section>
+
+<!-- ══════════ CATALOG ══════════ -->
+<section id="view-catalog" class="hidden space-y-5">
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 class="text-lg font-bold text-white">Component Catalog</h1>
+          <p class="mt-0.5 text-xs text-slate-500">Loan period <span id="loanPeriodLabel" class="font-semibold text-brand-300">2 hours</span> · <span id="catalogResultCount">0 items</span></p>
+        </div>
+        <div class="relative">
+          <i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
+          <input id="skuInput" type="text" onkeydown="if(event.key==='Enter'){quickAdd();}" placeholder="Scan or type SKU, then Enter"
+                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600 sm:w-64" />
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="relative flex-1 min-w-[200px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
+          <input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search…"
+                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
+        </div>
+        <select id="catalogCategory" onchange="renderCatalog()" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200"><option value="ALL">All categories</option></select>
+        <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400">
+          <input id="catalogInStock" type="checkbox" onchange="renderCatalog()" class="h-3.5 w-3.5 accent-brand-500" /> In stock
+        </label>
+      </div>
+    </div>
+  </div>
+  <div id="catalogGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+</section>
+
+<!-- ══════════ LOANS ══════════ -->
+<section id="view-loans" class="hidden space-y-5">
+  <div class="flex flex-col gap-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+    <div><h1 class="text-lg font-bold text-white">Active Borrowed Items</h1><p class="mt-0.5 text-xs text-slate-500">Live timers · one-click returns</p></div>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="returnAllLoans()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-500/20"><i class="fa-solid fa-rotate-left text-[11px]"></i> Return all</button>
+    </div>
+  </div>
+  <div id="loanList" class="grid grid-cols-1 gap-4 lg:grid-cols-2"></div>
+</section>
+
+<!-- ══════════ POSTER ══════════ -->
+<section id="view-poster" class="hidden space-y-5">
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-5">
+    <div class="space-y-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5 lg:col-span-2">
+      <div class="flex items-center gap-2.5 border-b border-ink-700/60 pb-3">
+        <i class="fa-solid fa-pen-ruler text-xs text-brand-400"></i><h2 class="text-sm font-bold text-white">Poster designer</h2>
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Station title</label>
+        <input id="posterTitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Subtitle</label>
+        <input id="posterSubtitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Deployed website URL</label>
+        <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.vercel.app/"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
+        <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">Paste the public URL where you deployed this file (Vercel, Netlify, GitHub Pages). The QR will encode this URL.</p>
+        <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div>
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Instructions</label>
+        <textarea id="posterInstructions" rows="3" oninput="onPosterInput()" class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white"></textarea>
+      </div>
+      <div class="space-y-2 pt-1">
+        <button onclick="downloadPoster()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-500"><i class="fa-solid fa-download text-[11px]"></i> Download PNG</button>
+        <button onclick="window.print()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300"><i class="fa-solid fa-print text-[11px]"></i> Print</button>
+      </div>
+    </div>
+
+    <div class="flex items-start justify-center overflow-auto rounded-2xl border border-ink-700/60 bg-ink-900/40 p-6 lg:col-span-3 lg:p-10">
+      <div id="posterCanvas" class="w-full max-w-sm space-y-6 rounded-2xl border-[5px] border-brand-600 bg-white p-8 text-center shadow-2xl">
+        <div class="space-y-2 border-b border-slate-200 pb-5">
+          <span class="inline-block rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-brand-700">Self-Service Lending</span>
+          <h2 id="posterTitlePreview" class="pt-1 text-xl font-extrabold leading-tight text-slate-900">—</h2>
+          <p id="posterSubtitlePreview" class="text-[11px] font-medium text-slate-500">—</p>
+        </div>
+        <div class="flex justify-center py-1">
+          <div class="inline-block rounded-2xl border-2 border-brand-100 bg-white p-4">
+            <div id="posterQrTarget" class="flex justify-center"></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-brand-100 bg-brand-50/70 p-3.5">
+          <p id="posterInstructionsPreview" class="text-[11px] font-medium leading-relaxed text-slate-700">—</p>
+        </div>
+        <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+          <span id="posterUrlPreview" class="truncate font-mono text-[9px] text-slate-400">—</span>
+          <span class="text-[9px] font-semibold uppercase tracking-wider text-slate-400">Open 24/7</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SYNC ══════════ -->
+<section id="view-sync" class="hidden space-y-5">
+
+  <div id="syncNotConfigured" class="rounded-3xl border border-amber-500/30 bg-amber-950/20 p-6 sm:p-8">
+    <div class="flex items-start gap-4">
+      <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-amber-500/15 text-amber-400"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+      <div>
+        <h1 class="text-xl font-extrabold text-white">Firebase sync is not configured yet</h1>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300">
+          The app works locally without Firebase, but cross-device sync (phone ↔ admin) needs a shared database. Follow the setup below — it takes 2 minutes.
+        </p>
+        <ol class="mt-4 space-y-2 text-sm leading-relaxed text-slate-300">
+          <li><strong class="text-white">1.</strong> Go to <a href="https://console.firebase.google.com" target="_blank" class="text-brand-400 underline">console.firebase.google.com</a> → Create a project (any name).</li>
+          <li><strong class="text-white">2.</strong> In the left menu, click <strong>Build → Realtime Database → Create Database</strong>. Choose <strong>Test mode</strong> and pick any region.</li>
+          <li><strong class="text-white">3.</strong> Click the <strong>gear icon → Project settings</strong>. Scroll down and copy the <strong>firebaseConfig</strong> block.</li>
+          <li><strong class="text-white">4.</strong> Paste it into the box below and click <strong>Save config</strong>. Reload is automatic.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+      <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Paste your firebaseConfig here</label>
+      <textarea id="firebaseConfigInput" rows="8" placeholder='{
+  "apiKey": "AIza…",
+  "authDomain": "your-project.firebaseapp.com",
+  "databaseURL": "https://your-project-default-rtdb.firebaseio.com",
+  "projectId": "your-project"
+}'
+        class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-3 font-mono text-[11px] text-white placeholder:text-slate-600"></textarea>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button onclick="saveFirebaseConfig()" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-500"><i class="fa-solid fa-check text-[11px]"></i> Save config</button>
+        <button onclick="clearFirebaseConfig()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-4 py-2 text-xs font-medium text-slate-300"><i class="fa-solid fa-trash text-[11px]"></i> Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="syncConfigured" class="hidden space-y-5">
+    <div class="rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/30 via-ink-850/50 to-ink-900/50 p-6 sm:p-8">
+      <div class="flex items-start gap-4">
+        <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-tower-broadcast text-xl"></i></div>
+        <div>
+          <h1 class="text-xl font-extrabold text-white">Live sync is active</h1>
+          <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-400">Any device using the same <strong class="text-slate-200">station code</strong> sees the same inventory, loans, and activity in real time.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+        <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">1</div><h2 class="text-sm font-bold text-white">Station code</h2></div>
+        <p class="mt-3 text-xs text-slate-400">Pick a short code. Anyone using the same code joins the same live station.</p>
+        <div class="mt-3 flex gap-2">
+          <input id="stationCodeInput" type="text" placeholder="LAB-421"
+                 class="mono flex-1 rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-sm font-bold uppercase tracking-wider text-white placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600 focus:border-brand-500/60 focus:outline-none" />
+          <button onclick="applyStationCode()" class="rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-brand-500">Apply</button>
+        </div>
+        <div class="mt-3 flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+          <span class="text-[10px] uppercase tracking-wider text-slate-500">Current</span>
+          <span id="syncCurrentCode" class="mono text-sm font-bold text-emerald-300">—</span>
+        </div>
+        <button onclick="generateStationCode()" class="mt-2 text-[11px] font-medium text-brand-400 hover:text-brand-300"><i class="fa-solid fa-dice mr-1"></i>Random code</button>
+      </div>
+
+      <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+        <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">2</div><h2 class="text-sm font-bold text-white">Deployed URL</h2></div>
+        <p class="mt-3 text-xs text-slate-400">The URL where this file is hosted. Used in the QR code.</p>
+        <input id="syncDeployUrlInput" type="text" placeholder="https://your-site.vercel.app/"
+               class="mt-3 focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
+        <button onclick="saveDeployUrl()" class="mt-2 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500">Save URL</button>
+      </div>
+
+      <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+        <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-xs font-bold text-brand-300">3</div><h2 class="text-sm font-bold text-white">Connect phone</h2></div>
+        <p class="mt-3 text-xs text-slate-400">Scan this with your phone camera. It opens the deployed URL with the station code attached.</p>
+        <div class="mt-3 flex justify-center rounded-xl border border-ink-700 bg-white p-3">
+          <img id="syncJoinQr" width="150" height="150" alt="Join QR" />
+        </div>
+        <button onclick="copyJoinUrl()" class="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-medium text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-link text-[10px]"></i> Copy join URL</button>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+      <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-signal text-xs text-brand-400"></i> Connection status</h3>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Station</div>
+          <div id="syncStatCode" class="mono mt-1.5 text-sm font-bold text-white">—</div>
+        </div>
+        <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Connection</div>
+          <div id="syncStatConn" class="mt-1.5 flex items-center gap-1.5 text-sm font-bold"><span class="h-2 w-2 rounded-full bg-amber-400"></span><span class="text-amber-300">Connecting…</span></div>
+        </div>
+        <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Last send</div>
+          <div id="syncStatSent" class="mono mt-1.5 text-xs text-slate-400">never</div>
+        </div>
+        <div class="rounded-xl border border-ink-700/60 bg-ink-900/50 p-3.5">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Last receive</div>
+          <div id="syncStatRecv" class="mono mt-1.5 text-xs text-slate-400">never</div>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button onclick="forceSync()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-medium text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-rotate text-[10px]"></i> Force re-sync</button>
+        <button onclick="clearFirebaseConfig()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300"><i class="fa-solid fa-trash text-[10px]"></i> Reset Firebase config</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ADMIN ══════════ -->
+<section id="view-admin" class="hidden space-y-5">
+  <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/25 bg-gradient-to-r from-brand-950/40 to-ink-850/50 p-4 sm:p-5">
+    <div class="flex items-center gap-3.5">
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-400"><i class="fa-solid fa-user-shield text-lg"></i></div>
+      <div><h1 class="text-base font-bold text-white">Administrator Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control · live borrower ledger</p></div>
+    </div>
+    <button onclick="lockAdmin()" class="focus-ring rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-500/20"><i class="fa-solid fa-lock mr-1.5 text-[10px]"></i> Lock</button>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4"><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Total SKUs</span><div class="mono mt-2 text-2xl font-bold text-white" id="admSkus">0</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4"><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Units on loan</span><div class="mono mt-2 text-2xl font-bold text-amber-300" id="admOnLoan">0</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4"><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Borrowers</span><div class="mono mt-2 text-2xl font-bold text-brand-300" id="admBorrowers">0</div></div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4"><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Overdue</span><div class="mono mt-2 text-2xl font-bold text-rose-400" id="admOverdue">0</div></div>
+  </div>
+
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
+      <div><h3 class="text-sm font-bold text-white">Live Borrowed Items</h3><p class="mt-0.5 text-xs text-slate-500">Updates instantly when anyone borrows or returns.</p></div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="border-b border-ink-700 bg-ink-900/60 text-[10px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">TXN</th><th class="px-4 py-3 font-semibold">Borrower</th><th class="px-4 py-3 font-semibold">ID</th>
+            <th class="px-4 py-3 font-semibold">Component</th><th class="px-4 py-3 font-semibold">Qty</th><th class="px-4 py-3 font-semibold">Borrowed</th>
+            <th class="px-4 py-3 font-semibold">Due</th><th class="px-4 py-3 font-semibold">Elapsed</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 text-right font-semibold">Action</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody" class="divide-y divide-ink-700/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
+      <div><h3 class="text-sm font-bold text-white">Master Inventory</h3></div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="openComponentModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-500"><i class="fa-solid fa-plus text-[11px]"></i> Add</button>
+        <button onclick="resetDemo()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-rotate text-[11px]"></i> Reset</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="border-b border-ink-700 bg-ink-900/60 text-[10px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">SKU</th><th class="px-4 py-3 font-semibold">Component</th><th class="px-4 py-3 font-semibold">Category</th>
+            <th class="px-4 py-3 font-semibold">Total</th><th class="px-4 py-3 font-semibold">Available</th><th class="px-4 py-3 font-semibold">Out</th>
+            <th class="px-4 py-3 font-semibold">QR</th><th class="px-4 py-3 text-right font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryBody" class="divide-y divide-ink-700/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Loan period (min)</label>
+        <input id="setLoanMinutes" type="number" min="5" step="5" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Low-stock threshold</label>
+        <input id="setLowStock" type="number" min="0" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Admin PIN</label>
+        <input id="setAdminPin" type="text" maxlength="8" class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs tracking-widest text-white" /></div>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button onclick="saveSettings()" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-brand-500"><i class="fa-solid fa-check text-[11px]"></i> Save settings</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ══════════ CART DRAWER ══════════ -->
+<div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
+  <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-ink-700/60 px-5 py-4">
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-lg bg-brand-500/10 text-brand-400"><i class="fa-solid fa-cart-shopping text-xs"></i></div>
+        <div><h3 class="text-sm font-bold text-white">Borrow Cart</h3><p class="text-[10px] text-slate-500" id="cartSummary">Empty</p></div>
+      </div>
+      <button onclick="closeCart()" class="focus-ring grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-ink-800 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="cartItems" class="flex-1 space-y-3 overflow-y-auto p-4"></div>
+    <div class="space-y-3.5 border-t border-ink-700/60 p-5">
+      <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Borrower details</h4>
+      <input id="borrowerName" type="text" placeholder="Full name" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="borrowerId" type="text" placeholder="Student ID / Phone" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <button onclick="checkoutCart()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 text-xs font-bold text-white hover:bg-brand-500 active:scale-[.98]"><i class="fa-solid fa-check text-[11px]"></i> Complete checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<div id="mPin" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-sm space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-6">
+    <div class="text-center">
+      <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-500/10 text-brand-400"><i class="fa-solid fa-lock text-lg"></i></div>
+      <h3 class="mt-4 text-base font-bold text-white">Admin Authentication</h3>
+      <p class="mt-1 text-xs text-slate-500">Enter your PIN.</p>
+    </div>
+    <input id="pinInput" type="password" maxlength="8" onkeydown="if(event.key==='Enter')verifyPin()" class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-950/80 py-3 text-center text-xl tracking-[.4em] text-white" />
+    <p id="pinError" class="hidden text-center text-xs font-medium text-rose-400">Incorrect PIN.</p>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mPin')" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="verifyPin()" class="focus-ring w-1/2 rounded-xl bg-brand-600 py-2.5 text-xs font-bold text-white hover:bg-brand-500">Unlock</button>
+    </div>
+    <p class="text-center text-[10px] text-slate-600">Default PIN: <span class="mono">1234</span></p>
+  </div>
+</div>
+
+<div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-lg space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-6">
+    <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="focus-ring grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
+    <input type="hidden" id="cmpOriginalId" />
+    <div class="grid grid-cols-2 gap-4">
+      <input id="cmpSku" type="text" placeholder="SKU" class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpStock" type="number" min="0" placeholder="Stock" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpName" type="text" placeholder="Component name" class="focus-ring col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpCategory" type="text" placeholder="Category" class="focus-ring col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <textarea id="cmpDesc" rows="2" placeholder="Description" class="focus-ring col-span-2 w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
+    </div>
+    <div class="flex gap-2"><button onclick="closeModal('mComponent')" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button><button onclick="saveComponent()" class="focus-ring w-1/2 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500">Save</button></div>
+  </div>
+</div>
+
+<div id="mQr" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-xs space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-6 text-center">
+    <h3 id="qrTitle" class="text-sm font-bold text-white">Component QR</h3>
+    <div class="inline-block rounded-2xl bg-white p-4"><div id="qrTarget" class="flex justify-center"></div></div>
+    <p id="qrSku" class="mono text-xs text-brand-400"></p>
+    <button onclick="closeModal('mQr')" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Close</button>
+  </div>
+</div>
+
+<div id="mConfirm" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-sm space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-6">
+    <div class="flex items-start gap-3.5">
+      <div id="confirmIconWrap" class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/10 text-rose-400"><i id="confirmIcon" class="fa-solid fa-triangle-exclamation"></i></div>
+      <div><h3 id="confirmTitle" class="text-sm font-bold text-white">Confirm</h3><p id="confirmMessage" class="mt-1 text-xs leading-relaxed text-slate-400"></p></div>
+    </div>
+    <div class="flex gap-2"><button id="confirmCancel" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button><button id="confirmOk" class="focus-ring w-1/2 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-500">Confirm</button></div>
+  </div>
+</div>
+
+<div id="toasts" class="pointer-events-none fixed bottom-5 right-5 z-[110] flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col gap-2"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════════════════════════ */
+const STORAGE_KEY = 'cls.app.v1';
+const MAX_ACTIVITY = 40;
+
+const SEED_INVENTORY = [
+  { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
+  { id:'SKU-1002', name:'Raspberry Pi 4 Model B (4GB)',         category:'Microcontrollers',   totalStock:6,  description:'Quad-core 64-bit SBC with dual 4K output.' },
+  { id:'SKU-1003', name:'Digital Multimeter Auto-Ranging',      category:'Tools & Equipment',  totalStock:8,  description:'AC/DC voltage, current, resistance tester.' },
+  { id:'SKU-1004', name:'DHT22 Temperature & Humidity Sensor',  category:'Sensors',            totalStock:20, description:'Calibrated capacitive temperature/humidity.' },
+  { id:'SKU-1005', name:'Ultrasonic Distance Sensor (HC-SR04)', category:'Sensors',            totalStock:15, description:'2cm–400cm non-contact distance module.' },
+  { id:'SKU-1006', name:'60W Temperature Controlled Iron',      category:'Tools & Equipment',  totalStock:5,  description:'Adjustable 200°C–450°C soldering station.' },
+  { id:'SKU-1007', name:'SG90 Micro Servo Motor 9g',            category:'Actuators & Motors', totalStock:25, description:'180-degree rotation miniature servo.' },
+  { id:'SKU-1008', name:'Solderless Breadboard 830 Point',      category:'Passives & Boards',  totalStock:30, description:'Standard tie-point prototyping board.' },
+  { id:'SKU-1009', name:'ESP32 DevKit V1 WiFi + BLE',           category:'Microcontrollers',   totalStock:10, description:'Dual-core WiFi/BLE development board.' },
+  { id:'SKU-1010', name:'Logic Analyzer 8-Channel 24MHz',       category:'Tools & Equipment',  totalStock:4,  description:'USB logic analyzer with clip leads.' }
+];
+
+const DEFAULT_SETTINGS = {
+  loanDurationMinutes: 120, adminPin: '1234', lowStockThreshold: 3,
+  posterTitle: 'Lab 101 Component Lending Station',
+  posterSubtitle: 'Department of Electrical & Computer Engineering',
+  posterInstructions: 'Scan this QR code with your mobile camera to view live stock, add items to your cart, and check out hardware instantly.'
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   CLIENT ID
+   ═══════════════════════════════════════════════════════════════ */
+const CLIENT_ID = Math.random().toString(36).slice(2, 10);
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════ */
+function defaultState() {
+  return {
+    inventory: SEED_INVENTORY.map(x => ({ ...x })),
+    loans: [], history: [], cart: {},
+    borrower: { name:'', id:'' },
+    settings: { ...DEFAULT_SETTINGS },
+    activity: [], simOffsetMs: 0
+  };
+}
+let state = defaultState();
+let isAdmin = false;
+let activeView = 'overview';
+let stationId = null;
+let deployUrl = '';
+let serverClockOffsetMs = 0;
+let fbApp = null;
+let fbDb = null;
+let stationRef = null;
+let connected = false;
+let lastSentAt = 0;
+let lastRecvAt = 0;
+let lastWriteTs = 0;
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2, '0');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function now() { return Date.now() + serverClockOffsetMs + state.simOffsetMs; }
+function findItem(id) { return state.inventory.find(i => i.id === id); }
+function fmtTime(ms) { return new Date(ms).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function fmtDate(ms) { return new Date(ms).toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' }); }
+function fmtDateTime(ms) { const d = new Date(ms); return d.toLocaleDateString([], { month:'short', day:'numeric' }) + ' · ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
+function fmtDuration(ms) { const t = Math.max(0, Math.floor(ms/1000)); const h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = t%60; return `${pad2(h)}:${pad2(m)}:${pad2(s)}`; }
+function fmtDurShort(ms) { const m = Math.max(0, Math.round(ms/60000)); const h = Math.floor(m/60); return h > 0 ? `${h}h ${pad2(m%60)}m` : `${m}m`; }
+function relTime(ms) { const d = now() - ms; if (d < 45000) return 'just now'; if (d < 3600000) return `${Math.floor(d/60000)}m ago`; if (d < 86400000) return `${Math.floor(d/3600000)}h ago`; return `${Math.floor(d/86400000)}d ago`; }
+
+function borrowedQty(id) { return state.loans.reduce((s,l) => l.itemId === id ? s + l.quantity : s, 0); }
+function availableQty(id) { const it = findItem(id); return it ? Math.max(0, it.totalStock - borrowedQty(id)) : 0; }
+function selectableQty(id) { return Math.max(0, availableQty(id) - (state.cart[id]||0)); }
+function loanMs() { return state.settings.loanDurationMinutes * 60000; }
+function isOverdue(l, t=now()) { return t > l.dueTimeMs; }
+function isDueSoon(l, t=now()) { const r = l.dueTimeMs - t; return r > 0 && r < 15*60000; }
+function newLoanId() { return 'TXN-' + Math.floor(100000 + Math.random()*900000); }
+function sanitizeCart() { Object.keys(state.cart).forEach(id => { const it = findItem(id); const q = Number(state.cart[id])||0; if (!it || q <= 0) { delete state.cart[id]; return; } const max = availableQty(id); if (q > max) { max <= 0 ? delete state.cart[id] : state.cart[id] = max; } }); }
+function logActivity(type, message) { state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() }); if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOASTS / MODALS
+   ═══════════════════════════════════════════════════════════════ */
+function toast(message, type='info', ttl=3500) {
+  const cfg = {
+    info:    { icon:'fa-circle-info',          color:'text-brand-400',   border:'border-brand-500/30',   bg:'bg-brand-500/10' },
+    success: { icon:'fa-circle-check',         color:'text-emerald-400', border:'border-emerald-500/30', bg:'bg-emerald-500/10' },
+    warn:    { icon:'fa-triangle-exclamation', color:'text-amber-400',   border:'border-amber-500/30',   bg:'bg-amber-500/10' },
+    error:   { icon:'fa-circle-xmark',         color:'text-rose-400',    border:'border-rose-500/30',    bg:'bg-rose-500/10' }
+  }[type] || {};
+  const el = document.createElement('div');
+  el.className = `pointer-events-auto fade-up flex items-start gap-3 rounded-xl border ${cfg.border} bg-ink-850/95 ${cfg.bg} p-3.5 shadow-lift backdrop-blur`;
+  el.innerHTML = `<i class="fa-solid ${cfg.icon} ${cfg.color} mt-0.5 text-sm"></i><p class="flex-1 text-xs leading-relaxed text-slate-200">${esc(message)}</p><button class="focus-ring -m-1 rounded p-1 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-[11px]"></i></button>`;
+  const dismiss = () => { el.style.transition = 'opacity .25s, transform .25s'; el.style.opacity = '0'; el.style.transform = 'translateX(12px)'; setTimeout(() => el.remove(), 260); };
+  el.querySelector('button').onclick = dismiss;
+  $('toasts').appendChild(el);
+  setTimeout(dismiss, ttl);
+}
+function openModal(id) { $(id).classList.remove('hidden'); $(id).classList.add('flex'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { $(id).classList.add('hidden'); $(id).classList.remove('flex'); if (!document.querySelector('.fixed.flex.z-\\[90\\], .fixed.flex.z-\\[95\\]')) document.body.style.overflow = ''; }
+function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-triangle-exclamation') {
+  return new Promise(resolve => {
+    $('confirmTitle').textContent = title; $('confirmMessage').textContent = message;
+    $('confirmIcon').className = `fa-solid ${icon}`;
+    $('confirmIconWrap').className = `grid h-10 w-10 shrink-0 place-items-center rounded-xl ${danger ? 'bg-rose-500/10 text-rose-400' : 'bg-brand-500/10 text-brand-400'}`;
+    const ok = $('confirmOk'); ok.textContent = okText;
+    ok.className = `focus-ring w-1/2 rounded-xl py-2.5 text-xs font-bold text-white ${danger ? 'bg-rose-600 hover:bg-rose-500' : 'bg-brand-600 hover:bg-brand-500'}`;
+    const finish = v => { closeModal('mConfirm'); ok.onclick = null; $('confirmCancel').onclick = null; resolve(v); };
+    ok.onclick = () => finish(true); $('confirmCancel').onclick = () => finish(false);
+    openModal('mConfirm');
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') ['mPin','mComponent','mQr','mConfirm'].forEach(closeModal);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════════════════════ */
+function go(view) {
+  activeView = view;
+  ['overview','catalog','loans','poster','sync','admin'].forEach(v => { const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view); });
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    const a = btn.dataset.nav === view;
+    btn.classList.toggle('active', a);
+    btn.classList.toggle('text-slate-200', a);
+    btn.classList.toggle('text-slate-400', !a);
+  });
+  if (view === 'poster') renderPoster();
+  if (view === 'sync') renderSyncPage();
+  if (view === 'admin') renderAdmin();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIREBASE SYNC
+   ═══════════════════════════════════════════════════════════════ */
+function loadFirebaseConfig() {
+  try { return JSON.parse(localStorage.getItem('cls.firebase') || 'null'); } catch { return null; }
+}
+function saveFirebaseConfig() {
+  const raw = $('firebaseConfigInput').value.trim();
+  if (!raw) { toast('Paste your firebaseConfig JSON first.', 'warn'); return; }
+  try {
+    const cfg = JSON.parse(raw);
+    if (!cfg.databaseURL) { toast('Missing databaseURL in config.', 'error'); return; }
+    localStorage.setItem('cls.firebase', JSON.stringify(cfg));
+    toast('Firebase config saved. Reloading…', 'success');
+    setTimeout(() => location.reload(), 800);
+  } catch (e) {
+    toast('Invalid JSON. Paste the whole object exactly as Firebase gives it.', 'error', 6000);
+  }
+}
+function clearFirebaseConfig() {
+  if (!confirm('Remove Firebase config? The app will work locally only.')) return;
+  localStorage.removeItem('cls.firebase');
+  toast('Config cleared. Reloading…', 'info');
+  setTimeout(() => location.reload(), 600);
+}
+
+function initFirebase() {
+  const cfg = loadFirebaseConfig();
+  if (!cfg || !cfg.databaseURL) return false;
+  try {
+    fbApp = firebase.initializeApp(cfg);
+    fbDb = firebase.database();
+
+    // Server-anchored clock
+    fbDb.ref('.info/serverTimeOffset').on('value', snap => {
+      serverClockOffsetMs = snap.val() || 0;
+    });
+
+    // Connection state
+    fbDb.ref('.info/connected').on('value', snap => {
+      connected = snap.val() === true;
+      updateSyncPill();
+    });
+    return true;
+  } catch (e) {
+    console.error('[firebase] init failed', e);
+    return false;
+  }
+}
+
+function connectStation() {
+  if (!fbDb || !stationId) return;
+  if (stationRef) stationRef.off();
+  stationRef = fbDb.ref('stations/' + stationId);
+
+  stationRef.on('value', snap => {
+    const data = snap.val();
+    if (!data) {
+      // First time on this station — publish our current state
+      publishState(true);
+      return;
+    }
+    if (data.updatedAt && data.updatedAt <= lastWriteTs) return;
+    if (data.updatedBy === CLIENT_ID) return;
+    applyRemote(data);
+  });
+
+  // Update connection UI
+  updateSyncPill();
+}
+
+let publishTimer = null;
+function queuePublish() {
+  if (!stationRef) return;
+  clearTimeout(publishTimer);
+  publishTimer = setTimeout(() => publishState(), 150);
+}
+
+function publishState(force = false) {
+  if (!stationRef || !connected) return;
+  const ts = Date.now();
+  lastWriteTs = ts;
+  const payload = {
+    updatedAt: ts,
+    updatedBy: CLIENT_ID,
+    inventory: state.inventory,
+    loans: state.loans,
+    history: state.history.slice(0, 30),
+    settings: state.settings,
+    activity: state.activity.slice(0, MAX_ACTIVITY)
+  };
+  stationRef.set(payload)
+    .then(() => { lastSentAt = Date.now(); flashSync('sent'); })
+    .catch(err => { console.warn('[firebase] write failed', err); });
+}
+
+let applyingRemote = false;
+function applyRemote(data) {
+  if (applyingRemote) return;
+  applyingRemote = true;
+  try {
+    if (Array.isArray(data.inventory)) state.inventory = data.inventory;
+    if (Array.isArray(data.loans))     state.loans = data.loans;
+    if (Array.isArray(data.history))   state.history = data.history;
+    if (Array.isArray(data.activity))  state.activity = data.activity;
+    if (data.settings && typeof data.settings === 'object') {
+      state.settings = { ...state.settings, ...data.settings };
+    }
+    lastRecvAt = Date.now();
+    sanitizeCart();
+    renderAll();
+    flashSync('received');
+  } finally {
+    setTimeout(() => { applyingRemote = false; }, 100);
+  }
+}
+
+function flashSync(dir) {
+  const pill = $('syncPill');
+  if (!pill) return;
+  pill.style.transform = 'scale(1.08)';
+  setTimeout(() => { pill.style.transform = ''; }, 220);
+}
+
+function updateSyncPill() {
+  const pill = $('syncPill');
+  const txt = $('syncPillText');
+  if (!pill || !txt) return;
+  const dot = pill.querySelector('span');
+
+  let cls, dotCls, label;
+  if (!loadFirebaseConfig()) { cls = 'border-slate-500/30 bg-slate-500/10 text-slate-400'; dotCls = 'bg-slate-500'; label = 'No Firebase'; }
+  else if (!stationId) { cls = 'border-slate-500/30 bg-slate-500/10 text-slate-400'; dotCls = 'bg-slate-500'; label = 'No station'; }
+  else if (connected) { cls = 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'; dotCls = 'bg-emerald-400'; label = 'Synced'; }
+  else { cls = 'border-amber-500/30 bg-amber-500/10 text-amber-300'; dotCls = 'bg-amber-400 pulse-dot'; label = 'Connecting…'; }
+
+  pill.className = `flex items-center gap-2 rounded-xl border ${cls} px-2.5 py-1.5 text-[11px] font-medium`;
+  if (dot) dot.className = `h-1.5 w-1.5 rounded-full ${dotCls}`;
+  txt.textContent = label;
+
+  if (activeView === 'sync') renderSyncPage();
+}
+
+function forceSync() {
+  if (!stationRef) { toast('Firebase not configured.', 'warn'); return; }
+  publishState(true);
+  toast('State pushed to server.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PERSISTENCE
+   ═══════════════════════════════════════════════════════════════ */
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    inventory: state.inventory, loans: state.loans, history: state.history,
+    cart: state.cart, borrower: state.borrower, settings: state.settings,
+    activity: state.activity, simOffsetMs: state.simOffsetMs
+  })); } catch {}
+  queuePublish();
+}
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const base = defaultState();
+    state = {
+      inventory: Array.isArray(s.inventory) && s.inventory.length ? s.inventory : base.inventory,
+      loans: Array.isArray(s.loans) ? s.loans : [],
+      history: Array.isArray(s.history) ? s.history : [],
+      cart: (s.cart && typeof s.cart === 'object') ? s.cart : {},
+      borrower: { ...base.borrower, ...(s.borrower || {}) },
+      settings: { ...base.settings, ...(s.settings || {}) },
+      activity: Array.isArray(s.activity) ? s.activity : [],
+      simOffsetMs: Number(s.simOffsetMs) || 0
+    };
+    sanitizeCart();
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER: OVERVIEW
+   ═══════════════════════════════════════════════════════════════ */
+function renderOverview() {
+  const t = now();
+  const total = state.inventory.reduce((s,i) => s + i.totalStock, 0);
+  const onLoan = state.loans.reduce((s,l) => s + l.quantity, 0);
+  const avail = Math.max(0, total - onLoan);
+  const util = total ? Math.round((onLoan/total)*100) : 0;
+  const overdue = state.loans.filter(l => isOverdue(l, t)).length;
+
+  $('heroAvailable').textContent = avail;
+  $('heroOnLoan').textContent = onLoan;
+  $('heroUtil').textContent = util + '%';
+  $('heroUtilBar').style.width = Math.min(100, util) + '%';
+  $('heroSyncLabel').textContent = connected ? 'live' : 'offline';
+
+  const chip = $('heroOverdueChip');
+  if (overdue > 0) { chip.classList.remove('hidden'); chip.classList.add('flex'); $('heroOverdueCount').textContent = overdue; }
+  else { chip.classList.add('hidden'); chip.classList.remove('flex'); }
+
+  $('kpiSkus').textContent = state.inventory.length;
+  $('kpiLoans').textContent = state.loans.length;
+  $('kpiBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
+  $('kpiOverdue').textContent = overdue;
+
+  renderActivity();
+}
+
+function renderActivity() {
+  const box = $('activityFeed');
+  if (!state.activity.length) { box.innerHTML = `<div class="py-14 text-center text-xs text-slate-500">No activity yet.</div>`; return; }
+  const cfg = {
+    checkout: { icon:'fa-arrow-right-from-bracket', c:'text-brand-400',   bg:'bg-brand-500/10' },
+    return:   { icon:'fa-arrow-left-to-bracket',    c:'text-emerald-400', bg:'bg-emerald-500/10' },
+    inventory:{ icon:'fa-boxes-stacked',            c:'text-amber-400',   bg:'bg-amber-500/10' },
+    system:   { icon:'fa-gear',                     c:'text-slate-400',   bg:'bg-slate-500/10' }
+  };
+  box.innerHTML = state.activity.slice(0, 20).map(a => {
+    const c = cfg[a.type] || cfg.system;
+    return `<div class="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-ink-800/50"><div class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg ${c.bg} ${c.c}"><i class="fa-solid ${c.icon} text-[10px]"></i></div><div class="min-w-0 flex-1"><p class="text-xs text-slate-300">${esc(a.message)}</p><span class="mt-0.5 block text-[10px] text-slate-600">${esc(relTime(a.timestamp))}</span></div></div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER: CATALOG
+   ═══════════════════════════════════════════════════════════════ */
+function populateCategories() {
+  const sel = $('catalogCategory'); const cur = sel.value || 'ALL';
+  const cats = [...new Set(state.inventory.map(i => i.category))].sort();
+  sel.innerHTML = `<option value="ALL">All categories</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  sel.value = cats.includes(cur) || cur === 'ALL' ? cur : 'ALL';
+}
+
+function renderCatalog() {
+  const grid = $('catalogGrid');
+  const q = ($('catalogSearch').value || '').trim().toLowerCase();
+  const cat = $('catalogCategory').value || 'ALL';
+  const inStockOnly = $('catalogInStock').checked;
+
+  let list = state.inventory.filter(it => {
+    const hay = `${it.name} ${it.id} ${it.category} ${it.description}`.toLowerCase();
+    if (q && !hay.includes(q)) return false;
+    if (cat !== 'ALL' && it.category !== cat) return false;
+    if (inStockOnly && availableQty(it.id) <= 0) return false;
+    return true;
+  }).sort((a,b) => a.name.localeCompare(b.name));
+
+  $('catalogResultCount').textContent = `${list.length} item${list.length===1?'':'s'}`;
+
+  if (!list.length) { grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`; return; }
+
+  const low = state.settings.lowStockThreshold;
+  grid.innerHTML = list.map(item => {
+    const avail = availableQty(item.id);
+    const inCart = state.cart[item.id] || 0;
+    const canAdd = selectableQty(item.id) > 0;
+    const isLow = avail > 0 && avail <= low;
+    const pct = item.totalStock ? (avail/item.totalStock)*100 : 0;
+    let sCls = 'border-rose-500/25 bg-rose-500/10 text-rose-400', sTxt = 'Out of stock', bCls = 'bg-rose-500';
+    if (avail > 0 && isLow) { sCls = 'border-amber-500/25 bg-amber-500/10 text-amber-400'; sTxt = `Low · ${avail}`; bCls = 'bg-amber-500'; }
+    else if (avail > 0) { sCls = 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400'; sTxt = `${avail} available`; bCls = 'bg-emerald-500'; }
+    const action = inCart > 0
+      ? `<div class="flex items-center justify-between rounded-xl border border-brand-500/30 bg-brand-500/10 p-1"><button onclick="changeQty('${item.id}',-1)" class="focus-ring grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/20"><i class="fa-solid fa-minus text-[10px]"></i></button><span class="mono text-sm font-bold text-brand-300">${inCart} in cart</span><button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="focus-ring grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/20 disabled:opacity-30"><i class="fa-solid fa-plus text-[10px]"></i></button></div>`
+      : `<button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-2.5 text-xs font-semibold text-white hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-ink-750 disabled:text-slate-500"><i class="fa-solid fa-cart-plus text-[11px]"></i> Add to cart</button>`;
+    return `<article class="fade-up flex flex-col rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 hover:border-ink-600"><div class="flex items-start justify-between gap-3"><div class="grid h-9 w-9 place-items-center rounded-xl bg-ink-800 text-slate-400"><i class="fa-solid fa-microchip text-sm"></i></div><span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sCls}">${sTxt}</span></div><div class="mt-3.5 flex-1"><div class="mono text-[10px] text-slate-600">${esc(item.id)}</div><h3 class="mt-1 text-sm font-bold text-white">${esc(item.name)}</h3><p class="line-clamp-2 mt-1.5 text-[11px] text-slate-500">${esc(item.description)}</p></div><div class="mt-4 space-y-2"><div class="flex items-center justify-between text-[10px]"><span class="text-slate-500">${esc(item.category)}</span><span class="mono text-slate-600">${avail} / ${item.totalStock}</span></div><div class="h-1 overflow-hidden rounded-full bg-ink-800"><div class="h-full rounded-full ${bCls} transition-all" style="width:${pct}%"></div></div></div><div class="mt-4">${action}</div></article>`;
+  }).join('');
+}
+
+function changeQty(id, delta) {
+  const item = findItem(id); if (!item) return;
+  const cur = state.cart[id] || 0;
+  const next = cur + delta;
+  if (next <= 0) delete state.cart[id];
+  else if (next <= availableQty(id)) state.cart[id] = next;
+  else { toast(`Only ${availableQty(id)} × ${item.name} available.`, 'warn', 2500); return; }
+  renderCatalog(); renderCart(); updateBadges();
+}
+
+function quickAdd() {
+  const input = $('skuInput');
+  const q = input.value.trim().toUpperCase(); if (!q) return;
+  const item = state.inventory.find(i => i.id.toUpperCase() === q || i.name.toUpperCase().includes(q));
+  if (!item) { toast(`No component for "${q}"`, 'error'); input.select(); return; }
+  if (selectableQty(item.id) <= 0) { toast(`${item.name} fully reserved.`, 'warn'); input.select(); return; }
+  changeQty(item.id, 1);
+  toast(`Added ${item.name}.`, 'success', 2000);
+  input.value = ''; input.focus();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CART
+   ═══════════════════════════════════════════════════════════════ */
+function openCart() { $('borrowerName').value = state.borrower.name || ''; $('borrowerId').value = state.borrower.id || ''; $('cartDrawer').classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderCart(); }
+function closeCart() { $('cartDrawer').classList.add('hidden'); if (!document.querySelector('.fixed.flex.z-\\[90\\], .fixed.flex.z-\\[95\\]')) document.body.style.overflow = ''; }
+
+function renderCart() {
+  const box = $('cartItems');
+  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
+  const total = entries.reduce((s,[,q]) => s + q, 0);
+  $('cartSummary').textContent = entries.length ? `${entries.length} line${entries.length===1?'':'s'} · ${total} unit${total===1?'':'s'}` : 'Empty';
+  if (!entries.length) { box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`; return; }
+  box.innerHTML = entries.map(([id, qty]) => {
+    const item = findItem(id); if (!item) return '';
+    const maxed = selectableQty(id) <= 0;
+    return `<div class="fade-up flex items-center gap-3 rounded-xl border border-ink-700/60 bg-ink-850/60 p-3"><div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink-800 text-slate-500"><i class="fa-solid fa-microchip text-xs"></i></div><div class="min-w-0 flex-1"><h4 class="line-clamp-1 text-xs font-bold text-white">${esc(item.name)}</h4><span class="mono text-[10px] text-slate-600">${esc(item.id)}</span></div><div class="flex shrink-0 items-center gap-1.5"><button onclick="changeQty('${id}',-1)" class="focus-ring grid h-6 w-6 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700"><i class="fa-solid fa-minus text-[9px]"></i></button><span class="mono w-5 text-center text-xs font-bold text-brand-300">${qty}</span><button onclick="changeQty('${id}',1)" ${maxed?'disabled':''} class="focus-ring grid h-6 w-6 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700 disabled:opacity-30"><i class="fa-solid fa-plus text-[9px]"></i></button></div></div>`;
+  }).join('');
+}
+
+function checkoutCart() {
+  const name = $('borrowerName').value.trim();
+  const idRef = $('borrowerId').value.trim();
+  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
+  if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
+  if (!name) { toast('Borrower name required.', 'warn'); $('borrowerName').focus(); return; }
+  if (!idRef) { toast('Student ID / phone required.', 'warn'); $('borrowerId').focus(); return; }
+
+  for (const [itemId, qty] of entries) {
+    const item = findItem(itemId);
+    if (!item) { toast('A component no longer exists.', 'error'); return; }
+    if (availableQty(itemId) < qty) { toast(`Only ${availableQty(itemId)} × ${item.name} available.`, 'error'); sanitizeCart(); renderAll(); return; }
+  }
+
+  const t = now();
+  const due = t + loanMs();
+  const lineCount = entries.length;
+  const unitCount = entries.reduce((s,[,q]) => s + q, 0);
+
+  entries.forEach(([itemId, qty]) => {
+    const item = findItem(itemId);
+    const record = {
+      loanId: newLoanId(), itemId, itemName: item.name, category: item.category, quantity: qty,
+      borrowerName: name, borrowerId: idRef,
+      borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
+      dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
+      status: 'ACTIVE'
+    };
+    state.loans.unshift(record);
+    state.history.unshift({ ...record });
+  });
+
+  state.cart = {};
+  state.borrower = { name, id: idRef };
+  logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'} across ${lineCount} component${lineCount===1?'':'s'}`);
+
+  save(); renderAll(); closeCart();
+  toast(`Checkout complete — ${unitCount} unit${unitCount===1?'':'s'} due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
+  go('loans');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOANS
+   ═══════════════════════════════════════════════════════════════ */
+function renderLoans() {
+  const box = $('loanList'); const t = now();
+  const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
+  if (!loans.length) { box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans</p><button onclick="go('catalog')" class="focus-ring mt-5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500">Browse catalog</button></div>`; return; }
+  box.innerHTML = loans.map(loan => {
+    const overdue = isOverdue(loan, t); const dueSoon = !overdue && isDueSoon(loan, t);
+    const elapsed = Math.max(0, t - loan.borrowTimeMs);
+    const pct = Math.min(100, (elapsed / loanMs()) * 100);
+    const rem = loan.dueTimeMs - t;
+    let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/30 bg-emerald-500/10 text-emerald-300', pTxt='Active', bCls='bg-gradient-to-r from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
+    if (overdue) { cCls='border-rose-500/40 bg-rose-950/20 overdue-pulse'; pCls='bg-rose-500 text-white'; pTxt='Overdue'; bCls='bg-rose-500'; tCls='text-rose-400'; tLbl='Overdue by'; }
+    else if (dueSoon) { cCls='border-amber-500/40 bg-amber-950/10'; pCls='border-amber-500/30 bg-amber-500/10 text-amber-300'; pTxt='Due soon'; bCls='bg-amber-500'; tCls='text-amber-400'; }
+    return `<article class="fade-up flex flex-col gap-4 rounded-2xl border p-5 ${cCls}"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="mono text-[10px] text-brand-400">${esc(loan.loanId)}</div><h3 class="mt-1.5 text-sm font-bold text-white">${esc(loan.itemName)} <span class="text-slate-500">×${loan.quantity}</span></h3><p class="mt-1 text-[11px] text-slate-500">${esc(loan.borrowerName)} · <span class="mono">${esc(loan.borrowerId)}</span></p></div><span class="shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${pCls}">${pTxt}</span></div><div class="space-y-2"><div class="flex items-center justify-between text-[11px]"><span class="text-slate-500">${tLbl}</span><span data-remaining="${loan.loanId}" class="mono font-bold ${tCls}">${fmtDuration(Math.abs(rem))}</span></div><div class="h-1.5 overflow-hidden rounded-full bg-ink-800"><div data-bar="${loan.loanId}" class="h-full rounded-full ${bCls} transition-all" style="width:${pct}%"></div></div></div><div class="grid grid-cols-2 gap-3 border-t border-ink-700/50 pt-4"><div><span class="block text-[10px] uppercase text-slate-600">Elapsed</span><span data-elapsed="${loan.loanId}" class="mono text-xs font-semibold text-slate-300">${fmtDuration(elapsed)}</span></div><div class="text-right"><span class="block text-[10px] uppercase text-slate-600">Due</span><span class="mono text-xs font-semibold text-slate-300">${esc(loan.dueTimeFormatted)}</span></div></div><button onclick="returnLoan('${loan.loanId}')" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300 hover:border-emerald-500/50 hover:bg-emerald-600 hover:text-white"><i class="fa-solid fa-rotate-left text-[11px]"></i> Return component</button></article>`;
+  }).join('');
+}
+
+async function returnLoan(loanId) {
+  const idx = state.loans.findIndex(l => l.loanId === loanId); if (idx === -1) return;
+  const loan = state.loans[idx];
+  const ok = await confirmDialog('Return component', `Return ${loan.quantity} × "${loan.itemName}" from ${loan.borrowerName}?`, 'Return', false, 'fa-rotate-left');
+  if (!ok) return;
+  const t = now();
+  const hist = state.history.find(h => h.loanId === loanId);
+  if (hist) { hist.status = 'RETURNED'; hist.returnTimeMs = t; hist.returnTimeFormatted = fmtDateTime(t); hist.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); hist.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; }
+  state.loans.splice(idx, 1);
+  logActivity('return', `${loan.borrowerName} returned ${loan.quantity} × ${loan.itemName}`);
+  save(); renderAll();
+  toast(`Returned ${loan.itemName}.`, 'success');
+}
+
+async function returnAllLoans() {
+  if (!state.loans.length) { toast('No active loans.', 'warn'); return; }
+  const ok = await confirmDialog('Return all', `Return all ${state.loans.length} active loan(s)?`, 'Return all');
+  if (!ok) return;
+  const t = now(); const count = state.loans.length;
+  state.loans.forEach(loan => { const h = state.history.find(x => x.loanId === loan.loanId); if (h) { h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t); h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; } });
+  state.loans = [];
+  logActivity('return', `All ${count} active loan(s) returned`);
+  save(); renderAll();
+  toast(`Returned ${count} loan${count===1?'':'s'}.`, 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   POSTER
+   ═══════════════════════════════════════════════════════════════ */
+function getJoinUrl() {
+  const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
+  const code = stationId || 'LAB-000';
+  return `${base}/?station=${code}`;
+}
+
+function renderPoster() {
+  const s = state.settings;
+  $('posterTitle').value = s.posterTitle;
+  $('posterSubtitle').value = s.posterSubtitle;
+  $('posterUrl').value = deployUrl || '';
+  $('posterInstructions').value = s.posterInstructions;
+
+  $('posterTitlePreview').textContent = s.posterTitle;
+  $('posterSubtitlePreview').textContent = s.posterSubtitle;
+  $('posterInstructionsPreview').textContent = s.posterInstructions;
+
+  const url = getJoinUrl();
+  $('posterUrlPreview').textContent = url;
+
+  const warn = $('posterUrlWarning');
+  const local = !deployUrl || location.protocol === 'file:';
+  if (local) {
+    warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 mt-0.5 shrink-0"></i><span><strong>Deploy first.</strong> Set your deployed URL on the Sync page. Otherwise the QR won't open anywhere.</span>`;
+    warn.classList.remove('hidden'); warn.classList.add('flex');
+  } else {
+    warn.classList.add('hidden'); warn.classList.remove('flex');
+  }
+
+  $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
+}
+
+function onPosterInput() {
+  state.settings.posterTitle = $('posterTitle').value;
+  state.settings.posterSubtitle = $('posterSubtitle').value;
+  state.settings.posterInstructions = $('posterInstructions').value;
+  save();
+  renderPoster();
+}
+
+async function downloadPoster() {
+  const node = $('posterCanvas');
+  const img = node.querySelector('#posterQrTarget img');
+  if (img && !img.complete) await new Promise(r => { img.onload = r; img.onerror = r; });
+  html2canvas(node, { scale: 3, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+    const a = document.createElement('a'); a.download = 'station-qr-poster.png'; a.href = canvas.toDataURL('image/png'); a.click();
+    toast('Poster downloaded.', 'success');
+  }).catch(() => toast('Export failed.', 'error'));
+}
+
+function showQr(itemId) {
+  const item = findItem(itemId); if (!item) return;
+  $('qrTitle').textContent = item.name; $('qrSku').textContent = item.id;
+  $('qrTarget').innerHTML = `<img crossorigin="anonymous" width="140" height="140" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(item.id)}" />`;
+  openModal('mQr');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SYNC PAGE
+   ═══════════════════════════════════════════════════════════════ */
+function renderSyncPage() {
+  const hasFb = !!loadFirebaseConfig();
+  $('syncNotConfigured').classList.toggle('hidden', hasFb);
+  $('syncConfigured').classList.toggle('hidden', !hasFb);
+  if (!hasFb) return;
+
+  const inp = $('stationCodeInput');
+  if (inp && document.activeElement !== inp) inp.value = stationId || '';
+
+  $('syncCurrentCode').textContent = stationId || '—';
+  $('syncStatCode').textContent = stationId || '—';
+
+  const deployInp = $('syncDeployUrlInput');
+  if (deployInp && document.activeElement !== deployInp) deployInp.value = deployUrl || '';
+
+  const conn = $('syncStatConn');
+  if (conn) conn.innerHTML = connected
+    ? `<span class="h-2 w-2 rounded-full bg-emerald-400"></span><span class="text-emerald-300">Connected</span>`
+    : `<span class="h-2 w-2 rounded-full bg-amber-400 pulse-dot"></span><span class="text-amber-300">Connecting…</span>`;
+
+  $('syncStatSent').textContent = lastSentAt ? relTime(lastSentAt) : 'never';
+  $('syncStatRecv').textContent = lastRecvAt ? relTime(lastRecvAt) : 'never';
+
+  if (stationId && deployUrl) {
+    const url = getJoinUrl();
+    $('syncJoinQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(url)}`;
+  }
+}
+
+function generateStationCode() {
+  const code = 'LAB-' + Math.floor(100 + Math.random()*900);
+  $('stationCodeInput').value = code;
+  toast(`Generated ${code}. Click Apply.`, 'info');
+}
+
+function applyStationCode() {
+  const raw = $('stationCodeInput').value.trim().toUpperCase();
+  const clean = raw.replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+  if (!clean) { toast('Enter a valid code.', 'warn'); return; }
+  stationId = clean;
+  localStorage.setItem('cls.station', clean);
+  connectStation();
+  renderSyncPage();
+  renderPoster();
+  logActivity('system', `Joined station ${clean}`);
+  save();
+  toast(`Now syncing on station ${clean}.`, 'success');
+}
+
+function saveDeployUrl() {
+  const url = $('syncDeployUrlInput').value.trim();
+  if (!url) { toast('Enter your deployed URL.', 'warn'); return; }
+  deployUrl = url.replace(/\/$/, '');
+  localStorage.setItem('cls.deployUrl', deployUrl);
+  renderSyncPage();
+  renderPoster();
+  toast('Deploy URL saved.', 'success');
+}
+
+function copyJoinUrl() {
+  const url = getJoinUrl();
+  navigator.clipboard.writeText(url).then(() => toast('Join URL copied.', 'success')).catch(() => prompt('Copy:', url));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN
+   ═══════════════════════════════════════════════════════════════ */
+function onAdminClick() { if (isAdmin) { go('admin'); return; } $('pinInput').value = ''; $('pinError').classList.add('hidden'); openModal('mPin'); setTimeout(() => $('pinInput').focus(), 60); }
+function verifyPin() {
+  if ($('pinInput').value.trim() === String(state.settings.adminPin)) {
+    isAdmin = true; closeModal('mPin');
+    $('navAdmin').classList.remove('hidden'); $('navAdminMobile').classList.remove('hidden');
+    $('adminIcon').className = 'fa-solid fa-lock-open text-[11px] text-emerald-400';
+    $('adminLabel').textContent = 'Console';
+    logActivity('system', 'Admin unlocked');
+    save(); renderActivity(); go('admin');
+    toast('Admin unlocked.', 'success');
+  } else { $('pinError').classList.remove('hidden'); $('pinInput').select(); }
+}
+function lockAdmin() {
+  isAdmin = false;
+  $('navAdmin').classList.add('hidden'); $('navAdminMobile').classList.add('hidden');
+  $('adminIcon').className = 'fa-solid fa-lock text-[11px] text-amber-400';
+  $('adminLabel').textContent = 'Unlock';
+  go('overview'); toast('Admin locked.', 'info');
+}
+
+function renderAdmin() {
+  if (!isAdmin) return;
+  const t = now();
+  $('admSkus').textContent = state.inventory.length;
+  $('admOnLoan').textContent = state.loans.reduce((s,l) => s+l.quantity, 0);
+  $('admBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
+  $('admOverdue').textContent = state.loans.filter(l => isOverdue(l, t)).length;
+
+  // Ledger
+  const tbody = $('ledgerBody');
+  const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
+  if (!loans.length) { tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`; }
+  else {
+    tbody.innerHTML = loans.map(loan => {
+      const overdue = isOverdue(loan, t);
+      const dueSoon = !overdue && isDueSoon(loan, t);
+      const elapsed = Math.max(0, t - loan.borrowTimeMs);
+      let pill = 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300', label = 'Normal';
+      if (overdue) { pill = 'bg-rose-500 text-white'; label = 'Overdue'; }
+      else if (dueSoon) { pill = 'border-amber-500/30 bg-amber-500/10 text-amber-300'; label = 'Due soon'; }
+      return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40"><td class="mono whitespace-nowrap px-4 py-3 text-[11px] font-semibold text-brand-400">${esc(loan.loanId)}</td><td class="px-4 py-3 font-semibold text-white">${esc(loan.borrowerName)}</td><td class="mono px-4 py-3 text-[11px] text-slate-500">${esc(loan.borrowerId)}</td><td class="px-4 py-3"><div class="text-slate-200">${esc(loan.itemName)}</div><div class="mono text-[10px] text-slate-600">${esc(loan.itemId)}</div></td><td class="mono px-4 py-3 font-bold text-amber-400">${loan.quantity}</td><td class="mono whitespace-nowrap px-4 py-3 text-[11px] text-slate-500">${esc(loan.borrowTimeFormatted)}</td><td class="mono whitespace-nowrap px-4 py-3 text-[11px] text-slate-500">${esc(loan.dueTimeFormatted)}</td><td class="mono whitespace-nowrap px-4 py-3 font-semibold text-amber-300" data-admin-elapsed="${loan.loanId}">${fmtDuration(elapsed)}</td><td class="px-4 py-3"><span class="whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${pill}">${label}</span></td><td class="px-4 py-3 text-right"><button onclick="returnLoan('${loan.loanId}')" class="focus-ring rounded-lg border border-rose-500/30 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20">Return</button></td></tr>`;
+    }).join('');
+  }
+
+  // Inventory
+  const inv = $('inventoryBody');
+  inv.innerHTML = state.inventory.map(item => {
+    const out = borrowedQty(item.id); const avail = availableQty(item.id);
+    const low = avail > 0 && avail <= state.settings.lowStockThreshold;
+    const aCls = avail === 0 ? 'text-rose-400' : low ? 'text-amber-400' : 'text-emerald-400';
+    return `<tr class="hover:bg-ink-800/40"><td class="mono whitespace-nowrap px-4 py-3 text-[11px] text-slate-500">${esc(item.id)}</td><td class="px-4 py-3"><div class="font-semibold text-white">${esc(item.name)}</div></td><td class="px-4 py-3 text-slate-400">${esc(item.category)}</td><td class="mono px-4 py-3 text-slate-300">${item.totalStock}</td><td class="mono px-4 py-3 font-bold ${aCls}">${avail}</td><td class="mono px-4 py-3 font-bold text-amber-400">${out}</td><td class="px-4 py-3"><button onclick="showQr('${item.id}')" class="focus-ring rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/40"><i class="fa-solid fa-qrcode text-[10px]"></i></button></td><td class="px-4 py-3"><div class="flex justify-end gap-3"><button onclick="openComponentModal('${item.id}')" class="focus-ring text-[11px] font-semibold text-brand-400">Edit</button><button onclick="deleteComponent('${item.id}')" class="focus-ring text-[11px] font-semibold text-rose-400">Delete</button></div></td></tr>`;
+  }).join('');
+
+  // Settings
+  $('setLoanMinutes').value = state.settings.loanDurationMinutes;
+  $('setLowStock').value = state.settings.lowStockThreshold;
+  $('setAdminPin').value = state.settings.adminPin;
+}
+
+function openComponentModal(id = null) {
+  const item = id ? findItem(id) : null;
+  $('componentModalTitle').textContent = item ? 'Edit component' : 'Add component';
+  $('cmpOriginalId').value = item ? item.id : '';
+  $('cmpSku').value = item ? item.id : nextSku();
+  $('cmpName').value = item ? item.name : '';
+  $('cmpCategory').value = item ? item.category : 'Sensors';
+  $('cmpStock').value = item ? item.totalStock : 10;
+  $('cmpDesc').value = item ? item.description : '';
+  openModal('mComponent');
+}
+function nextSku() { const nums = state.inventory.map(i => parseInt(String(i.id).replace(/\D/g,''),10)).filter(n => !isNaN(n)); return 'SKU-' + ((nums.length ? Math.max(...nums) : 1000) + 1); }
+function saveComponent() {
+  const orig = $('cmpOriginalId').value;
+  const sku = $('cmpSku').value.trim().toUpperCase();
+  const name = $('cmpName').value.trim();
+  const cat = $('cmpCategory').value.trim() || 'General';
+  const stock = Math.max(0, parseInt($('cmpStock').value, 10) || 0);
+  const desc = $('cmpDesc').value.trim();
+  if (!sku || !name) { toast('SKU and name required.', 'warn'); return; }
+  if (orig) {
+    const item = findItem(orig);
+    if (!item) { toast('Not found.', 'error'); return; }
+    const out = borrowedQty(orig);
+    if (stock < out) { toast(`Cannot set stock below ${out} (on loan).`, 'error'); return; }
+    if (sku !== orig && findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
+    if (sku !== orig) {
+      state.loans.forEach(l => { if (l.itemId === orig) { l.itemId = sku; l.itemName = name; } });
+      if (state.cart[orig]) { state.cart[sku] = (state.cart[sku]||0) + state.cart[orig]; delete state.cart[orig]; }
+    }
+    Object.assign(item, { id:sku, name, category:cat, totalStock:stock, description:desc });
+    logActivity('inventory', `Updated ${sku}`);
+  } else {
+    if (findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
+    state.inventory.push({ id:sku, name, category:cat, totalStock:stock, description:desc || 'Lab component.' });
+    logActivity('inventory', `Added ${sku} — ${name}`);
+  }
+  save(); populateCategories(); closeModal('mComponent'); renderAll();
+  toast('Saved.', 'success');
+}
+async function deleteComponent(id) {
+  const item = findItem(id); if (!item) return;
+  const out = borrowedQty(id);
+  if (out > 0) { toast(`Cannot delete — ${out} on loan.`, 'error'); return; }
+  const ok = await confirmDialog('Delete component', `Remove "${item.name}"?`, 'Delete', true, 'fa-trash');
+  if (!ok) return;
+  state.inventory = state.inventory.filter(i => i.id !== id);
+  delete state.cart[id];
+  logActivity('inventory', `Deleted ${id}`);
+  save(); populateCategories(); renderAll();
+  toast('Deleted.', 'success');
+}
+function saveSettings() {
+  state.settings.loanDurationMinutes = Math.max(5, parseInt($('setLoanMinutes').value, 10) || 120);
+  state.settings.lowStockThreshold = Math.max(0, parseInt($('setLowStock').value, 10) || 0);
+  state.settings.adminPin = $('setAdminPin').value.trim() || '1234';
+  save(); renderAll();
+  toast('Settings saved.', 'success');
+}
+
+async function resetDemo() {
+  const ok = await confirmDialog('Reset data', 'Restore sample inventory and clear all loans?', 'Reset');
+  if (!ok) return;
+  const savedStation = stationId; const savedDeploy = deployUrl;
+  state = defaultState();
+  if (savedStation) { stationId = savedStation; }
+  if (savedDeploy) { deployUrl = savedDeploy; }
+  save(); populateCategories(); renderAll();
+  toast('Reset.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BADGES
+   ═══════════════════════════════════════════════════════════════ */
+function updateBadges() {
+  const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
+  const badge = $('cartCount');
+  badge.textContent = cartUnits;
+  badge.classList.toggle('hidden', cartUnits === 0);
+  const dot = $('navLoanDot');
+  if (state.loans.length) { dot.textContent = state.loans.length; dot.classList.remove('hidden'); }
+  else dot.classList.add('hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER ALL
+   ═══════════════════════════════════════════════════════════════ */
+function renderAll() {
+  renderOverview(); renderCatalog(); renderLoans(); renderCart(); updateBadges();
+  if (isAdmin) renderAdmin();
+  if (activeView === 'sync') renderSyncPage();
+  if (activeView === 'poster') renderPoster();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TICK — 1s updates
+   ═══════════════════════════════════════════════════════════════ */
+let lastStatusKey = '';
+function tick() {
+  const t = now();
+  $('clockTime').textContent = fmtTime(t);
+  $('clockDate').textContent = fmtDate(t);
+
+  state.loans.forEach(loan => {
+    const elapsed = Math.max(0, t - loan.borrowTimeMs);
+    const rem = Math.abs(loan.dueTimeMs - t);
+    const e1 = document.querySelector(`[data-elapsed="${loan.loanId}"]`); if (e1) e1.textContent = fmtDuration(elapsed);
+    const e2 = document.querySelector(`[data-remaining="${loan.loanId}"]`); if (e2) e2.textContent = fmtDuration(rem);
+    const e3 = document.querySelector(`[data-bar="${loan.loanId}"]`); if (e3) e3.style.width = Math.min(100, (elapsed/loanMs())*100) + '%';
+    const e4 = document.querySelector(`[data-admin-elapsed="${loan.loanId}"]`); if (e4) e4.textContent = fmtDuration(elapsed);
+  });
+
+  const key = state.loans.map(l => isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N').join('');
+  if (key !== lastStatusKey) { lastStatusKey = key; renderLoans(); if (isAdmin) renderAdmin(); renderOverview(); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ═══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  load();
+  stationId = localStorage.getItem('cls.station');
+  deployUrl = localStorage.getItem('cls.deployUrl') || '';
+
+  // Read ?station= from URL (phone scan)
+  const urlStation = new URLSearchParams(location.search).get('station');
+  if (urlStation) {
+    const clean = urlStation.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+    if (clean) { stationId = clean; localStorage.setItem('cls.station', clean); }
+  }
+  if (!stationId) {
+    stationId = 'LAB-' + Math.floor(100 + Math.random()*900);
+    localStorage.setItem('cls.station', stationId);
+  }
+
+  const fbOk = initFirebase();
+  populateCategories();
+  renderAll();
+  tick();
+  updateSyncPill();
+
+  if (fbOk) connectStation();
+
+  setInterval(tick, 1000);
+  setInterval(updateSyncPill, 3000);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPOSE GLOBALS
+   ═══════════════════════════════════════════════════════════════ */
+window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
+window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
+window.returnLoan = returnLoan; window.returnAllLoans = returnAllLoans;
+window.renderCatalog = renderCatalog;
+window.onPosterInput = onPosterInput; window.downloadPoster = downloadPoster; window.showQr = showQr;
+window.onAdminClick = onAdminClick; window.verifyPin = verifyPin; window.lockAdmin = lockAdmin;
+window.openComponentModal = openComponentModal; window.saveComponent = saveComponent;
+window.deleteComponent = deleteComponent; window.saveSettings = saveSettings; window.resetDemo = resetDemo;
+window.openModal = openModal; window.closeModal = closeModal;
+window.saveFirebaseConfig = saveFirebaseConfig; window.clearFirebaseConfig = clearFirebaseConfig;
+window.applyStationCode = applyStationCode; window.generateStationCode = generateStationCode;
+window.saveDeployUrl = saveDeployUrl; window.copyJoinUrl = copyJoinUrl; window.forceSync = forceSync;
+</script>
+</body>
+</html>
