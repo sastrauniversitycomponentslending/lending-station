@@ -24,7 +24,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
 
@@ -243,7 +242,7 @@
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Deployed website URL</label>
         <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.vercel.app/"
                class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
-        <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">Paste the public URL where you deployed this file. The QR will encode this URL.</p>
+        <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">Paste the public URL where you deployed this file.</p>
         <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div>
       </div>
       <div>
@@ -514,7 +513,7 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   BUILT-IN FIREBASE CONFIG — works on every device automatically
+   BUILT-IN FIREBASE CONFIG
    ═══════════════════════════════════════════════════════════════ */
 const BUILTIN_FIREBASE = {
   apiKey: "AIzaSyCmg42q2ZN_GNH65pCSprXHyu7ZZ1RKZTE",
@@ -527,12 +526,10 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   CONFIG
-   ═══════════════════════════════════════════════════════════════ */
 const STORAGE_KEY = 'cls.app.v2';
 const MAX_ACTIVITY = 40;
 const SINGLE_STATION = 'LAB-MAIN';
+const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity'];
 
 const SEED_INVENTORY = [
   { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
@@ -556,9 +553,6 @@ const DEFAULT_SETTINGS = {
 
 const CLIENT_ID = Math.random().toString(36).slice(2, 10);
 
-/* ═══════════════════════════════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════════════════════════════ */
 function defaultState() {
   return {
     inventory: SEED_INVENTORY.map(x => ({ ...x })),
@@ -580,7 +574,6 @@ let stationRef = null;
 let connected = false;
 let lastSentAt = 0;
 let lastRecvAt = 0;
-let lastWriteTs = 0;
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
@@ -663,21 +656,17 @@ function go(view) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   FIREBASE SYNC
+   FIREBASE SYNC — per-key (no more overwriting)
    ═══════════════════════════════════════════════════════════════ */
 function initFirebase() {
   try {
-    if (!firebase.apps.length) {
-      fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
-    } else {
-      fbApp = firebase.app();
-    }
+    if (!firebase.apps.length) fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
+    else fbApp = firebase.app();
     fbDb = firebase.database();
 
     fbDb.ref('.info/serverTimeOffset').on('value', snap => {
       serverClockOffsetMs = snap.val() || 0;
     });
-
     fbDb.ref('.info/connected').on('value', snap => {
       connected = snap.val() === true;
       updateSyncPill();
@@ -694,61 +683,73 @@ function connectStation() {
   if (stationRef) stationRef.off();
   stationRef = fbDb.ref('stations/' + SINGLE_STATION);
 
-  stationRef.on('value', snap => {
-    const data = snap.val();
-    if (!data) { publishState(true); return; }
-    if (data.updatedAt && data.updatedAt <= lastWriteTs) return;
-    if (data.updatedBy === CLIENT_ID) return;
-    applyRemote(data);
+  // Each key listens independently — any device writing a key updates everyone
+  SYNC_KEYS.forEach(key => {
+    stationRef.child(key).on('value', snap => {
+      const val = snap.val();
+      if (val === null) return;
+      if (key === 'settings') {
+        state.settings = { ...DEFAULT_SETTINGS, ...val };
+      } else if (key === 'inventory' && Array.isArray(val) && val.length) {
+        state.inventory = val;
+      } else if (key === 'loans' && Array.isArray(val)) {
+        state.loans = val;
+      } else if (key === 'history' && Array.isArray(val)) {
+        state.history = val;
+      } else if (key === 'activity' && Array.isArray(val)) {
+        state.activity = val;
+      } else {
+        return;
+      }
+      sanitizeCart();
+      lastRecvAt = Date.now();
+      renderAll();
+      flashSync('received');
+    });
+  });
+
+  // Seed server if empty
+  stationRef.child('inventory').once('value').then(snap => {
+    const val = snap.val();
+    if (!val || !Array.isArray(val) || !val.length) {
+      setTimeout(() => {
+        if (connected) {
+          publishKey('inventory');
+          publishKey('settings');
+        }
+      }, 800);
+    }
   });
 
   updateSyncPill();
 }
 
-let publishTimer = null;
-function queuePublish() {
-  if (!stationRef) return;
-  clearTimeout(publishTimer);
-  publishTimer = setTimeout(() => publishState(), 150);
-}
-
-function publishState(force = false) {
+function publishKey(key) {
   if (!stationRef || !connected) return;
-  const ts = Date.now();
-  lastWriteTs = ts;
-  const payload = {
-    updatedAt: ts,
-    updatedBy: CLIENT_ID,
-    inventory: state.inventory,
-    loans: state.loans,
-    history: state.history.slice(0, 200),
-    settings: state.settings,
-    activity: state.activity.slice(0, MAX_ACTIVITY)
-  };
-  stationRef.set(payload)
+  const val = state[key];
+  if (val === undefined) return;
+  stationRef.child(key).set(val)
     .then(() => { lastSentAt = Date.now(); flashSync('sent'); })
-    .catch(err => { console.warn('[firebase] write failed', err); });
+    .catch(err => console.warn('[publish]', key, err));
 }
 
-let applyingRemote = false;
-function applyRemote(data) {
-  if (applyingRemote) return;
-  applyingRemote = true;
-  try {
-    if (Array.isArray(data.inventory)) state.inventory = data.inventory;
-    if (Array.isArray(data.loans))     state.loans = data.loans;
-    if (Array.isArray(data.history))   state.history = data.history;
-    if (Array.isArray(data.activity))  state.activity = data.activity;
-    if (data.settings && typeof data.settings === 'object') {
-      state.settings = { ...state.settings, ...data.settings };
-    }
-    lastRecvAt = Date.now();
-    sanitizeCart();
-    renderAll();
-    flashSync('received');
-  } finally {
-    setTimeout(() => { applyingRemote = false; }, 100);
-  }
+function publishAll() {
+  if (!stationRef || !connected) return;
+  SYNC_KEYS.forEach(publishKey);
+}
+
+let publishTimer = null;
+let pendingKeys = new Set();
+function queuePublish(keys) {
+  if (!stationRef || !connected) return;
+  if (Array.isArray(keys)) keys.forEach(k => pendingKeys.add(k));
+  else SYNC_KEYS.forEach(k => pendingKeys.add(k));
+  clearTimeout(publishTimer);
+  publishTimer = setTimeout(() => {
+    const toPublish = [...pendingKeys];
+    pendingKeys.clear();
+    toPublish.forEach(publishKey);
+  }, 200);
 }
 
 function flashSync(dir) {
@@ -776,9 +777,22 @@ function updateSyncPill() {
 }
 
 function forceSync() {
-  if (!stationRef) { toast('Firebase not connected yet.', 'warn'); return; }
-  publishState(true);
-  toast('State pushed to server.', 'success');
+  if (!stationRef || !connected) { toast('Firebase not connected yet.', 'warn'); return; }
+  stationRef.once('value').then(snap => {
+    const data = snap.val() || {};
+    SYNC_KEYS.forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) {
+        if (key === 'settings') state.settings = { ...DEFAULT_SETTINGS, ...data[key] };
+        else state[key] = data[key];
+      }
+    });
+    sanitizeCart();
+    renderAll();
+    toast('Pulled latest from server.', 'success');
+  }).catch(() => {
+    publishAll();
+    toast('State pushed to server.', 'success');
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -790,8 +804,13 @@ function save() {
     cart: state.cart, borrower: state.borrower, settings: state.settings,
     activity: state.activity, simOffsetMs: state.simOffsetMs
   })); } catch {}
-  queuePublish();
 }
+
+function saveAndPublish(...keys) {
+  save();
+  if (keys.length) queuePublish(keys);
+}
+
 function load() {
   try {
     const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -975,7 +994,8 @@ function checkoutCart() {
   state.borrower = { name, id: idRef };
   logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'} across ${lineCount} component${lineCount===1?'':'s'}`);
 
-  save(); renderAll(); closeCart();
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll(); closeCart();
   toast(`Checkout complete — ${unitCount} unit${unitCount===1?'':'s'} due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
   go('loans');
 }
@@ -1009,7 +1029,8 @@ async function returnLoan(loanId) {
   if (hist) { hist.status = 'RETURNED'; hist.returnTimeMs = t; hist.returnTimeFormatted = fmtDateTime(t); hist.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); hist.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; }
   state.loans.splice(idx, 1);
   logActivity('return', `${loan.borrowerName} returned ${loan.quantity} × ${loan.itemName}`);
-  save(); renderAll();
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll();
   toast(`Returned ${loan.itemName}.`, 'success');
 }
 
@@ -1021,7 +1042,8 @@ async function returnAllLoans() {
   state.loans.forEach(loan => { const h = state.history.find(x => x.loanId === loan.loanId); if (h) { h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t); h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; } });
   state.loans = [];
   logActivity('return', `All ${count} active loan(s) returned`);
-  save(); renderAll();
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll();
   toast(`Returned ${count} loan${count===1?'':'s'}.`, 'success');
 }
 
@@ -1063,7 +1085,7 @@ function onPosterInput() {
   state.settings.posterTitle = $('posterTitle').value;
   state.settings.posterSubtitle = $('posterSubtitle').value;
   state.settings.posterInstructions = $('posterInstructions').value;
-  save();
+  saveAndPublish('settings');
   renderPoster();
 }
 
@@ -1190,35 +1212,6 @@ function exportExcel() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CSV (kept for fallback)
-   ═══════════════════════════════════════════════════════════════ */
-function downloadCSV(filename, rows) {
-  const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
-}
-function exportHistoryCSV() {
-  if (!state.history.length) { toast('No records.', 'warn'); return; }
-  const t = now();
-  const rows = [['TXN','Borrower','ID','SKU','Component','Category','Qty','Borrowed','Due','Returned','Status','Minutes','Overdue']];
-  state.history.forEach(h => {
-    const active = h.status === 'ACTIVE';
-    const end = active ? t : (h.returnTimeMs || h.borrowTimeMs);
-    rows.push([h.loanId, h.borrowerName, h.borrowerId, h.itemId, h.itemName, h.category, h.quantity, h.borrowTimeFormatted, h.dueTimeFormatted, active?'STILL BORROWED':(h.returnTimeFormatted||''), h.status, ((end-h.borrowTimeMs)/60000).toFixed(1), active?(t>h.dueTimeMs?'YES':'NO'):(h.overdueFlag||'NO')]);
-  });
-  downloadCSV(`lending-log-${new Date().toISOString().slice(0,10)}.csv`, rows);
-  toast('Log exported.', 'success');
-}
-function exportInventoryCSV() {
-  const rows = [['SKU','Name','Category','Total','Available','Out','Description']];
-  state.inventory.forEach(i => rows.push([i.id, i.name, i.category, i.totalStock, availableQty(i.id), borrowedQty(i.id), i.description]));
-  downloadCSV(`inventory-${new Date().toISOString().slice(0,10)}.csv`, rows);
-  toast('Inventory exported.', 'success');
-}
-
-/* ═══════════════════════════════════════════════════════════════
    ADMIN
    ═══════════════════════════════════════════════════════════════ */
 function onAdminClick() { if (isAdmin) { go('admin'); return; } $('pinInput').value = ''; $('pinError').classList.add('hidden'); openModal('mPin'); setTimeout(() => $('pinInput').focus(), 60); }
@@ -1229,7 +1222,8 @@ function verifyPin() {
     $('adminIcon').className = 'fa-solid fa-lock-open text-[11px] text-emerald-400';
     $('adminLabel').textContent = 'Console';
     logActivity('system', 'Admin unlocked');
-    save(); renderActivity(); go('admin');
+    saveAndPublish('activity');
+    renderActivity(); go('admin');
     toast('Admin unlocked.', 'success');
   } else { $('pinError').classList.remove('hidden'); $('pinInput').select(); }
 }
@@ -1314,7 +1308,8 @@ function saveComponent() {
     state.inventory.push({ id:sku, name, category:cat, totalStock:stock, description:desc || 'Lab component.' });
     logActivity('inventory', `Added ${sku} — ${name}`);
   }
-  save(); populateCategories(); closeModal('mComponent'); renderAll();
+  saveAndPublish('inventory', 'activity');
+  populateCategories(); closeModal('mComponent'); renderAll();
   toast('Saved.', 'success');
 }
 async function deleteComponent(id) {
@@ -1326,14 +1321,16 @@ async function deleteComponent(id) {
   state.inventory = state.inventory.filter(i => i.id !== id);
   delete state.cart[id];
   logActivity('inventory', `Deleted ${id}`);
-  save(); populateCategories(); renderAll();
+  saveAndPublish('inventory', 'activity');
+  populateCategories(); renderAll();
   toast('Deleted.', 'success');
 }
 function saveSettings() {
   state.settings.loanDurationMinutes = Math.max(5, parseInt($('setLoanMinutes').value, 10) || 120);
   state.settings.lowStockThreshold = Math.max(0, parseInt($('setLowStock').value, 10) || 0);
   state.settings.adminPin = $('setAdminPin').value.trim() || '1234';
-  save(); renderAll();
+  saveAndPublish('settings');
+  renderAll();
   toast('Settings saved.', 'success');
 }
 
@@ -1343,7 +1340,8 @@ async function resetDemo() {
   const savedDeploy = deployUrl;
   state = defaultState();
   deployUrl = savedDeploy;
-  save(); populateCategories(); renderAll();
+  saveAndPublish('inventory', 'loans', 'history', 'activity');
+  populateCategories(); renderAll();
   toast('Reset.', 'success');
 }
 
@@ -1426,7 +1424,7 @@ window.openComponentModal = openComponentModal; window.saveComponent = saveCompo
 window.deleteComponent = deleteComponent; window.saveSettings = saveSettings; window.resetDemo = resetDemo;
 window.openModal = openModal; window.closeModal = closeModal;
 window.saveDeployUrl = saveDeployUrl; window.copyJoinUrl = copyJoinUrl; window.forceSync = forceSync;
-window.exportExcel = exportExcel; window.exportHistoryCSV = exportHistoryCSV; window.exportInventoryCSV = exportInventoryCSV;
+window.exportExcel = exportExcel;
 </script>
 </body>
 </html>
