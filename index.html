@@ -56,9 +56,85 @@
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
 <!-- ══════════════════════════════════════════════════════════
+     FIRST-TIME SETUP SCREEN
+     ══════════════════════════════════════════════════════════ -->
+<div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
+  <div class="w-full max-w-lg py-8">
+
+    <div class="mb-6 flex justify-center">
+      <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
+        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+        <g transform="translate(60,60)">
+          <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/>
+          <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/>
+        </g>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
+        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+      </svg>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+      <div class="bg-gradient-to-r from-rose-500 to-rose-700 py-3.5 text-center">
+        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">First-Time Setup · Administrator</h1>
+      </div>
+
+      <div class="p-7 space-y-5">
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-[11px] font-medium text-amber-800">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> This screen appears only once. Create the teacher account below.
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Teacher No</label>
+          <input id="setupTeacherNo" type="text" maxlength="4" autocomplete="off" placeholder="e.g. 1234"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
+                 onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()"
+                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.3em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Password</label>
+          <input id="setupPassword" type="password" autocomplete="new-password" placeholder="min 6 characters"
+                 onkeydown="if(event.key==='Enter')document.getElementById('setupConfirm').focus()"
+                 class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Confirm Password</label>
+          <input id="setupConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
+                 onkeydown="if(event.key==='Enter')completeSetup()"
+                 class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+        </div>
+
+        <div class="pt-2">
+          <button id="setupBtn" onclick="completeSetup()"
+                  class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+            <i class="fa-solid fa-user-plus text-xs"></i>
+            <span id="setupBtnText">Create Admin Account</span>
+          </button>
+        </div>
+
+        <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
+
+        <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
+          <p><b class="text-slate-700">Teacher No</b> must be exactly <b>4 characters</b> (letters + digits).</p>
+          <p class="mt-0.5"><b class="text-slate-700">Password</b> must be at least 6 characters.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="mt-5 text-center text-[10px] text-slate-500">
+      <i class="fa-solid fa-shield-halved mr-1"></i> Bajaj Engineering Skills Training · Component Lending Station
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
      LOGIN SCREEN
      ══════════════════════════════════════════════════════════ -->
-<div id="loginScreen" class="fixed inset-0 z-[200] flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
+<div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
 
     <div class="mb-6 flex justify-center">
@@ -70,21 +146,20 @@
         </g>
         <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white" letter-spacing="1">BAJAJ</text>
         <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">BAJAJ</text>
-        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">ENGINEERING</text>
-        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">SKILLS TRAINING</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
       </svg>
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
 
-      <!-- Toggle: Student / Admin -->
       <div class="flex border-b border-slate-200 bg-slate-50">
         <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500">
           <i class="fa-solid fa-graduation-cap mr-1.5"></i> Student
         </button>
         <button id="tabAdmin" onclick="switchLoginTab('admin')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100">
-          <i class="fa-solid fa-user-shield mr-1.5"></i> Admin
+          <i class="fa-solid fa-user-shield mr-1.5"></i> Teacher
         </button>
       </div>
 
@@ -92,7 +167,7 @@
         <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Student Web Interface</h1>
       </div>
       <div id="adminHeader" class="hidden bg-gradient-to-r from-rose-500 to-rose-700 py-3.5 text-center">
-        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Administrator Login</h1>
+        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Teacher Login</h1>
       </div>
 
       <!-- STUDENT FORM -->
@@ -140,10 +215,11 @@
       <!-- ADMIN FORM -->
       <div id="adminForm" class="hidden p-7 space-y-5">
         <div class="flex items-center gap-4">
-          <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">User ID</label>
-          <input id="adminUserInput" type="text" autocomplete="username" placeholder="admin"
+          <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Teacher No</label>
+          <input id="adminUserInput" type="text" maxlength="4" autocomplete="username" placeholder="4 characters"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
                  onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
-                 class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.3em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
 
         <div class="flex items-center gap-4">
@@ -157,13 +233,12 @@
           <button id="adminLoginBtn" onclick="attemptAdminLogin()"
                   class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
             <i class="fa-solid fa-user-shield text-xs"></i>
-            <span id="adminLoginBtnText">Sign in as Admin</span>
+            <span id="adminLoginBtnText">Sign in as Teacher</span>
           </button>
         </div>
 
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
-          <p>Administrator access only.</p>
-          <p class="mt-1">Default credentials: <b class="mono text-slate-700">admin</b> / <b class="mono text-slate-700">admin123</b></p>
+          <p>Teacher access only.</p>
         </div>
       </div>
 
@@ -179,9 +254,7 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     MAIN APP
-     ══════════════════════════════════════════════════════════ -->
+<!-- MAIN APP -->
 <div id="app" class="hidden min-h-screen flex flex-col">
 
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
@@ -352,7 +425,7 @@
   <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/25 bg-gradient-to-r from-brand-950/40 to-ink-850/50 p-4 sm:p-5">
     <div class="flex items-center gap-3.5">
       <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-400"><i class="fa-solid fa-user-shield text-lg"></i></div>
-      <div><h1 class="text-base font-bold text-white">Administrator Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control</p></div>
+      <div><h1 class="text-base font-bold text-white">Teacher Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control</p></div>
     </div>
   </div>
 
@@ -421,13 +494,14 @@
   </div>
 
   <div class="rounded-2xl border border-rose-500/25 bg-rose-950/10 p-5">
-    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-key text-xs text-rose-400"></i> Admin Credentials</h3>
-    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the User ID and Password used to sign in to the admin console.</p>
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-key text-xs text-rose-400"></i> Teacher Credentials</h3>
+    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the Teacher No and Password. Teacher No must be exactly 4 characters.</p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <div>
-        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Admin User ID</label>
-        <input id="setAdminUser" type="text" autocomplete="off"
-               class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
+        <input id="setAdminUser" type="text" maxlength="4" autocomplete="off"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
+               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs tracking-[.3em] text-white" />
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">New password</label>
@@ -625,8 +699,6 @@ const STORAGE_KEY = 'bajaj.lending.v1';
 const SESSION_KEY = 'bajaj.session.v1';
 const MAX_ACTIVITY = 40;
 const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity', 'students', 'adminConfig'];
-const DEFAULT_ADMIN_USER = 'admin';
-const DEFAULT_ADMIN_PASS = 'admin123';
 
 const SEED_INVENTORY = [
   { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
@@ -655,7 +727,7 @@ function defaultState() {
     settings: { ...DEFAULT_SETTINGS },
     activity: [], simOffsetMs: 0,
     students: {},
-    adminConfig: { username: DEFAULT_ADMIN_USER, passwordHash: null }
+    adminConfig: null
   };
 }
 let state = defaultState();
@@ -786,6 +858,7 @@ function generateCaptcha() {
 function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
 function showLoginInfo(msg) { const i = $('loginInfo'); i.textContent = msg; i.classList.remove('hidden'); $('loginError').classList.add('hidden'); }
 function clearLoginMessages() { $('loginError').classList.add('hidden'); $('loginInfo').classList.add('hidden'); }
+function showSetupError(msg) { const e = $('setupError'); e.textContent = msg; e.classList.remove('hidden'); }
 
 function switchLoginTab(tab) {
   loginTab = tab;
@@ -813,6 +886,47 @@ function switchLoginTab(tab) {
     tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
     tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
     setTimeout(() => $('adminUserInput').focus(), 100);
+  }
+}
+
+async function completeSetup() {
+  const teacherNo = $('setupTeacherNo').value.trim().toUpperCase();
+  const pw = $('setupPassword').value;
+  const cf = $('setupConfirm').value;
+  const btn = $('setupBtn');
+  const btnTxt = $('setupBtnText');
+  $('setupError').classList.add('hidden');
+
+  if (teacherNo.length !== 4) { showSetupError('Teacher No must be exactly 4 characters.'); return; }
+  if (!/^[A-Z0-9]{4}$/.test(teacherNo)) { showSetupError('Teacher No can only contain letters and digits.'); return; }
+  if (pw.length < 6) { showSetupError('Password must be at least 6 characters.'); return; }
+  if (pw !== cf) { showSetupError('Passwords do not match.'); return; }
+
+  btn.disabled = true;
+  btnTxt.textContent = 'Creating…';
+
+  try {
+    const hash = await hashPassword(pw);
+    const cfg = { username: teacherNo, passwordHash: hash, createdAt: Date.now() };
+    state.adminConfig = cfg;
+    saveLocal();
+    publishKey('adminConfig');
+
+    $('setupScreen').classList.add('hidden');
+    $('setupScreen').classList.remove('flex');
+    $('loginScreen').classList.remove('hidden');
+    $('loginScreen').classList.add('flex');
+    generateCaptcha();
+    switchLoginTab('admin');
+    $('adminUserInput').value = teacherNo;
+    setTimeout(() => $('adminPassInput').focus(), 200);
+    toast(`Teacher account "${teacherNo}" created. Sign in with your password.`, 'success', 5000);
+  } catch (e) {
+    console.error(e);
+    showSetupError('Setup failed. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btnTxt.textContent = 'Create Admin Account';
   }
 }
 
@@ -876,58 +990,47 @@ async function attemptStudentLogin() {
 }
 
 async function attemptAdminLogin() {
-  const username = $('adminUserInput').value.trim();
+  const teacherNo = $('adminUserInput').value.trim().toUpperCase();
   const password = $('adminPassInput').value;
   const btn = $('adminLoginBtn');
   const btnTxt = $('adminLoginBtnText');
 
   clearLoginMessages();
-  if (!username) { showLoginError('Please enter your User ID.'); return; }
+  if (!teacherNo) { showLoginError('Please enter your Teacher No.'); return; }
+  if (teacherNo.length !== 4) { showLoginError('Teacher No must be exactly 4 characters.'); return; }
   if (!password) { showLoginError('Please enter your Password.'); return; }
 
   btn.disabled = true;
   btnTxt.textContent = 'Verifying…';
 
   try {
+    // Wait for adminConfig to load if we're still connecting
+    if (!state.adminConfig || !state.adminConfig.passwordHash) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    if (!state.adminConfig || !state.adminConfig.passwordHash) {
+      showLoginError('Admin account not set up yet. Please refresh the page.');
+      return;
+    }
+
+    const expectedUser = (state.adminConfig.username || '').toUpperCase();
     const hash = await hashPassword(password);
 
-    // Wait for adminConfig to load if needed
-    if (!state.adminConfig || !state.adminConfig.passwordHash) {
-      await new Promise(r => setTimeout(r, 900));
-    }
-
-    // Bootstrap default admin if none exists yet
-    if (!state.adminConfig || !state.adminConfig.passwordHash) {
-      const defaultHash = await hashPassword(DEFAULT_ADMIN_PASS);
-      if (username === DEFAULT_ADMIN_USER && hash === defaultHash) {
-        state.adminConfig = { username: DEFAULT_ADMIN_USER, passwordHash: defaultHash, createdAt: Date.now() };
-        publishKey('adminConfig');
-        enterApp('admin', DEFAULT_ADMIN_USER, 'Administrator');
-        return;
-      }
-      showLoginError('Admin account not ready yet. Refresh and try again.');
-      return;
-    }
-
-    const expectedUser = state.adminConfig.username || DEFAULT_ADMIN_USER;
-    if (username !== expectedUser) {
-      showLoginError('Incorrect User ID or Password.');
+    if (teacherNo !== expectedUser || hash !== state.adminConfig.passwordHash) {
+      showLoginError('Incorrect Teacher No or Password.');
       $('adminPassInput').select();
       return;
     }
-    if (hash === state.adminConfig.passwordHash) {
-      enterApp('admin', username, 'Administrator');
-    } else {
-      showLoginError('Incorrect User ID or Password.');
-      $('adminPassInput').select();
-    }
+
+    enterApp('admin', teacherNo, 'Teacher');
 
   } catch (e) {
     console.error(e);
     showLoginError('Login error. Please try again.');
   } finally {
     btn.disabled = false;
-    btnTxt.textContent = 'Sign in as Admin';
+    btnTxt.textContent = 'Sign in as Teacher';
   }
 }
 
@@ -935,6 +1038,9 @@ function enterApp(role, register, name) {
   session = { role, register, name };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
   $('loginScreen').classList.add('hidden');
+  $('loginScreen').classList.remove('flex');
+  $('setupScreen').classList.add('hidden');
+  $('setupScreen').classList.remove('flex');
   $('app').classList.remove('hidden');
   applyRoleUI();
   renderAll();
@@ -955,7 +1061,7 @@ function applyRoleUI() {
     $('menuRegister').textContent = session.register;
     const badge = $('menuRoleBadge');
     if (isAdminUser) {
-      badge.textContent = 'Admin';
+      badge.textContent = 'Teacher';
       badge.className = 'mt-1 inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[9px] font-bold uppercase text-rose-300';
     } else {
       badge.textContent = 'Student';
@@ -970,6 +1076,7 @@ function logout() {
   try { sessionStorage.removeItem(SESSION_KEY); } catch {}
   $('app').classList.add('hidden');
   $('loginScreen').classList.remove('hidden');
+  $('loginScreen').classList.add('flex');
   $('loginRegister').value = '';
   $('loginPassword').value = '';
   $('loginCaptchaInput').value = '';
@@ -1014,7 +1121,7 @@ async function saveNewPassword() {
     state.adminConfig.updatedAt = Date.now();
     publishKey('adminConfig');
     show('Password updated.', true);
-    toast('Admin password changed.', 'success');
+    toast('Password changed.', 'success');
   } else {
     const s = (state.students || {})[session.register];
     if (!s || curHash !== s.passwordHash) { show('Current password is incorrect.', false); return; }
@@ -1028,13 +1135,13 @@ async function saveNewPassword() {
 }
 
 function showForgotHelp() {
-  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask admin to reset.');
+  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask teacher to reset.');
 }
 
 function go(view) {
   const isAdminUser = session.role === 'admin';
   if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) {
-    toast('Admin access required.', 'warn');
+    toast('Teacher access required.', 'warn');
     return;
   }
   activeView = view;
@@ -1064,20 +1171,6 @@ function initFirebase() {
   } catch (e) { console.error('[firebase]', e); return false; }
 }
 
-async function ensureAdminBootstrap() {
-  if (!stationRef) return;
-  try {
-    const snap = await stationRef.child('adminConfig').once('value');
-    const val = snap.val();
-    if (!val || !val.passwordHash) {
-      const hash = await hashPassword(DEFAULT_ADMIN_PASS);
-      await stationRef.child('adminConfig').set({
-        username: DEFAULT_ADMIN_USER, passwordHash: hash, createdAt: Date.now()
-      });
-    }
-  } catch (e) { console.warn('[bootstrap]', e); }
-}
-
 function connectStation() {
   if (!fbDb) return;
   if (stationRef) stationRef.off();
@@ -1092,7 +1185,15 @@ function connectStation() {
       else if (key === 'history') state.history = Array.isArray(val) ? val : [];
       else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
       else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
-      else if (key === 'adminConfig') { if (val && typeof val === 'object') state.adminConfig = { ...state.adminConfig, ...val }; }
+      else if (key === 'adminConfig') {
+        if (val && typeof val === 'object') {
+          state.adminConfig = val;
+        } else {
+          state.adminConfig = null;
+        }
+        // Update screen based on adminConfig presence
+        updateAuthScreen();
+      }
       else return;
       lastRecvAt = Date.now();
       sanitizeCart();
@@ -1108,13 +1209,36 @@ function connectStation() {
     }
   });
 
-  setTimeout(ensureAdminBootstrap, 400);
-
   if (window._pollTimer) clearInterval(window._pollTimer);
   window._pollTimer = setInterval(() => { if (stationRef) pullLatest(); }, 5000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) pullLatest(); });
   window.addEventListener('focus', pullLatest);
   updateSyncPill();
+}
+
+function updateAuthScreen() {
+  // Don't switch screens if user is already logged in
+  if (session && session.role) return;
+
+  const hasAdmin = state.adminConfig && state.adminConfig.passwordHash;
+  const setupEl = $('setupScreen');
+  const loginEl = $('loginScreen');
+
+  if (hasAdmin) {
+    setupEl.classList.add('hidden');
+    setupEl.classList.remove('flex');
+    loginEl.classList.remove('hidden');
+    loginEl.classList.add('flex');
+  } else {
+    // No admin yet — show setup screen (unless we're still waiting for Firebase)
+    if (connected) {
+      loginEl.classList.add('hidden');
+      loginEl.classList.remove('flex');
+      setupEl.classList.remove('hidden');
+      setupEl.classList.add('flex');
+      setTimeout(() => $('setupTeacherNo').focus(), 150);
+    }
+  }
 }
 
 function publishKey(key) {
@@ -1136,9 +1260,10 @@ async function pullLatest() {
       else if (key === 'history') state.history = Array.isArray(data[key]) ? data[key] : [];
       else if (key === 'activity') state.activity = Array.isArray(data[key]) ? data[key] : [];
       else if (key === 'students') state.students = (data[key] && typeof data[key] === 'object') ? data[key] : {};
-      else if (key === 'adminConfig') { if (data[key]) state.adminConfig = { ...state.adminConfig, ...data[key] }; }
+      else if (key === 'adminConfig') state.adminConfig = (data[key] && typeof data[key] === 'object') ? data[key] : null;
     });
     lastRecvAt = Date.now();
+    updateAuthScreen();
     renderAll();
   } catch (e) {}
 }
@@ -1184,7 +1309,7 @@ function loadLocal() {
       activity: Array.isArray(s.activity) ? s.activity : [],
       simOffsetMs: 0,
       students: (s.students && typeof s.students === 'object') ? s.students : {},
-      adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : base.adminConfig
+      adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : null
     };
     sanitizeCart();
   } catch {}
@@ -1416,8 +1541,7 @@ function renderDashboard() {
 
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
-
-  const adminUser = (state.adminConfig && state.adminConfig.username) || DEFAULT_ADMIN_USER;
+  const adminUser = (state.adminConfig && state.adminConfig.username) || '';
   $('setAdminUser').value = adminUser;
 
   const students = Object.values(state.students || {}).sort((a,b) => b.createdAt - a.createdAt);
@@ -1437,14 +1561,14 @@ function saveSettings() {
 
 async function saveAdminCredentials() {
   if (session.role !== 'admin') return;
-  const newUser = $('setAdminUser').value.trim();
+  const newUser = $('setAdminUser').value.trim().toUpperCase();
   const newPass = $('setAdminPass').value;
   const confirmPass = $('setAdminPassConfirm').value;
   const msg = $('credMessage');
   const show = (t, ok) => { msg.textContent = t; msg.className = `mt-3 text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 4000); };
 
-  if (!newUser) { show('User ID cannot be empty.', false); return; }
-  if (newUser.length < 3) { show('User ID must be at least 3 characters.', false); return; }
+  if (newUser.length !== 4) { show('Teacher No must be exactly 4 characters.', false); return; }
+  if (!/^[A-Z0-9]{4}$/.test(newUser)) { show('Teacher No can only contain letters and digits.', false); return; }
   if (newPass || confirmPass) {
     if (newPass !== confirmPass) { show('Passwords do not match.', false); return; }
     if (newPass.length < 6) { show('Password must be at least 6 characters.', false); return; }
@@ -1462,7 +1586,7 @@ async function saveAdminCredentials() {
   $('setAdminPass').value = '';
   $('setAdminPassConfirm').value = '';
   show('Credentials updated successfully.', true);
-  toast('Admin credentials updated.', 'success');
+  toast('Teacher credentials updated.', 'success');
 }
 
 async function resetStudentPassword(reg) {
@@ -1708,27 +1832,35 @@ document.addEventListener('DOMContentLoaded', () => {
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
   generateCaptcha();
 
+  // Check session
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
       session = saved;
-      $('loginScreen').classList.add('hidden');
       $('app').classList.remove('hidden');
       applyRoleUI();
     }
   } catch {}
 
   initFirebase();
+
+  // Show login/setup screen immediately based on local state
+  if (!session.role) {
+    if (state.adminConfig && state.adminConfig.passwordHash) {
+      $('loginScreen').classList.remove('hidden');
+      $('loginScreen').classList.add('flex');
+    } else {
+      // Wait for Firebase to answer before deciding — show setup temporarily
+      $('setupScreen').classList.remove('hidden');
+      $('setupScreen').classList.add('flex');
+    }
+  }
+
   populateCategories();
   renderAll();
   tick();
   updateSyncPill();
   connectStation();
-
-  setTimeout(() => {
-    const reg = $('loginRegister');
-    if (reg && !$('loginScreen').classList.contains('hidden')) reg.focus();
-  }, 150);
 
   setInterval(tick, 1000);
   setInterval(updateSyncPill, 3000);
@@ -1747,6 +1879,17 @@ window.switchLoginTab = switchLoginTab;
 window.attemptStudentLogin = attemptStudentLogin;
 window.attemptAdminLogin = attemptAdminLogin;
 window.resetStudentPassword = resetStudentPassword;
+window.completeSetup = completeSetup;
+window.logout = logout;
+window.toggleUserMenu = toggleUserMenu;
+window.openChangePassword = openChangePassword;
+window.saveNewPassword = saveNewPassword;
+window.showForgotHelp = showForgotHelp;
+window.forceSync = forceSync;
+window.copyJoinUrl = copyJoinUrl;
+window.exportExcel = exportExcel;
+window.openModal = openModal;
+window.closeModal = closeModal;
 </script>
 </body>
 </html>
