@@ -77,8 +77,8 @@
         <i class="fa-solid fa-clock-rotate-left mr-2 text-xs"></i>My Loans
         <span id="navLoanDot" class="ml-1.5 hidden rounded-full bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-300"></span>
       </button>
-      <button data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
-      <button data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
+      <button id="navPoster" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
+      <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
       <button id="navAdmin" data-nav="admin" onclick="go('admin')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 transition hover:text-slate-200"><i class="fa-solid fa-sliders mr-2 text-xs"></i>Admin</button>
     </nav>
 
@@ -114,8 +114,8 @@
     <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Overview</button>
     <button data-nav="catalog"  onclick="go('catalog')"  class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Catalog</button>
     <button data-nav="loans"    onclick="go('loans')"    class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Loans</button>
-    <button data-nav="poster"   onclick="go('poster')"   class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Poster</button>
-    <button data-nav="sync"     onclick="go('sync')"     class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Sync</button>
+    <button id="navPosterMobile" data-nav="poster"   onclick="go('poster')"   class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Poster</button>
+    <button id="navSyncMobile"   data-nav="sync"     onclick="go('sync')"     class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400">Sync</button>
     <button data-nav="admin"    onclick="go('admin')"    class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400" id="navAdminMobile">Admin</button>
   </nav>
 </header>
@@ -132,7 +132,7 @@
         <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">One shared lab · every device syncs automatically. Real-time inventory, automatic due dates, instant returns.</p>
         <div class="mt-7 flex flex-wrap items-center gap-3">
           <button onclick="go('catalog')" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-500"><i class="fa-solid fa-boxes-stacked text-xs"></i> Browse catalog</button>
-          <button onclick="go('sync')" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-ink-500 hover:text-white"><i class="fa-solid fa-mobile-screen-button text-xs"></i> Connect phone</button>
+          <button id="heroConnectBtn" onclick="go('sync')" class="focus-ring hidden items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:border-ink-500 hover:text-white"><i class="fa-solid fa-mobile-screen-button text-xs"></i> Connect phone</button>
         </div>
       </div>
       <div class="w-full shrink-0 lg:w-[380px]">
@@ -471,7 +471,6 @@
       <button onclick="closeModal('mPin')" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
       <button onclick="verifyPin()" class="focus-ring w-1/2 rounded-xl bg-brand-600 py-2.5 text-xs font-bold text-white hover:bg-brand-500">Unlock</button>
     </div>
-    <p class="text-center text-[10px] text-slate-600">Default PIN: <span class="mono">1234</span></p>
   </div>
 </div>
 
@@ -641,6 +640,11 @@ document.addEventListener('keydown', e => {
    NAV
    ═══════════════════════════════════════════════════════════════ */
 function go(view) {
+  // Admin-only views: block non-admins
+  if (!isAdmin && (view === 'poster' || view === 'sync' || view === 'admin')) {
+    toast('Admin access required. Unlock the console first.', 'warn');
+    return;
+  }
   activeView = view;
   ['overview','catalog','loans','poster','sync','admin'].forEach(v => { const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view); });
   document.querySelectorAll('[data-nav]').forEach(btn => {
@@ -683,8 +687,6 @@ function connectStation() {
   if (stationRef) stationRef.off();
   stationRef = fbDb.ref('stations/' + SINGLE_STATION);
 
-  // Each key listens independently. Firebase converts empty arrays to null,
-  // so for lists we treat null as "empty array" instead of skipping.
   SYNC_KEYS.forEach(key => {
     stationRef.child(key).on('value', snap => {
       const val = snap.val();
@@ -696,7 +698,6 @@ function connectStation() {
         if (val === null) return;
         if (Array.isArray(val) && val.length) state.inventory = val;
       } else if (key === 'loans') {
-        // ← the critical fix: null means "no active loans"
         state.loans = Array.isArray(val) ? val : [];
       } else if (key === 'history') {
         state.history = Array.isArray(val) ? val : [];
@@ -713,7 +714,6 @@ function connectStation() {
     });
   });
 
-  // Seed server if empty
   stationRef.child('inventory').once('value').then(snap => {
     const val = snap.val();
     if (!val || !Array.isArray(val) || !val.length) {
@@ -724,14 +724,12 @@ function connectStation() {
     }
   });
 
-  // Polling fallback — if no update received in 8s, force a pull
   if (window._pollTimer) clearInterval(window._pollTimer);
   window._pollTimer = setInterval(() => {
     if (!stationRef) return;
     if (Date.now() - lastRecvAt > 8000) pullLatest();
   }, 5000);
 
-  // Pull when the tab regains focus or becomes visible
   if (!window._focusBound) {
     window._focusBound = true;
     document.addEventListener('visibilitychange', () => { if (!document.hidden) pullLatest(); });
@@ -1237,7 +1235,13 @@ function onAdminClick() { if (isAdmin) { go('admin'); return; } $('pinInput').va
 function verifyPin() {
   if ($('pinInput').value.trim() === String(state.settings.adminPin)) {
     isAdmin = true; closeModal('mPin');
+    // Reveal admin-only nav items
     $('navAdmin').classList.remove('hidden'); $('navAdminMobile').classList.remove('hidden');
+    $('navPoster').classList.remove('hidden'); $('navPosterMobile').classList.remove('hidden');
+    $('navSync').classList.remove('hidden'); $('navSyncMobile').classList.remove('hidden');
+    const heroBtn = $('heroConnectBtn');
+    if (heroBtn) { heroBtn.classList.remove('hidden'); heroBtn.classList.add('flex'); }
+
     $('adminIcon').className = 'fa-solid fa-lock-open text-[11px] text-emerald-400';
     $('adminLabel').textContent = 'Console';
     logActivity('system', 'Admin unlocked');
@@ -1248,7 +1252,13 @@ function verifyPin() {
 }
 function lockAdmin() {
   isAdmin = false;
+  // Hide admin-only nav items
   $('navAdmin').classList.add('hidden'); $('navAdminMobile').classList.add('hidden');
+  $('navPoster').classList.add('hidden'); $('navPosterMobile').classList.add('hidden');
+  $('navSync').classList.add('hidden'); $('navSyncMobile').classList.add('hidden');
+  const heroBtn = $('heroConnectBtn');
+  if (heroBtn) { heroBtn.classList.add('hidden'); heroBtn.classList.remove('flex'); }
+
   $('adminIcon').className = 'fa-solid fa-lock text-[11px] text-amber-400';
   $('adminLabel').textContent = 'Unlock';
   go('overview'); toast('Admin locked.', 'info');
