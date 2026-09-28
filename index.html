@@ -48,6 +48,7 @@
   .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px #0a0f1a, 0 0 0 4px #3b62f6; }
   @keyframes pulseDot { 0%,100% { opacity:1; } 50% { opacity:.35; } }
   .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
+  .tab-pill { transition: all .2s ease; }
   @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
 </style>
 </head>
@@ -55,41 +56,47 @@
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
 <!-- ══════════════════════════════════════════════════════════
-     LOGIN SCREEN (BAJAJ THEME)
+     LOGIN SCREEN
      ══════════════════════════════════════════════════════════ -->
 <div id="loginScreen" class="fixed inset-0 z-[200] flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
 
-    <!-- Logo -->
     <div class="mb-6 flex justify-center">
       <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
-        <!-- Blue square with BAJAJ -->
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <!-- Stylized arrow symbol -->
         <g transform="translate(60,60)">
           <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white" opacity="0.98"/>
           <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white" opacity="0.98"/>
         </g>
-        <!-- BAJAJ text -->
         <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white" letter-spacing="1">BAJAJ</text>
-
-        <!-- BEST (large) -->
         <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <!-- BAJAJ ENGINEERING SKILLS TRAINING -->
         <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">BAJAJ</text>
         <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">ENGINEERING</text>
         <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8" letter-spacing="1">SKILLS TRAINING</text>
       </svg>
     </div>
 
-    <!-- Login card -->
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-      <div class="bg-gradient-to-r from-bajaj-500 to-bajaj-600 py-3.5 text-center">
-        <h1 class="text-base font-extrabold uppercase tracking-[.2em] text-white">Student Web Interface</h1>
+
+      <!-- Toggle: Student / Admin -->
+      <div class="flex border-b border-slate-200 bg-slate-50">
+        <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500">
+          <i class="fa-solid fa-graduation-cap mr-1.5"></i> Student
+        </button>
+        <button id="tabAdmin" onclick="switchLoginTab('admin')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100">
+          <i class="fa-solid fa-user-shield mr-1.5"></i> Admin
+        </button>
       </div>
 
-      <div class="p-7 space-y-5">
-        <!-- Register No -->
+      <div id="studentHeader" class="bg-gradient-to-r from-bajaj-500 to-bajaj-600 py-3.5 text-center">
+        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Student Web Interface</h1>
+      </div>
+      <div id="adminHeader" class="hidden bg-gradient-to-r from-rose-500 to-rose-700 py-3.5 text-center">
+        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Administrator Login</h1>
+      </div>
+
+      <!-- STUDENT FORM -->
+      <div id="studentForm" class="p-7 space-y-5">
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Register No</label>
           <input id="loginRegister" type="text" autocomplete="username" placeholder="e.g. STU001"
@@ -97,7 +104,6 @@
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
 
-        <!-- Password -->
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Password</label>
           <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy"
@@ -105,52 +111,79 @@
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
 
-        <!-- Captcha -->
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Enter captcha</label>
           <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off"
-                 onkeydown="if(event.key==='Enter')attemptLogin()"
+                 onkeydown="if(event.key==='Enter')attemptStudentLogin()"
                  class="w-28 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
           <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()" title="Click to refresh"></canvas>
         </div>
 
-        <!-- Submit -->
         <div class="pt-2">
-          <button id="loginSubmitBtn" onclick="attemptLogin()"
+          <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
                   class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-600 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-700 disabled:opacity-60">
             <i class="fa-solid fa-right-to-bracket text-xs"></i>
             <span id="loginSubmitText">Submit</span>
           </button>
         </div>
 
-        <!-- Forgot -->
         <div class="text-right">
           <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-700 underline decoration-dotted hover:text-bajaj-900">Forgot password?</button>
         </div>
 
-        <p id="loginError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
-        <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-center text-xs font-semibold text-emerald-700"></p>
-
-        <!-- Footer -->
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
           <p>For your first login use your <b class="text-slate-700">Date of Birth</b> as password.</p>
           <p class="mt-0.5">[Date format <b class="mono text-slate-700">ddmmyyyy</b> E.g. 03121990]</p>
         </div>
       </div>
+
+      <!-- ADMIN FORM -->
+      <div id="adminForm" class="hidden p-7 space-y-5">
+        <div class="flex items-center gap-4">
+          <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">User ID</label>
+          <input id="adminUserInput" type="text" autocomplete="username" placeholder="admin"
+                 onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
+                 class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Password</label>
+          <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="••••••••"
+                 onkeydown="if(event.key==='Enter')attemptAdminLogin()"
+                 class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+        </div>
+
+        <div class="pt-2">
+          <button id="adminLoginBtn" onclick="attemptAdminLogin()"
+                  class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+            <i class="fa-solid fa-user-shield text-xs"></i>
+            <span id="adminLoginBtnText">Sign in as Admin</span>
+          </button>
+        </div>
+
+        <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
+          <p>Administrator access only.</p>
+          <p class="mt-1">Default credentials: <b class="mono text-slate-700">admin</b> / <b class="mono text-slate-700">admin123</b></p>
+        </div>
+      </div>
+
+      <div class="px-7 pb-6 space-y-3">
+        <p id="loginError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
+        <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-center text-xs font-semibold text-emerald-700"></p>
+      </div>
     </div>
 
     <p class="mt-5 text-center text-[10px] text-slate-500">
-      <i class="fa-solid fa-shield-halved mr-1"></i> BajaJ Engineering Skills Training · Component Lending Station
+      <i class="fa-solid fa-shield-halved mr-1"></i> Bajaj Engineering Skills Training · Component Lending Station
     </p>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
-     MAIN APP (hidden until login)
+     MAIN APP
      ══════════════════════════════════════════════════════════ -->
 <div id="app" class="hidden min-h-screen flex flex-col">
 
-<!-- HEADER -->
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
   <div class="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 lg:px-6">
 
@@ -195,7 +228,6 @@
         <span id="cartCount" class="hidden min-w-[18px] rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-extrabold">0</span>
       </button>
 
-      <!-- User menu -->
       <div class="relative">
         <button onclick="toggleUserMenu()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-2.5 py-2 text-xs font-medium text-slate-300 hover:border-brand-500/50 hover:text-white">
           <div class="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-bajaj-500 to-bajaj-700 text-[10px] font-bold text-white" id="userAvatar">?</div>
@@ -231,7 +263,6 @@
 
 <main class="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
 
-<!-- OVERVIEW -->
 <section id="view-overview" class="space-y-6">
   <div class="relative overflow-hidden rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-6 sm:p-9">
     <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-bajaj-500/10 blur-3xl"></div>
@@ -241,7 +272,7 @@
           <i class="fa-solid fa-graduation-cap"></i> Bajaj Engineering Skills Training
         </div>
         <h1 class="text-3xl font-extrabold leading-[1.1] text-white sm:text-4xl">Borrow lab hardware<br /><span class="bg-gradient-to-r from-bajaj-400 to-emerald-400 bg-clip-text text-transparent">in under a minute.</span></h1>
-        <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">Real-time inventory · automatic due dates · instant returns. Every device syncs live.</p>
+        <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">Real-time inventory · automatic due dates · instant returns.</p>
         <div class="mt-7 flex flex-wrap items-center gap-3">
           <button onclick="go('catalog')" class="focus-ring flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-500"><i class="fa-solid fa-boxes-stacked text-xs"></i> Browse catalog</button>
         </div>
@@ -266,10 +297,6 @@
             <div class="flex items-center justify-between text-xs"><span class="text-slate-500">Utilization</span><span class="mono font-semibold text-slate-300" id="heroUtil">0%</span></div>
             <div class="h-1.5 overflow-hidden rounded-full bg-ink-750"><div id="heroUtilBar" class="h-full rounded-full bg-gradient-to-r from-bajaj-500 to-emerald-400 transition-all duration-700" style="width:0%"></div></div>
           </div>
-          <div id="heroOverdueChip" class="mt-4 hidden items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5">
-            <i class="fa-solid fa-triangle-exclamation text-xs text-rose-400"></i>
-            <span class="text-xs font-medium text-rose-300"><span id="heroOverdueCount">0</span> overdue loan(s)</span>
-          </div>
         </div>
       </div>
     </div>
@@ -283,7 +310,6 @@
   </div>
 </section>
 
-<!-- CATALOG -->
 <section id="view-catalog" class="hidden space-y-5">
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-col gap-4">
@@ -314,7 +340,6 @@
   <div id="catalogGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
 </section>
 
-<!-- LOANS -->
 <section id="view-loans" class="hidden space-y-5">
   <div class="flex flex-col gap-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
     <div><h1 class="text-lg font-bold text-white">Active Borrowed Items</h1><p class="mt-0.5 text-xs text-slate-500">Live timers · one-click returns</p></div>
@@ -323,12 +348,11 @@
   <div id="loanList" class="grid grid-cols-1 gap-4 lg:grid-cols-2"></div>
 </section>
 
-<!-- DASHBOARD (admin only) -->
 <section id="view-dashboard" class="hidden space-y-5">
   <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/25 bg-gradient-to-r from-brand-950/40 to-ink-850/50 p-4 sm:p-5">
     <div class="flex items-center gap-3.5">
       <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-400"><i class="fa-solid fa-user-shield text-lg"></i></div>
-      <div><h1 class="text-base font-bold text-white">Administrator Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control · live borrower ledger</p></div>
+      <div><h1 class="text-base font-bold text-white">Administrator Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control</p></div>
     </div>
   </div>
 
@@ -341,8 +365,11 @@
 
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
-      <div><h3 class="text-sm font-bold text-white">Live Borrowed Items</h3><p class="mt-0.5 text-xs text-slate-500">Updates instantly when anyone borrows or returns.</p></div>
-      <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500"><i class="fa-solid fa-file-excel text-[11px]"></i> Export Excel</button>
+      <div><h3 class="text-sm font-bold text-white">Live Borrowed Items</h3></div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500"><i class="fa-solid fa-file-excel text-[11px]"></i> Export Excel</button>
+        <button onclick="clearHistory()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20"><i class="fa-solid fa-eraser text-[11px]"></i> Clear History</button>
+      </div>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
@@ -393,17 +420,29 @@
     </div>
   </div>
 
-  <div class="rounded-2xl border border-amber-500/25 bg-amber-950/10 p-5">
-    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-users-gear text-xs text-amber-400"></i> Authorized Admins</h3>
-    <p class="mb-4 text-xs leading-relaxed text-slate-400">Only the register numbers listed below can access this console. Add or remove as needed. Separate with commas.</p>
-    <div class="flex flex-col gap-3 sm:flex-row">
-      <input id="setAdmins" type="text" placeholder="ADMIN001, ADMIN002"
-             class="focus-ring mono flex-1 rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
-      <button onclick="saveAdmins()" class="focus-ring flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-amber-500"><i class="fa-solid fa-check text-[11px]"></i> Update</button>
+  <div class="rounded-2xl border border-rose-500/25 bg-rose-950/10 p-5">
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-key text-xs text-rose-400"></i> Admin Credentials</h3>
+    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the User ID and Password used to sign in to the admin console.</p>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Admin User ID</label>
+        <input id="setAdminUser" type="text" autocomplete="off"
+               class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">New password</label>
+        <input id="setAdminPass" type="password" autocomplete="new-password" placeholder="leave blank to keep"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm password</label>
+        <input id="setAdminPassConfirm" type="password" autocomplete="new-password" placeholder="repeat new password"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
     </div>
-    <div class="mt-4 rounded-xl border border-ink-700/60 bg-ink-900/50 p-3">
-      <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Currently authorized</div>
-      <div id="adminListDisplay" class="mt-2 flex flex-wrap gap-1.5"></div>
+    <p id="credMessage" class="mt-3 hidden text-xs font-medium"></p>
+    <div class="mt-4 flex justify-end">
+      <button onclick="saveAdminCredentials()" class="focus-ring flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-rose-500"><i class="fa-solid fa-key text-[11px]"></i> Update credentials</button>
     </div>
   </div>
 
@@ -413,7 +452,6 @@
   </div>
 </section>
 
-<!-- POSTER -->
 <section id="view-poster" class="hidden space-y-5">
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-5">
     <div class="space-y-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5 lg:col-span-2">
@@ -424,12 +462,10 @@
         <input id="posterTitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Subtitle</label>
         <input id="posterSubtitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
-      <div>
-        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Portal URL</label>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Portal URL</label>
         <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.com/"
                class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
-        <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div>
-      </div>
+        <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Instructions</label>
         <textarea id="posterInstructions" rows="3" oninput="onPosterInput()" class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white"></textarea></div>
       <div class="space-y-2 pt-1">
@@ -459,13 +495,12 @@
   </div>
 </section>
 
-<!-- SYNC -->
 <section id="view-sync" class="hidden space-y-5">
   <div class="rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/30 via-ink-850/50 to-ink-900/50 p-6 sm:p-8">
     <div class="flex items-start gap-4">
       <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-tower-broadcast text-xl"></i></div>
       <div><h1 class="text-xl font-extrabold text-white">Live sync is active</h1>
-        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">Every device that opens this URL joins the same live station. Borrows on any device appear everywhere within a second.</p></div>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">Every device that opens this URL joins the same live station.</p></div>
     </div>
   </div>
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -487,7 +522,7 @@
     </div>
     <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
       <div class="flex items-center gap-3"><div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-brand-300"><i class="fa-solid fa-mobile-screen-button text-xs"></i></div><h2 class="text-sm font-bold text-white">Join from any phone</h2></div>
-      <p class="mt-3 text-xs text-slate-400">Scan this QR with the phone camera. It opens the site already connected to this station.</p>
+      <p class="mt-3 text-xs text-slate-400">Scan this QR with the phone camera.</p>
       <div class="mt-3 flex justify-center rounded-xl border border-ink-700 bg-white p-4"><img id="syncJoinQr" width="180" height="180" alt="Join QR" /></div>
       <button onclick="copyJoinUrl()" class="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-medium text-slate-300 hover:border-ink-500 hover:text-white"><i class="fa-solid fa-link text-[10px]"></i> Copy join URL</button>
     </div>
@@ -500,9 +535,6 @@
 </footer>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     CART DRAWER
-     ══════════════════════════════════════════════════════════ -->
 <div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
   <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
     <div class="flex items-center justify-between border-b border-ink-700/60 px-5 py-4">
@@ -522,9 +554,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     MODALS
-     ══════════════════════════════════════════════════════════ -->
 <div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-6">
     <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -581,9 +610,6 @@
 <div id="toasts" class="pointer-events-none fixed bottom-5 right-5 z-[110] flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col gap-2"></div>
 
 <script>
-/* ══════════════════════════════════════════════════════════
-   CONFIG
-   ══════════════════════════════════════════════════════════ */
 const BUILTIN_FIREBASE = {
   apiKey: "AIzaSyCmg42q2ZN_GNH65pCSprXHyu7ZZ1RKZTE",
   authDomain: "components-8893a.firebaseapp.com",
@@ -599,8 +625,8 @@ const STORAGE_KEY = 'bajaj.lending.v1';
 const SESSION_KEY = 'bajaj.session.v1';
 const MAX_ACTIVITY = 40;
 const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity', 'students', 'adminConfig'];
-const DEFAULT_ADMIN_REGISTERS = ['ADMIN001'];
-const DEFAULT_ADMIN_PASSWORD = 'admin123';
+const DEFAULT_ADMIN_USER = 'admin';
+const DEFAULT_ADMIN_PASS = 'admin123';
 
 const SEED_INVENTORY = [
   { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
@@ -621,9 +647,6 @@ const DEFAULT_SETTINGS = {
   posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.'
 };
 
-/* ══════════════════════════════════════════════════════════
-   STATE
-   ══════════════════════════════════════════════════════════ */
 function defaultState() {
   return {
     inventory: SEED_INVENTORY.map(x => ({ ...x })),
@@ -632,7 +655,7 @@ function defaultState() {
     settings: { ...DEFAULT_SETTINGS },
     activity: [], simOffsetMs: 0,
     students: {},
-    adminConfig: { admins: [...DEFAULT_ADMIN_REGISTERS], passwordHash: null }
+    adminConfig: { username: DEFAULT_ADMIN_USER, passwordHash: null }
   };
 }
 let state = defaultState();
@@ -643,15 +666,12 @@ let serverClockOffsetMs = 0;
 let fbApp = null, fbDb = null, stationRef = null, connected = false;
 let lastSentAt = 0, lastRecvAt = 0;
 let captchaCode = '';
+let loginTab = 'student';
 
-/* ══════════════════════════════════════════════════════════
-   HELPERS
-   ══════════════════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-// Stable hash (works everywhere including file://)
 function stableHash(text) {
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0; i < text.length; i++) {
@@ -695,9 +715,6 @@ function newLoanId() { return 'TXN-' + Math.floor(100000 + Math.random()*900000)
 function sanitizeCart() { Object.keys(state.cart).forEach(id => { const it = findItem(id); const q = Number(state.cart[id])||0; if (!it || q <= 0) { delete state.cart[id]; return; } const max = availableQty(id); if (q > max) { max <= 0 ? delete state.cart[id] : state.cart[id] = max; } }); }
 function logActivity(type, message) { state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() }); if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY; }
 
-/* ══════════════════════════════════════════════════════════
-   TOASTS / MODALS
-   ══════════════════════════════════════════════════════════ */
 function toast(message, type='info', ttl=3500) {
   const cfg = {
     info:    { icon:'fa-circle-info',          color:'text-brand-400',   border:'border-brand-500/30',   bg:'bg-brand-500/10' },
@@ -728,9 +745,6 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
   });
 }
 
-/* ══════════════════════════════════════════════════════════
-   CAPTCHA
-   ══════════════════════════════════════════════════════════ */
 function generateCaptcha() {
   const canvas = $('captchaCanvas');
   if (!canvas) return;
@@ -740,14 +754,12 @@ function generateCaptcha() {
   for (let i = 0; i < 5; i++) captchaCode += chars[Math.floor(Math.random()*chars.length)];
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // Background
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   grad.addColorStop(0, '#f1f5f9');
   grad.addColorStop(1, '#e2e8f0');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Noise lines
   for (let i = 0; i < 5; i++) {
     ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
     ctx.lineWidth = 1 + Math.random();
@@ -756,19 +768,13 @@ function generateCaptcha() {
     ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height);
     ctx.stroke();
   }
-
-  // Noise dots
   for (let i = 0; i < 40; i++) {
     ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
     ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 1.5);
   }
-
-  // Characters
   for (let i = 0; i < captchaCode.length; i++) {
     ctx.save();
-    const x = 16 + i * 26;
-    const y = 32;
-    ctx.translate(x, y);
+    ctx.translate(16 + i * 26, 32);
     ctx.rotate((Math.random() - 0.5) * 0.6);
     ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`;
     ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`;
@@ -777,32 +783,40 @@ function generateCaptcha() {
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   AUTH
-   ══════════════════════════════════════════════════════════ */
-function showLoginError(msg) {
-  const e = $('loginError');
-  e.textContent = msg;
-  e.classList.remove('hidden');
-  $('loginInfo').classList.add('hidden');
-}
-function showLoginInfo(msg) {
-  const i = $('loginInfo');
-  i.textContent = msg;
-  i.classList.remove('hidden');
-  $('loginError').classList.add('hidden');
-}
-function clearLoginMessages() {
-  $('loginError').classList.add('hidden');
-  $('loginInfo').classList.add('hidden');
+function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
+function showLoginInfo(msg) { const i = $('loginInfo'); i.textContent = msg; i.classList.remove('hidden'); $('loginError').classList.add('hidden'); }
+function clearLoginMessages() { $('loginError').classList.add('hidden'); $('loginInfo').classList.add('hidden'); }
+
+function switchLoginTab(tab) {
+  loginTab = tab;
+  clearLoginMessages();
+  const studentForm = $('studentForm');
+  const adminForm = $('adminForm');
+  const tabStudent = $('tabStudent');
+  const tabAdmin = $('tabAdmin');
+  const studentHeader = $('studentHeader');
+  const adminHeader = $('adminHeader');
+
+  if (tab === 'student') {
+    studentForm.classList.remove('hidden');
+    adminForm.classList.add('hidden');
+    studentHeader.classList.remove('hidden');
+    adminHeader.classList.add('hidden');
+    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
+    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    setTimeout(() => $('loginRegister').focus(), 100);
+  } else {
+    studentForm.classList.add('hidden');
+    adminForm.classList.remove('hidden');
+    studentHeader.classList.add('hidden');
+    adminHeader.classList.remove('hidden');
+    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
+    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    setTimeout(() => $('adminUserInput').focus(), 100);
+  }
 }
 
-function isAdminRegister(reg) {
-  const admins = (state.adminConfig && state.adminConfig.admins) || DEFAULT_ADMIN_REGISTERS;
-  return admins.map(a => a.toUpperCase()).includes(reg.toUpperCase());
-}
-
-async function attemptLogin() {
+async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
   const pw = $('loginPassword').value;
   const captchaInput = $('loginCaptchaInput').value.trim().toUpperCase();
@@ -810,7 +824,6 @@ async function attemptLogin() {
   const btnTxt = $('loginSubmitText');
 
   clearLoginMessages();
-
   if (!reg) { showLoginError('Please enter your Register No.'); return; }
   if (!pw) { showLoginError('Please enter your Password.'); return; }
   if (!captchaInput) { showLoginError('Please enter the captcha.'); return; }
@@ -826,37 +839,6 @@ async function attemptLogin() {
 
   try {
     const hash = await hashPassword(pw);
-
-    // Wait a moment for admin config to load
-    if (!state.adminConfig || !state.adminConfig.passwordHash) {
-      await new Promise(r => setTimeout(r, 900));
-    }
-
-    // ── ADMIN LOGIN ──
-    if (isAdminRegister(reg)) {
-      let adminHash = state.adminConfig && state.adminConfig.passwordHash;
-      // Bootstrap default admin password on first run
-      if (!adminHash) {
-        const defaultHash = await hashPassword(DEFAULT_ADMIN_PASSWORD);
-        if (hash === defaultHash) {
-          state.adminConfig = { admins: [...DEFAULT_ADMIN_REGISTERS], passwordHash: defaultHash };
-          publishKey('adminConfig');
-          enterApp('admin', reg, 'Administrator');
-          return;
-        }
-        showLoginError('Admin account not ready yet. Refresh and try again.');
-        return;
-      }
-      if (hash === adminHash) {
-        enterApp('admin', reg, 'Administrator');
-      } else {
-        showLoginError('Incorrect password for admin account.');
-        $('loginPassword').select();
-      }
-      return;
-    }
-
-    // ── STUDENT LOGIN ──
     const students = state.students || {};
     const existing = students[reg];
 
@@ -870,23 +852,19 @@ async function attemptLogin() {
       return;
     }
 
-    // First-time login — password must be a DOB (8 digits)
     if (!/^\d{8}$/.test(pw)) {
       showLoginError('First-time login: use your Date of Birth (ddmmyyyy).');
       return;
     }
 
-    // Register new student
     state.students = state.students || {};
     state.students[reg] = {
-      register: reg,
-      name: 'Student ' + reg,
-      passwordHash: hash,
-      createdAt: Date.now()
+      register: reg, name: 'Student ' + reg,
+      passwordHash: hash, createdAt: Date.now()
     };
     publishKey('students');
     enterApp('user', reg, state.students[reg].name);
-    toast('Welcome! First login successful — your password is now your DOB.', 'success', 5000);
+    toast('Welcome! Your password is now your DOB.', 'success', 5000);
 
   } catch (e) {
     console.error(e);
@@ -897,10 +875,65 @@ async function attemptLogin() {
   }
 }
 
+async function attemptAdminLogin() {
+  const username = $('adminUserInput').value.trim();
+  const password = $('adminPassInput').value;
+  const btn = $('adminLoginBtn');
+  const btnTxt = $('adminLoginBtnText');
+
+  clearLoginMessages();
+  if (!username) { showLoginError('Please enter your User ID.'); return; }
+  if (!password) { showLoginError('Please enter your Password.'); return; }
+
+  btn.disabled = true;
+  btnTxt.textContent = 'Verifying…';
+
+  try {
+    const hash = await hashPassword(password);
+
+    // Wait for adminConfig to load if needed
+    if (!state.adminConfig || !state.adminConfig.passwordHash) {
+      await new Promise(r => setTimeout(r, 900));
+    }
+
+    // Bootstrap default admin if none exists yet
+    if (!state.adminConfig || !state.adminConfig.passwordHash) {
+      const defaultHash = await hashPassword(DEFAULT_ADMIN_PASS);
+      if (username === DEFAULT_ADMIN_USER && hash === defaultHash) {
+        state.adminConfig = { username: DEFAULT_ADMIN_USER, passwordHash: defaultHash, createdAt: Date.now() };
+        publishKey('adminConfig');
+        enterApp('admin', DEFAULT_ADMIN_USER, 'Administrator');
+        return;
+      }
+      showLoginError('Admin account not ready yet. Refresh and try again.');
+      return;
+    }
+
+    const expectedUser = state.adminConfig.username || DEFAULT_ADMIN_USER;
+    if (username !== expectedUser) {
+      showLoginError('Incorrect User ID or Password.');
+      $('adminPassInput').select();
+      return;
+    }
+    if (hash === state.adminConfig.passwordHash) {
+      enterApp('admin', username, 'Administrator');
+    } else {
+      showLoginError('Incorrect User ID or Password.');
+      $('adminPassInput').select();
+    }
+
+  } catch (e) {
+    console.error(e);
+    showLoginError('Login error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btnTxt.textContent = 'Sign in as Admin';
+  }
+}
+
 function enterApp(role, register, name) {
   session = { role, register, name };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
-
   $('loginScreen').classList.add('hidden');
   $('app').classList.remove('hidden');
   applyRoleUI();
@@ -910,16 +943,12 @@ function enterApp(role, register, name) {
 
 function applyRoleUI() {
   const isAdminUser = session.role === 'admin';
-
-  // Show/hide admin nav
   ['navDashboard','navPoster','navSync','navDashboardMobile','navPosterMobile','navSyncMobile'].forEach(id => {
-    const el = $(id);
-    if (!el) return;
+    const el = $(id); if (!el) return;
     if (isAdminUser) el.classList.remove('hidden');
     else el.classList.add('hidden');
   });
 
-  // User badge
   if (session.register) {
     $('userAvatar').textContent = session.register.slice(0, 1).toUpperCase();
     $('userLabel').textContent = session.register;
@@ -933,8 +962,6 @@ function applyRoleUI() {
       badge.className = 'mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-300';
     }
   }
-
-  // Set default view
   go('overview');
 }
 
@@ -946,27 +973,23 @@ function logout() {
   $('loginRegister').value = '';
   $('loginPassword').value = '';
   $('loginCaptchaInput').value = '';
+  $('adminUserInput').value = '';
+  $('adminPassInput').value = '';
   clearLoginMessages();
   generateCaptcha();
-  setTimeout(() => $('loginRegister').focus(), 100);
+  switchLoginTab('student');
 }
 
-function toggleUserMenu() {
-  const m = $('userMenu');
-  m.classList.toggle('hidden');
-}
+function toggleUserMenu() { $('userMenu').classList.toggle('hidden'); }
 document.addEventListener('click', e => {
   if (!e.target.closest('#userMenu') && !e.target.closest('[onclick="toggleUserMenu()"]')) {
-    const m = $('userMenu');
-    if (m) m.classList.add('hidden');
+    const m = $('userMenu'); if (m) m.classList.add('hidden');
   }
 });
 
 function openChangePassword() {
   $('userMenu').classList.add('hidden');
-  $('cpCurrent').value = '';
-  $('cpNew').value = '';
-  $('cpConfirm').value = '';
+  $('cpCurrent').value = ''; $('cpNew').value = ''; $('cpConfirm').value = '';
   $('cpMessage').classList.add('hidden');
   openModal('mChangePassword');
 }
@@ -976,12 +999,7 @@ async function saveNewPassword() {
   const nw = $('cpNew').value;
   const cf = $('cpConfirm').value;
   const msg = $('cpMessage');
-
-  const show = (t, ok) => {
-    msg.textContent = t;
-    msg.className = `text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`;
-    msg.classList.remove('hidden');
-  };
+  const show = (t, ok) => { msg.textContent = t; msg.className = `text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); };
 
   if (!cur || !nw || !cf) { show('Please fill all fields.', false); return; }
   if (nw !== cf) { show('New passwords do not match.', false); return; }
@@ -991,9 +1009,7 @@ async function saveNewPassword() {
   const newHash = await hashPassword(nw);
 
   if (session.role === 'admin') {
-    if (!state.adminConfig || curHash !== state.adminConfig.passwordHash) {
-      show('Current password is incorrect.', false); return;
-    }
+    if (!state.adminConfig || curHash !== state.adminConfig.passwordHash) { show('Current password is incorrect.', false); return; }
     state.adminConfig.passwordHash = newHash;
     state.adminConfig.updatedAt = Date.now();
     publishKey('adminConfig');
@@ -1001,57 +1017,42 @@ async function saveNewPassword() {
     toast('Admin password changed.', 'success');
   } else {
     const s = (state.students || {})[session.register];
-    if (!s || curHash !== s.passwordHash) {
-      show('Current password is incorrect.', false); return;
-    }
+    if (!s || curHash !== s.passwordHash) { show('Current password is incorrect.', false); return; }
     s.passwordHash = newHash;
     s.passwordUpdatedAt = Date.now();
     publishKey('students');
     show('Password updated.', true);
     toast('Password changed.', 'success');
   }
-
   setTimeout(() => closeModal('mChangePassword'), 1200);
 }
 
 function showForgotHelp() {
-  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: contact the admin to reset.');
+  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask admin to reset.');
 }
 
-/* ══════════════════════════════════════════════════════════
-   NAVIGATION
-   ══════════════════════════════════════════════════════════ */
 function go(view) {
   const isAdminUser = session.role === 'admin';
-
-  // Admin-only views guard
   if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) {
     toast('Admin access required.', 'warn');
     return;
   }
-
   activeView = view;
   ['overview','catalog','loans','dashboard','poster','sync'].forEach(v => {
-    const el = $(`view-${v}`);
-    if (el) el.classList.toggle('hidden', v !== view);
+    const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view);
   });
-
   document.querySelectorAll('[data-nav]').forEach(btn => {
     const a = btn.dataset.nav === view;
     btn.classList.toggle('active', a);
     btn.classList.toggle('text-slate-200', a);
     btn.classList.toggle('text-slate-400', !a);
   });
-
   if (view === 'poster') renderPoster();
   if (view === 'sync') renderSyncPage();
   if (view === 'dashboard') renderDashboard();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ══════════════════════════════════════════════════════════
-   FIREBASE SYNC
-   ══════════════════════════════════════════════════════════ */
 function initFirebase() {
   try {
     if (!firebase.apps.length) fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
@@ -1069,11 +1070,9 @@ async function ensureAdminBootstrap() {
     const snap = await stationRef.child('adminConfig').once('value');
     const val = snap.val();
     if (!val || !val.passwordHash) {
-      const hash = await hashPassword(DEFAULT_ADMIN_PASSWORD);
+      const hash = await hashPassword(DEFAULT_ADMIN_PASS);
       await stationRef.child('adminConfig').set({
-        admins: DEFAULT_ADMIN_REGISTERS,
-        passwordHash: hash,
-        createdAt: Date.now()
+        username: DEFAULT_ADMIN_USER, passwordHash: hash, createdAt: Date.now()
       });
     }
   } catch (e) { console.warn('[bootstrap]', e); }
@@ -1093,13 +1092,8 @@ function connectStation() {
       else if (key === 'history') state.history = Array.isArray(val) ? val : [];
       else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
       else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
-      else if (key === 'adminConfig') {
-        if (val && typeof val === 'object') {
-          state.adminConfig = { ...state.adminConfig, ...val };
-        }
-      }
+      else if (key === 'adminConfig') { if (val && typeof val === 'object') state.adminConfig = { ...state.adminConfig, ...val }; }
       else return;
-
       lastRecvAt = Date.now();
       sanitizeCart();
       renderAll();
@@ -1169,9 +1163,6 @@ function forceSync() {
   pullLatest().then(() => toast('Pulled latest from server.', 'success'));
 }
 
-/* ══════════════════════════════════════════════════════════
-   PERSISTENCE (local fallback)
-   ══════════════════════════════════════════════════════════ */
 function saveLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
     inventory: state.inventory, loans: state.loans, history: state.history,
@@ -1198,14 +1189,8 @@ function loadLocal() {
     sanitizeCart();
   } catch {}
 }
-function saveAndPublish(...keys) {
-  saveLocal();
-  if (keys.length) keys.forEach(publishKey);
-}
+function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
 
-/* ══════════════════════════════════════════════════════════
-   RENDER: OVERVIEW
-   ══════════════════════════════════════════════════════════ */
 function renderOverview() {
   const t = now();
   const total = state.inventory.reduce((s,i) => s + i.totalStock, 0);
@@ -1219,24 +1204,15 @@ function renderOverview() {
   $('heroUtil').textContent = util + '%';
   $('heroUtilBar').style.width = Math.min(100, util) + '%';
   $('heroSyncLabel').textContent = connected ? 'live' : 'offline';
-
-  const chip = $('heroOverdueChip');
-  if (overdue > 0) { chip.classList.remove('hidden'); chip.classList.add('flex'); $('heroOverdueCount').textContent = overdue; }
-  else { chip.classList.add('hidden'); chip.classList.remove('flex'); }
-
   $('kpiSkus').textContent = state.inventory.length;
   $('kpiLoans').textContent = state.loans.length;
   $('kpiBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
   $('kpiOverdue').textContent = overdue;
-
   $('loanPeriodLabel').textContent = state.settings.loanDurationMinutes >= 60
     ? `${(state.settings.loanDurationMinutes / 60).toFixed(1)} hours`
     : `${state.settings.loanDurationMinutes} minutes`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   RENDER: CATALOG
-   ══════════════════════════════════════════════════════════ */
 function populateCategories() {
   const sel = $('catalogCategory'); if (!sel) return;
   const cur = sel.value || 'ALL';
@@ -1250,7 +1226,6 @@ function renderCatalog() {
   const q = ($('catalogSearch').value || '').trim().toLowerCase();
   const cat = $('catalogCategory').value || 'ALL';
   const inStockOnly = $('catalogInStock').checked;
-
   let list = state.inventory.filter(it => {
     const hay = `${it.name} ${it.id} ${it.category} ${it.description}`.toLowerCase();
     if (q && !hay.includes(q)) return false;
@@ -1258,14 +1233,8 @@ function renderCatalog() {
     if (inStockOnly && availableQty(it.id) <= 0) return false;
     return true;
   }).sort((a,b) => a.name.localeCompare(b.name));
-
   $('catalogResultCount').textContent = `${list.length} item${list.length===1?'':'s'}`;
-
-  if (!list.length) {
-    grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`;
-    return;
-  }
-
+  if (!list.length) { grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`; return; }
   const low = state.settings.lowStockThreshold;
   grid.innerHTML = list.map(item => {
     const avail = availableQty(item.id);
@@ -1304,9 +1273,6 @@ function quickAdd() {
   input.value = ''; input.focus();
 }
 
-/* ══════════════════════════════════════════════════════════
-   CART
-   ══════════════════════════════════════════════════════════ */
 function openCart() {
   $('borrowerName').value = state.borrower.name || (session.name || '');
   $('borrowerId').value = state.borrower.id || (session.register || '');
@@ -1314,20 +1280,14 @@ function openCart() {
   document.body.style.overflow = 'hidden';
   renderCart();
 }
-function closeCart() {
-  $('cartDrawer').classList.add('hidden');
-  document.body.style.overflow = '';
-}
+function closeCart() { $('cartDrawer').classList.add('hidden'); document.body.style.overflow = ''; }
 
 function renderCart() {
   const box = $('cartItems');
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   const total = entries.reduce((s,[,q]) => s + q, 0);
   $('cartSummary').textContent = entries.length ? `${entries.length} item${entries.length===1?'':'s'} · ${total} unit${total===1?'':'s'}` : 'Empty';
-  if (!entries.length) {
-    box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`;
-    return;
-  }
+  if (!entries.length) { box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`; return; }
   box.innerHTML = entries.map(([id, qty]) => {
     const item = findItem(id); if (!item) return '';
     const maxed = selectableQty(id) <= 0;
@@ -1368,25 +1328,18 @@ function checkoutCart() {
 
   state.cart = {};
   state.borrower = { name, id: idRef };
-  logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'} across ${lineCount} component${lineCount===1?'':'s'}`);
-
+  logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'}`);
   saveAndPublish('loans', 'history', 'activity');
   renderAll(); closeCart();
   toast(`Checkout complete — due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
   go('loans');
 }
 
-/* ══════════════════════════════════════════════════════════
-   LOANS
-   ══════════════════════════════════════════════════════════ */
 function renderLoans() {
   const box = $('loanList'); if (!box) return;
   const t = now();
   const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
-  if (!loans.length) {
-    box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500">Browse catalog</button></div>`;
-    return;
-  }
+  if (!loans.length) { box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-500">Browse catalog</button></div>`; return; }
   box.innerHTML = loans.map(loan => {
     const overdue = isOverdue(loan, t); const dueSoon = !overdue && isDueSoon(loan, t);
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
@@ -1427,12 +1380,9 @@ async function returnAllLoans() {
   logActivity('return', `All ${count} active loan(s) returned`);
   saveAndPublish('loans', 'history', 'activity');
   renderAll();
-  toast(`Returned ${count} loan${count===1?'':'s'}.`, 'success');
+  toast(`Returned ${count}.`, 'success');
 }
 
-/* ══════════════════════════════════════════════════════════
-   RENDER: DASHBOARD (admin)
-   ══════════════════════════════════════════════════════════ */
 function renderDashboard() {
   if (session.role !== 'admin') return;
   const t = now();
@@ -1464,33 +1414,16 @@ function renderDashboard() {
     return `<tr class="hover:bg-ink-800/40"><td class="mono whitespace-nowrap px-4 py-3 text-[11px] text-slate-500">${esc(item.id)}</td><td class="px-4 py-3 font-semibold text-white">${esc(item.name)}</td><td class="px-4 py-3 text-slate-400">${esc(item.category)}</td><td class="mono px-4 py-3 text-slate-300">${item.totalStock}</td><td class="mono px-4 py-3 font-bold ${aCls}">${avail}</td><td class="mono px-4 py-3 font-bold text-amber-400">${out}</td><td class="px-4 py-3"><button onclick="showQr('${item.id}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/40"><i class="fa-solid fa-qrcode text-[10px]"></i></button></td><td class="px-4 py-3"><div class="flex justify-end gap-3"><button onclick="openComponentModal('${item.id}')" class="text-[11px] font-semibold text-brand-400">Edit</button><button onclick="deleteComponent('${item.id}')" class="text-[11px] font-semibold text-rose-400">Delete</button></div></td></tr>`;
   }).join('');
 
-  // Settings
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
 
-  // Admins
-  const admins = (state.adminConfig && state.adminConfig.admins) || DEFAULT_ADMIN_REGISTERS;
-  $('setAdmins').value = admins.join(', ');
-  $('adminListDisplay').innerHTML = admins.map(a =>
-    `<span class="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-300 mono">${esc(a)}</span>`
-  ).join('');
+  const adminUser = (state.adminConfig && state.adminConfig.username) || DEFAULT_ADMIN_USER;
+  $('setAdminUser').value = adminUser;
 
-  // Students
   const students = Object.values(state.students || {}).sort((a,b) => b.createdAt - a.createdAt);
   const studentsList = $('studentsList');
-  if (!students.length) {
-    studentsList.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
-  } else {
-    studentsList.innerHTML = students.map(s => `
-      <div class="flex items-center justify-between rounded-lg border border-ink-700/60 bg-ink-900/50 px-3 py-2">
-        <div class="min-w-0">
-          <div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div>
-          <div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div>
-        </div>
-        <button onclick="resetStudentPassword('${esc(s.register)}')" class="text-[10px] font-semibold text-amber-400 hover:text-amber-300">Reset password</button>
-      </div>
-    `).join('');
-  }
+  if (!students.length) studentsList.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
+  else studentsList.innerHTML = students.map(s => `<div class="flex items-center justify-between rounded-lg border border-ink-700/60 bg-ink-900/50 px-3 py-2"><div class="min-w-0"><div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div><div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div></div><button onclick="resetStudentPassword('${esc(s.register)}')" class="text-[10px] font-semibold text-amber-400 hover:text-amber-300">Reset password</button></div>`).join('');
 }
 
 function saveSettings() {
@@ -1502,31 +1435,45 @@ function saveSettings() {
   toast('Settings saved.', 'success');
 }
 
-function saveAdmins() {
+async function saveAdminCredentials() {
   if (session.role !== 'admin') return;
-  const raw = $('setAdmins').value.trim();
-  const list = raw.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-  if (!list.length) { toast('Enter at least one admin register.', 'warn'); return; }
-  if (!list.includes(session.register)) {
-    toast('You must keep your own register in the list.', 'warn');
-    return;
+  const newUser = $('setAdminUser').value.trim();
+  const newPass = $('setAdminPass').value;
+  const confirmPass = $('setAdminPassConfirm').value;
+  const msg = $('credMessage');
+  const show = (t, ok) => { msg.textContent = t; msg.className = `mt-3 text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 4000); };
+
+  if (!newUser) { show('User ID cannot be empty.', false); return; }
+  if (newUser.length < 3) { show('User ID must be at least 3 characters.', false); return; }
+  if (newPass || confirmPass) {
+    if (newPass !== confirmPass) { show('Passwords do not match.', false); return; }
+    if (newPass.length < 6) { show('Password must be at least 6 characters.', false); return; }
   }
-  state.adminConfig = { ...(state.adminConfig || {}), admins: list };
+
+  const cfg = { ...(state.adminConfig || {}) };
+  cfg.username = newUser;
+  if (newPass) cfg.passwordHash = await hashPassword(newPass);
+  if (!cfg.passwordHash) { show('Password is required.', false); return; }
+  cfg.updatedAt = Date.now();
+
+  state.adminConfig = cfg;
   publishKey('adminConfig');
-  renderDashboard();
-  toast('Authorized admins updated.', 'success');
+
+  $('setAdminPass').value = '';
+  $('setAdminPassConfirm').value = '';
+  show('Credentials updated successfully.', true);
+  toast('Admin credentials updated.', 'success');
 }
 
 async function resetStudentPassword(reg) {
   if (session.role !== 'admin') return;
-  const s = (state.students || {})[reg];
-  if (!s) return;
-  const ok = await confirmDialog('Reset password', `Reset ${reg}'s password? They will need to use DOB (ddmmyyyy) again on next login.`, 'Reset');
+  const s = (state.students || {})[reg]; if (!s) return;
+  const ok = await confirmDialog('Reset password', `Reset ${reg}'s password?`, 'Reset');
   if (!ok) return;
   delete state.students[reg];
   publishKey('students');
   renderDashboard();
-  toast(`${reg} password reset. Next login uses DOB.`, 'success');
+  toast(`${reg} password reset.`, 'success');
 }
 
 function openComponentModal(id = null) {
@@ -1601,9 +1548,25 @@ async function resetDemo() {
   toast('Reset.', 'success');
 }
 
-/* ══════════════════════════════════════════════════════════
-   POSTER
-   ══════════════════════════════════════════════════════════ */
+async function clearHistory() {
+  if (session.role !== 'admin') return;
+  const totalRecords = state.history.length;
+  if (!totalRecords) { toast('History is already empty.', 'warn'); return; }
+  const ok = await confirmDialog(
+    'Clear transaction history',
+    `Permanently delete ${totalRecords} transaction record(s)? The current inventory and active loans stay intact. Do this after you've downloaded the Excel backup.`,
+    'Erase history'
+  );
+  if (!ok) return;
+  state.history = [];
+  state.activity = [];
+  publishKey('history');
+  publishKey('activity');
+  saveLocal();
+  renderDashboard();
+  toast(`${totalRecords} records erased.`, 'success', 4000);
+}
+
 function getJoinUrl() {
   const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
   return base + '/';
@@ -1619,14 +1582,10 @@ function renderPoster() {
   $('posterInstructionsPreview').textContent = s.posterInstructions;
   const url = getJoinUrl();
   $('posterUrlPreview').textContent = url;
-
   const warn = $('posterUrlWarning');
   const local = !deployUrl || location.protocol === 'file:';
-  if (local) {
-    warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 mt-0.5 shrink-0"></i><span><strong>Set the URL above</strong> to the deployed site. Otherwise the QR won't open anywhere.</span>`;
-    warn.classList.remove('hidden'); warn.classList.add('flex');
-  } else { warn.classList.add('hidden'); warn.classList.remove('flex'); }
-
+  if (local) { warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 mt-0.5 shrink-0"></i><span><strong>Set the URL above</strong> to the deployed site.</span>`; warn.classList.remove('hidden'); warn.classList.add('flex'); }
+  else { warn.classList.add('hidden'); warn.classList.remove('flex'); }
   $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
 }
 function onPosterInput() {
@@ -1648,9 +1607,6 @@ async function downloadPoster() {
   }).catch(() => toast('Export failed.', 'error'));
 }
 
-/* ══════════════════════════════════════════════════════════
-   SYNC PAGE
-   ══════════════════════════════════════════════════════════ */
 function renderSyncPage() {
   const conn = $('syncStatConn');
   if (conn) conn.innerHTML = connected
@@ -1666,9 +1622,6 @@ function copyJoinUrl() {
   navigator.clipboard.writeText(url).then(() => toast('URL copied.', 'success')).catch(() => prompt('Copy:', url));
 }
 
-/* ══════════════════════════════════════════════════════════
-   EXCEL EXPORT
-   ══════════════════════════════════════════════════════════ */
 function exportExcel() {
   if (session.role !== 'admin') return;
   if (!state.history.length && !state.inventory.length) { toast('Nothing to export.', 'warn'); return; }
@@ -1708,21 +1661,12 @@ function exportExcel() {
   toast('Excel downloaded.', 'success');
 }
 
-/* ══════════════════════════════════════════════════════════
-   BADGES
-   ══════════════════════════════════════════════════════════ */
 function updateBadges() {
   const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
   const badge = $('cartCount');
-  if (badge) {
-    badge.textContent = cartUnits;
-    badge.classList.toggle('hidden', cartUnits === 0);
-  }
+  if (badge) { badge.textContent = cartUnits; badge.classList.toggle('hidden', cartUnits === 0); }
 }
 
-/* ══════════════════════════════════════════════════════════
-   RENDER ALL
-   ══════════════════════════════════════════════════════════ */
 function renderAll() {
   renderOverview();
   renderCatalog();
@@ -1736,9 +1680,6 @@ function renderAll() {
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   TICK
-   ══════════════════════════════════════════════════════════ */
 let lastStatusKey = '';
 function tick() {
   const t = now();
@@ -1762,15 +1703,11 @@ function tick() {
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   BOOTSTRAP
-   ══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
   generateCaptcha();
 
-  // Restore session if valid
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
@@ -1797,22 +1734,18 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateSyncPill, 3000);
 });
 
-/* ══════════════════════════════════════════════════════════
-   EXPOSE
-   ══════════════════════════════════════════════════════════ */
 window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
 window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
 window.returnLoan = returnLoan; window.returnAllLoans = returnAllLoans;
 window.renderCatalog = renderCatalog;
 window.onPosterInput = onPosterInput; window.downloadPoster = downloadPoster; window.showQr = showQr;
 window.openComponentModal = openComponentModal; window.saveComponent = saveComponent;
-window.deleteComponent = deleteComponent; window.saveSettings = saveSettings; window.saveAdmins = saveAdmins;
-window.resetDemo = resetDemo;
-window.openModal = openModal; window.closeModal = closeModal;
-window.forceSync = forceSync; window.copyJoinUrl = copyJoinUrl; window.exportExcel = exportExcel;
-window.attemptLogin = attemptLogin; window.logout = logout; window.generateCaptcha = generateCaptcha;
-window.toggleUserMenu = toggleUserMenu; window.openChangePassword = openChangePassword;
-window.saveNewPassword = saveNewPassword; window.showForgotHelp = showForgotHelp;
+window.deleteComponent = deleteComponent; window.saveSettings = saveSettings;
+window.saveAdminCredentials = saveAdminCredentials;
+window.resetDemo = resetDemo; window.clearHistory = clearHistory;
+window.switchLoginTab = switchLoginTab;
+window.attemptStudentLogin = attemptStudentLogin;
+window.attemptAdminLogin = attemptAdminLogin;
 window.resetStudentPassword = resetStudentPassword;
 </script>
 </body>
