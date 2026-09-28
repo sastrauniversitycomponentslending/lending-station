@@ -30,6 +30,7 @@
 <style>
   * { -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: smooth; }
+  body { transition: background-color .25s ease, color .25s ease; }
   .mono { font-family:'JetBrains Mono',monospace; font-variant-numeric: tabular-nums; }
   .glass { background: linear-gradient(180deg, rgba(19,27,42,.72), rgba(14,20,33,.72)); backdrop-filter: blur(14px) saturate(140%); }
   .fade-up { animation: fadeUp .2s cubic-bezier(.16,1,.3,1); }
@@ -38,6 +39,8 @@
   @keyframes scaleIn { from { opacity:0; transform: scale(.97); } to { opacity:1; transform:none; } }
   @keyframes pulseRing { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.45); } 50% { box-shadow: 0 0 0 12px rgba(244,63,94,0); } }
   .overdue-pulse { animation: pulseRing 2s infinite; }
+  @keyframes shakeAlert { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .shake-alert { animation: shakeAlert .35s ease-in-out 3; }
   .nav-btn { position: relative; }
   .nav-btn::after { content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:2px; background: linear-gradient(90deg,#3b62f6,#5b83fc); border-radius:2px; transform: scaleX(0); transition: transform .22s; }
   .nav-btn.active::after { transform: scaleX(1); }
@@ -50,23 +53,74 @@
   .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
   .tab-pill { transition: all .2s ease; }
   @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
+
+  /* ══════════════════════════════════════════════════════
+     LIGHT THEME OVERRIDES
+     Applied when <html> or <body> has class "theme-light"
+     ══════════════════════════════════════════════════════ */
+  body.theme-light { background-color: #f1f5f9 !important; color: #0f172a !important; }
+  body.theme-light .bg-ink-950 { background-color: #f1f5f9 !important; }
+  body.theme-light .bg-ink-900 { background-color: #ffffff !important; }
+  body.theme-light .bg-ink-850 { background-color: #f8fafc !important; }
+  body.theme-light .bg-ink-800 { background-color: #e2e8f0 !important; }
+  body.theme-light .bg-ink-750 { background-color: #cbd5e1 !important; }
+  body.theme-light .bg-ink-800\/60,
+  body.theme-light .bg-ink-800\/50,
+  body.theme-light .bg-ink-850\/60,
+  body.theme-light .bg-ink-850\/50,
+  body.theme-light .bg-ink-850\/40,
+  body.theme-light .bg-ink-900\/60,
+  body.theme-light .bg-ink-900\/70,
+  body.theme-light .bg-ink-900\/50,
+  body.theme-light .bg-ink-950\/80,
+  body.theme-light .bg-ink-950\/60,
+  body.theme-light .bg-ink-950\/70 { background-color: #ffffff !important; }
+  body.theme-light .text-white { color: #0f172a !important; }
+  body.theme-light .text-slate-100 { color: #1e293b !important; }
+  body.theme-light .text-slate-200 { color: #1e293b !important; }
+  body.theme-light .text-slate-300 { color: #334155 !important; }
+  body.theme-light .text-slate-400 { color: #475569 !important; }
+  body.theme-light .text-slate-500 { color: #64748b !important; }
+  body.theme-light .text-slate-600 { color: #64748b !important; }
+  body.theme-light .border-ink-700,
+  body.theme-light .border-ink-700\/60,
+  body.theme-light .border-ink-600,
+  body.theme-light .border-ink-600\/70,
+  body.theme-light .border-ink-800 { border-color: #e2e8f0 !important; }
+  body.theme-light .glass { background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(248,250,252,.85)) !important; }
+  body.theme-light input,
+  body.theme-light textarea,
+  body.theme-light select { background-color: #ffffff !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
+  body.theme-light input::placeholder,
+  body.theme-light textarea::placeholder { color: #94a3b8 !important; }
+  body.theme-light .bg-gradient-to-br { background: #ffffff !important; }
+  body.theme-light .bg-gradient-to-r { background-image: none !important; }
+  body.theme-light .overdue-pulse { animation: none !important; background-color: #fee2e2 !important; }
+  body.theme-light .bg-rose-950\/20,
+  body.theme-light .bg-rose-950\/10 { background-color: #fee2e2 !important; }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    position: relative;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
 </style>
 </head>
 
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
 <!-- ══════════════════════════════════════════════════════════
-     SETUP SCREEN (first-time admin account creation)
+     SETUP SCREEN
      ══════════════════════════════════════════════════════════ -->
 <div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
     <div class="mb-6 flex justify-center">
       <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)">
-          <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/>
-          <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/>
-        </g>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
         <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
         <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
         <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
@@ -77,12 +131,11 @@
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="bg-gradient-to-r from-rose-500 to-rose-700 py-3.5 text-center">
-        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">First-Time Setup · Administrator</h1>
+        <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">First-Time Setup · Create First Teacher</h1>
       </div>
-
       <div class="p-7 space-y-5">
         <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-[11px] font-medium text-amber-800">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i> This screen appears only once. Create the teacher account below.
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> This creates the first teacher account. You can add more later.
         </div>
 
         <div class="flex items-center gap-4">
@@ -92,14 +145,12 @@
                  onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()"
                  class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
-
         <div class="flex items-center gap-4">
           <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Password</label>
           <input id="setupPassword" type="password" autocomplete="new-password" placeholder="min 6 characters"
                  onkeydown="if(event.key==='Enter')document.getElementById('setupConfirm').focus()"
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
-
         <div class="flex items-center gap-4">
           <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Confirm Password</label>
           <input id="setupConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
@@ -107,26 +158,20 @@
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
 
-        <div class="pt-2">
-          <button id="setupBtn" onclick="completeSetup()"
-                  class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
-            <i class="fa-solid fa-user-plus text-xs"></i>
-            <span id="setupBtnText">Create Admin Account</span>
-          </button>
-        </div>
+        <button id="setupBtn" onclick="completeSetup()"
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+          <span id="setupBtnText">Create First Teacher</span>
+        </button>
 
         <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
 
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
-          <p><b class="text-slate-700">Teacher No</b> must be at least <b>4 characters</b> (letters + digits).</p>
-          <p class="mt-0.5"><b class="text-slate-700">Password</b> must be at least 6 characters.</p>
+          <p><b class="text-slate-700">Teacher No</b> · 4–12 characters (letters + digits).</p>
+          <p class="mt-0.5"><b class="text-slate-700">Password</b> · at least 6 characters.</p>
         </div>
       </div>
     </div>
-
-    <p class="mt-5 text-center text-[10px] text-slate-500">
-      <i class="fa-solid fa-shield-halved mr-1"></i> Bajaj Engineering Skills Training · Component Lending Station
-    </p>
   </div>
 </div>
 
@@ -136,12 +181,9 @@
 <div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
     <div class="mb-6 flex justify-center">
-      <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
+      <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)">
-          <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/>
-          <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/>
-        </g>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
         <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
         <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
         <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
@@ -174,37 +216,29 @@
                  onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()"
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
-
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Password</label>
           <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy"
                  onkeydown="if(event.key==='Enter')document.getElementById('loginCaptchaInput').focus()"
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
-
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Enter captcha</label>
           <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off"
                  onkeydown="if(event.key==='Enter')attemptStudentLogin()"
                  class="w-28 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
-          <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()" title="Click to refresh"></canvas>
+          <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()"></canvas>
         </div>
-
-        <div class="pt-2">
-          <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
-                  class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-600 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-700 disabled:opacity-60">
-            <i class="fa-solid fa-right-to-bracket text-xs"></i>
-            <span id="loginSubmitText">Submit</span>
-          </button>
-        </div>
-
+        <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-600 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-700 disabled:opacity-60">
+          <i class="fa-solid fa-right-to-bracket text-xs"></i>
+          <span id="loginSubmitText">Submit</span>
+        </button>
         <div class="text-right">
           <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-700 underline decoration-dotted hover:text-bajaj-900">Forgot password?</button>
         </div>
-
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
-          <p>For your first login use your <b class="text-slate-700">Date of Birth</b> as password.</p>
-          <p class="mt-0.5">[Date format <b class="mono text-slate-700">ddmmyyyy</b> E.g. 03121990]</p>
+          <p>First login: use your <b class="text-slate-700">Date of Birth</b> as password (ddmmyyyy).</p>
         </div>
       </div>
 
@@ -216,22 +250,17 @@
                  onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
                  class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
-
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Password</label>
           <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="••••••••"
                  onkeydown="if(event.key==='Enter')attemptAdminLogin()"
                  class="flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
-
-        <div class="pt-2">
-          <button id="adminLoginBtn" onclick="attemptAdminLogin()"
-                  class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
-            <i class="fa-solid fa-user-shield text-xs"></i>
-            <span id="adminLoginBtnText">Sign in as Teacher</span>
-          </button>
-        </div>
-
+        <button id="adminLoginBtn" onclick="attemptAdminLogin()"
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-shield text-xs"></i>
+          <span id="adminLoginBtnText">Sign in as Teacher</span>
+        </button>
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
           <p>Teacher access only.</p>
         </div>
@@ -242,10 +271,6 @@
         <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-center text-xs font-semibold text-emerald-700"></p>
       </div>
     </div>
-
-    <p class="mt-5 text-center text-[10px] text-slate-500">
-      <i class="fa-solid fa-shield-halved mr-1"></i> Bajaj Engineering Skills Training · Component Lending Station
-    </p>
   </div>
 </div>
 
@@ -292,6 +317,12 @@
         </div>
       </div>
 
+      <!-- THEME TOGGLE -->
+      <button id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme"
+              class="focus-ring theme-toggle border border-ink-600/70 bg-ink-800/60 text-amber-300 hover:border-brand-500/50 hover:text-white">
+        <i id="themeIcon" class="fa-solid fa-sun text-[14px]"></i>
+      </button>
+
       <button onclick="openCart()" class="focus-ring relative flex items-center gap-2 rounded-xl bg-brand-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-500 active:scale-[.97]">
         <i class="fa-solid fa-cart-shopping text-[11px]"></i>
         <span class="hidden sm:inline">Cart</span>
@@ -331,8 +362,23 @@
   </nav>
 </header>
 
+<!-- OVERDUE ALERT BANNER (persistent, shown to the borrower) -->
+<div id="overdueAlertBanner" class="hidden mx-auto w-full max-w-[1400px] px-4 pt-4 lg:px-6">
+  <div class="overdue-pulse flex flex-wrap items-center gap-3 rounded-2xl border-2 border-rose-500 bg-rose-950/40 p-4 sm:p-5">
+    <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-rose-500 text-white">
+      <i class="fa-solid fa-bell text-xl"></i>
+    </div>
+    <div class="flex-1 min-w-[200px]">
+      <h3 class="text-sm font-extrabold text-rose-200">You have overdue components!</h3>
+      <p id="overdueAlertDetail" class="mt-0.5 text-xs text-rose-300/90"></p>
+    </div>
+    <button onclick="go('loans')" class="focus-ring rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500">View items</button>
+  </div>
+</div>
+
 <main class="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 lg:px-6 lg:py-8">
 
+<!-- OVERVIEW -->
 <section id="view-overview" class="space-y-6">
   <div class="relative overflow-hidden rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-6 sm:p-9">
     <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-bajaj-500/10 blur-3xl"></div>
@@ -380,6 +426,7 @@
   </div>
 </section>
 
+<!-- CATALOG -->
 <section id="view-catalog" class="hidden space-y-5">
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-col gap-4">
@@ -410,6 +457,7 @@
   <div id="catalogGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
 </section>
 
+<!-- LOANS -->
 <section id="view-loans" class="hidden space-y-5">
   <div class="flex flex-col gap-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
     <div><h1 class="text-lg font-bold text-white">Active Borrowed Items</h1><p class="mt-0.5 text-xs text-slate-500">Live timers · one-click returns</p></div>
@@ -418,11 +466,15 @@
   <div id="loanList" class="grid grid-cols-1 gap-4 lg:grid-cols-2"></div>
 </section>
 
+<!-- DASHBOARD -->
 <section id="view-dashboard" class="hidden space-y-5">
   <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/25 bg-gradient-to-r from-brand-950/40 to-ink-850/50 p-4 sm:p-5">
     <div class="flex items-center gap-3.5">
       <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-400"><i class="fa-solid fa-user-shield text-lg"></i></div>
       <div><h1 class="text-base font-bold text-white">Teacher Console</h1><p class="mt-0.5 text-xs text-brand-300/70">Real-time stock control</p></div>
+    </div>
+    <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300">
+      Signed in as <span id="dashCurrentUser" class="mono font-bold">—</span>
     </div>
   </div>
 
@@ -433,6 +485,7 @@
     <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4"><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Overdue</span><div class="mono mt-2 text-2xl font-bold text-rose-400" id="admOverdue">0</div></div>
   </div>
 
+  <!-- Live Ledger -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
       <div><h3 class="text-sm font-bold text-white">Live Borrowed Items</h3></div>
@@ -455,6 +508,7 @@
     </div>
   </div>
 
+  <!-- Inventory -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-ink-700/60 px-5 py-4">
       <div><h3 class="text-sm font-bold text-white">Master Inventory</h3></div>
@@ -477,6 +531,7 @@
     </div>
   </div>
 
+  <!-- Settings -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -490,39 +545,29 @@
     </div>
   </div>
 
+  <!-- MANAGE TEACHERS (multi-admin) -->
   <div class="rounded-2xl border border-rose-500/25 bg-rose-950/10 p-5">
-    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-key text-xs text-rose-400"></i> Teacher Credentials</h3>
-    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the Teacher No and Password. Teacher No must be at least 4 characters.</p>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div>
-        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
-        <input id="setAdminUser" type="text" maxlength="12" autocomplete="off"
-               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
-               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs tracking-[.2em] text-white" />
-      </div>
-      <div>
-        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">New password</label>
-        <input id="setAdminPass" type="password" autocomplete="new-password" placeholder="leave blank to keep"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
-      </div>
-      <div>
-        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm password</label>
-        <input id="setAdminPassConfirm" type="password" autocomplete="new-password" placeholder="repeat new password"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
-      </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h3 class="flex items-center gap-2 text-sm font-bold text-white">
+        <i class="fa-solid fa-users text-xs text-rose-400"></i> Manage Teachers
+        <span id="teacherCountBadge" class="rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-300">0</span>
+      </h3>
+      <button onclick="openAddTeacherModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-500">
+        <i class="fa-solid fa-user-plus text-[11px]"></i> Add Teacher
+      </button>
     </div>
-    <p id="credMessage" class="mt-3 hidden text-xs font-medium"></p>
-    <div class="mt-4 flex justify-end">
-      <button onclick="saveAdminCredentials()" class="focus-ring flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-rose-500"><i class="fa-solid fa-key text-[11px]"></i> Update credentials</button>
-    </div>
+    <p class="mb-4 text-xs leading-relaxed text-slate-400">Any teacher listed here can sign in to this console. You cannot remove yourself.</p>
+    <div id="teachersList" class="space-y-2"></div>
   </div>
 
+  <!-- REGISTERED STUDENTS -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-graduation-cap text-xs text-brand-400"></i> Registered Students</h3>
     <div id="studentsList" class="max-h-64 space-y-1.5 overflow-y-auto"></div>
   </div>
 </section>
 
+<!-- POSTER -->
 <section id="view-poster" class="hidden space-y-5">
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-5">
     <div class="space-y-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-5 lg:col-span-2">
@@ -535,8 +580,7 @@
         <input id="posterSubtitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Portal URL</label>
         <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.com/"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
-        <div id="posterUrlWarning" class="mt-2 hidden items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-300"></div></div>
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" /></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Instructions</label>
         <textarea id="posterInstructions" rows="3" oninput="onPosterInput()" class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white"></textarea></div>
       <div class="space-y-2 pt-1">
@@ -566,6 +610,7 @@
   </div>
 </section>
 
+<!-- SYNC -->
 <section id="view-sync" class="hidden space-y-5">
   <div class="rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/30 via-ink-850/50 to-ink-900/50 p-6 sm:p-8">
     <div class="flex items-start gap-4">
@@ -606,7 +651,9 @@
 </footer>
 </div>
 
-<!-- CART DRAWER -->
+<!-- ══════════════════════════════════════════════════════════
+     CART DRAWER
+     ══════════════════════════════════════════════════════════ -->
 <div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
   <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
     <div class="flex items-center justify-between border-b border-ink-700/60 px-5 py-4">
@@ -639,6 +686,39 @@
       <textarea id="cmpDesc" rows="2" placeholder="Description" class="focus-ring col-span-2 w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
     </div>
     <div class="flex gap-2"><button onclick="closeModal('mComponent')" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button><button onclick="saveComponent()" class="focus-ring w-1/2 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500">Save</button></div>
+  </div>
+</div>
+
+<!-- ADD TEACHER MODAL -->
+<div id="mAddTeacher" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-md space-y-5 rounded-2xl border border-rose-700/50 bg-ink-850 p-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white">Add New Teacher</h3>
+      <button onclick="closeModal('mAddTeacher')" class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
+        <input id="newTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
+               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs tracking-[.2em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Password</label>
+        <input id="newTeacherPass" type="password" autocomplete="new-password" placeholder="min 6 characters"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm Password</label>
+        <input id="newTeacherPassConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
+    </div>
+    <p id="addTeacherError" class="hidden text-xs font-medium text-rose-400"></p>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mAddTeacher')" class="focus-ring w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="saveNewTeacher()" class="focus-ring w-1/2 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-500">Add Teacher</button>
+    </div>
   </div>
 </div>
 
@@ -680,9 +760,34 @@
   </div>
 </div>
 
+<!-- OVERDUE NOTIFICATION MODAL -->
+<div id="mOverdue" class="fixed inset-0 z-[97] hidden items-center justify-center bg-rose-950/70 p-4 backdrop-blur-md">
+  <div class="scale-in shake-alert w-full max-w-md space-y-5 rounded-2xl border-2 border-rose-500 bg-ink-850 p-6 shadow-2xl shadow-rose-500/30">
+    <div class="text-center">
+      <div class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-rose-500 text-white">
+        <i class="fa-solid fa-bell text-2xl"></i>
+      </div>
+      <h3 class="mt-4 text-lg font-extrabold text-rose-300">Overdue Notice</h3>
+      <p class="mt-1 text-xs text-slate-400">The following components are past their due time</p>
+    </div>
+    <div id="overdueItemsList" class="max-h-60 space-y-2 overflow-y-auto"></div>
+    <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-xs leading-relaxed text-rose-200">
+      <i class="fa-solid fa-circle-info mr-1"></i>
+      Please return these items to the lab immediately.
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mOverdue')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Dismiss</button>
+      <button onclick="closeModal('mOverdue'); go('loans');" class="w-1/2 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-500">View my loans</button>
+    </div>
+  </div>
+</div>
+
 <div id="toasts" class="pointer-events-none fixed bottom-5 right-5 z-[110] flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col gap-2"></div>
 
 <script>
+/* ═══════════════════════════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════════════════════════ */
 const BUILTIN_FIREBASE = {
   apiKey: "AIzaSyCmg42q2ZN_GNH65pCSprXHyu7ZZ1RKZTE",
   authDomain: "components-8893a.firebaseapp.com",
@@ -694,8 +799,10 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const SINGLE_STATION = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v2';
-const SESSION_KEY = 'bajaj.session.v2';
+const STORAGE_KEY = 'bajaj.lending.v3';
+const SESSION_KEY = 'bajaj.session.v3';
+const THEME_KEY = 'bajaj.theme';
+const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MAX_ACTIVITY = 40;
 const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity', 'students', 'adminConfig'];
 const MIN_ADMIN_USER_LEN = 4;
@@ -741,11 +848,40 @@ let fbApp = null, fbDb = null, stationRef = null, connected = false;
 let lastSentAt = 0, lastRecvAt = 0;
 let captchaCode = '';
 let loginTab = 'student';
+let currentTheme = 'dark';
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+/* ═══════════════════════════════════════════════════════════════
+   THEME
+   ═══════════════════════════════════════════════════════════════ */
+function applyTheme(theme) {
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  const icon = $('themeIcon');
+  if (currentTheme === 'light') {
+    document.body.classList.add('theme-light');
+    if (icon) icon.className = 'fa-solid fa-moon text-[14px]';
+  } else {
+    document.body.classList.remove('theme-light');
+    if (icon) icon.className = 'fa-solid fa-sun text-[14px]';
+  }
+  try { localStorage.setItem(THEME_KEY, currentTheme); } catch {}
+}
+function toggleTheme() {
+  applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+  toast(`Switched to ${currentTheme} mode.`, 'info', 1500);
+}
+function loadTheme() {
+  let saved = 'dark';
+  try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch {}
+  applyTheme(saved);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HASHING
+   ═══════════════════════════════════════════════════════════════ */
 function stableHash(text) {
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0; i < text.length; i++) {
@@ -770,6 +906,9 @@ async function hashPassword(pw) {
   return stableHash('best::' + pw);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
 function now() { return Date.now() + serverClockOffsetMs + state.simOffsetMs; }
 function findItem(id) { return state.inventory.find(i => i.id === id); }
 function fmtTime(ms) { return new Date(ms).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
@@ -789,6 +928,22 @@ function newLoanId() { return 'TXN-' + Math.floor(100000 + Math.random()*900000)
 function sanitizeCart() { Object.keys(state.cart).forEach(id => { const it = findItem(id); const q = Number(state.cart[id])||0; if (!it || q <= 0) { delete state.cart[id]; return; } const max = availableQty(id); if (q > max) { max <= 0 ? delete state.cart[id] : state.cart[id] = max; } }); }
 function logActivity(type, message) { state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() }); if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY; }
 
+function getAdmins() {
+  if (!state.adminConfig) return [];
+  if (Array.isArray(state.adminConfig.admins)) return state.adminConfig.admins;
+  // legacy single-admin format
+  if (state.adminConfig.username && state.adminConfig.passwordHash) {
+    return [{ username: state.adminConfig.username, passwordHash: state.adminConfig.passwordHash, createdAt: state.adminConfig.createdAt || Date.now() }];
+  }
+  return [];
+}
+function findAdminByUsername(name) {
+  return getAdmins().find(a => (a.username || '').toUpperCase() === (name || '').toUpperCase());
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOASTS / MODALS
+   ═══════════════════════════════════════════════════════════════ */
 function toast(message, type='info', ttl=3500) {
   const cfg = {
     info:    { icon:'fa-circle-info',          color:'text-brand-400',   border:'border-brand-500/30',   bg:'bg-brand-500/10' },
@@ -819,6 +974,9 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   CAPTCHA
+   ═══════════════════════════════════════════════════════════════ */
 function generateCaptcha() {
   const canvas = $('captchaCanvas');
   if (!canvas) return;
@@ -826,21 +984,14 @@ function generateCaptcha() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   captchaCode = '';
   for (let i = 0; i < 5; i++) captchaCode += chars[Math.floor(Math.random()*chars.length)];
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, '#f1f5f9');
-  grad.addColorStop(1, '#e2e8f0');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  grad.addColorStop(0, '#f1f5f9'); grad.addColorStop(1, '#e2e8f0');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < 5; i++) {
     ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
     ctx.lineWidth = 1 + Math.random();
-    ctx.beginPath();
-    ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height);
-    ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.stroke();
   }
   for (let i = 0; i < 40; i++) {
     ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
@@ -848,15 +999,16 @@ function generateCaptcha() {
   }
   for (let i = 0; i < captchaCode.length; i++) {
     ctx.save();
-    ctx.translate(16 + i * 26, 32);
-    ctx.rotate((Math.random() - 0.5) * 0.6);
+    ctx.translate(16 + i * 26, 32); ctx.rotate((Math.random() - 0.5) * 0.6);
     ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`;
     ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`;
-    ctx.fillText(captchaCode[i], 0, 0);
-    ctx.restore();
+    ctx.fillText(captchaCode[i], 0, 0); ctx.restore();
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   AUTH
+   ═══════════════════════════════════════════════════════════════ */
 function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
 function showLoginInfo(msg) { const i = $('loginInfo'); i.textContent = msg; i.classList.remove('hidden'); $('loginError').classList.add('hidden'); }
 function clearLoginMessages() { $('loginError').classList.add('hidden'); $('loginInfo').classList.add('hidden'); }
@@ -873,18 +1025,14 @@ function switchLoginTab(tab) {
   const adminHeader = $('adminHeader');
 
   if (tab === 'student') {
-    studentForm.classList.remove('hidden');
-    adminForm.classList.add('hidden');
-    studentHeader.classList.remove('hidden');
-    adminHeader.classList.add('hidden');
+    studentForm.classList.remove('hidden'); adminForm.classList.add('hidden');
+    studentHeader.classList.remove('hidden'); adminHeader.classList.add('hidden');
     tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
     tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
     setTimeout(() => $('loginRegister').focus(), 100);
   } else {
-    studentForm.classList.add('hidden');
-    adminForm.classList.remove('hidden');
-    studentHeader.classList.add('hidden');
-    adminHeader.classList.remove('hidden');
+    studentForm.classList.add('hidden'); adminForm.classList.remove('hidden');
+    studentHeader.classList.add('hidden'); adminHeader.classList.remove('hidden');
     tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
     tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
     setTimeout(() => $('adminUserInput').focus(), 100);
@@ -905,32 +1053,27 @@ async function completeSetup() {
   if (pw.length < MIN_ADMIN_PASS_LEN) { showSetupError(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`); return; }
   if (pw !== cf) { showSetupError('Passwords do not match.'); return; }
 
-  btn.disabled = true;
-  btnTxt.textContent = 'Creating…';
+  btn.disabled = true; btnTxt.textContent = 'Creating…';
 
   try {
     const hash = await hashPassword(pw);
-    const cfg = { username: teacherNo, passwordHash: hash, createdAt: Date.now() };
+    const cfg = {
+      admins: [{ username: teacherNo, passwordHash: hash, createdAt: Date.now() }],
+      createdAt: Date.now()
+    };
     state.adminConfig = cfg;
     saveLocal();
     publishKey('adminConfig');
 
-    $('setupScreen').classList.add('hidden');
-    $('setupScreen').classList.remove('flex');
-    $('loginScreen').classList.remove('hidden');
-    $('loginScreen').classList.add('flex');
+    $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
+    $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
     generateCaptcha();
     switchLoginTab('admin');
     $('adminUserInput').value = teacherNo;
     setTimeout(() => $('adminPassInput').focus(), 200);
-    toast(`Teacher account "${teacherNo}" created. Sign in with your password.`, 'success', 5000);
-  } catch (e) {
-    console.error(e);
-    showSetupError('Setup failed. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btnTxt.textContent = 'Create Admin Account';
-  }
+    toast(`First teacher "${teacherNo}" created.`, 'success', 5000);
+  } catch (e) { console.error(e); showSetupError('Setup failed. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Create First Teacher'; }
 }
 
 async function attemptStudentLogin() {
@@ -944,52 +1087,26 @@ async function attemptStudentLogin() {
   if (!reg) { showLoginError('Please enter your Register No.'); return; }
   if (!pw) { showLoginError('Please enter your Password.'); return; }
   if (!captchaInput) { showLoginError('Please enter the captcha.'); return; }
-  if (captchaInput !== captchaCode) {
-    showLoginError('Captcha does not match. Try again.');
-    generateCaptcha();
-    $('loginCaptchaInput').value = '';
-    return;
-  }
+  if (captchaInput !== captchaCode) { showLoginError('Captcha does not match. Try again.'); generateCaptcha(); $('loginCaptchaInput').value = ''; return; }
 
-  btn.disabled = true;
-  btnTxt.textContent = 'Verifying…';
-
+  btn.disabled = true; btnTxt.textContent = 'Verifying…';
   try {
     const hash = await hashPassword(pw);
     const students = state.students || {};
     const existing = students[reg];
-
     if (existing) {
-      if (hash === existing.passwordHash) {
-        enterApp('user', reg, existing.name || reg);
-      } else {
-        showLoginError('Incorrect password.');
-        $('loginPassword').select();
-      }
+      if (hash === existing.passwordHash) { enterApp('user', reg, existing.name || reg); }
+      else { showLoginError('Incorrect password.'); $('loginPassword').select(); }
       return;
     }
-
-    if (!/^\d{8}$/.test(pw)) {
-      showLoginError('First-time login: use your Date of Birth (ddmmyyyy).');
-      return;
-    }
-
+    if (!/^\d{8}$/.test(pw)) { showLoginError('First-time login: use your Date of Birth (ddmmyyyy).'); return; }
     state.students = state.students || {};
-    state.students[reg] = {
-      register: reg, name: 'Student ' + reg,
-      passwordHash: hash, createdAt: Date.now()
-    };
+    state.students[reg] = { register: reg, name: 'Student ' + reg, passwordHash: hash, createdAt: Date.now() };
     publishKey('students');
     enterApp('user', reg, state.students[reg].name);
     toast('Welcome! Your password is now your DOB.', 'success', 5000);
-
-  } catch (e) {
-    console.error(e);
-    showLoginError('Login error. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btnTxt.textContent = 'Submit';
-  }
+  } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
 }
 
 async function attemptAdminLogin() {
@@ -1003,50 +1120,34 @@ async function attemptAdminLogin() {
   if (teacherNo.length < MIN_ADMIN_USER_LEN) { showLoginError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
   if (!password) { showLoginError('Please enter your Password.'); return; }
 
-  btn.disabled = true;
-  btnTxt.textContent = 'Verifying…';
+  btn.disabled = true; btnTxt.textContent = 'Verifying…';
 
   try {
-    if (!state.adminConfig || !state.adminConfig.passwordHash) {
-      await new Promise(r => setTimeout(r, 1000));
-    }
+    if (!state.adminConfig) { await new Promise(r => setTimeout(r, 1000)); }
+    const admins = getAdmins();
+    if (!admins.length) { showLoginError('No teacher accounts found. Please refresh the page.'); return; }
 
-    if (!state.adminConfig || !state.adminConfig.passwordHash) {
-      showLoginError('Admin account not set up yet. Please refresh the page.');
-      return;
-    }
+    const admin = findAdminByUsername(teacherNo);
+    if (!admin) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
 
-    const expectedUser = (state.adminConfig.username || '').toUpperCase();
     const hash = await hashPassword(password);
+    if (hash !== admin.passwordHash) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
 
-    if (teacherNo !== expectedUser || hash !== state.adminConfig.passwordHash) {
-      showLoginError('Incorrect Teacher No or Password.');
-      $('adminPassInput').select();
-      return;
-    }
-
-    enterApp('admin', teacherNo, 'Teacher');
-
-  } catch (e) {
-    console.error(e);
-    showLoginError('Login error. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btnTxt.textContent = 'Sign in as Teacher';
-  }
+    enterApp('admin', teacherNo, admin.username);
+  } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Teacher'; }
 }
 
 function enterApp(role, register, name) {
   session = { role, register, name };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
-  $('loginScreen').classList.add('hidden');
-  $('loginScreen').classList.remove('flex');
-  $('setupScreen').classList.add('hidden');
-  $('setupScreen').classList.remove('flex');
+  $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
+  $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
   $('app').classList.remove('hidden');
   applyRoleUI();
   renderAll();
   tick();
+  checkOverdueForCurrentUser(true);
 }
 
 function applyRoleUI() {
@@ -1056,7 +1157,6 @@ function applyRoleUI() {
     if (isAdminUser) el.classList.remove('hidden');
     else el.classList.add('hidden');
   });
-
   if (session.register) {
     $('userAvatar').textContent = session.register.slice(0, 1).toUpperCase();
     $('userLabel').textContent = session.register;
@@ -1077,13 +1177,9 @@ function logout() {
   session = { role: null, register: null, name: null };
   try { sessionStorage.removeItem(SESSION_KEY); } catch {}
   $('app').classList.add('hidden');
-  $('loginScreen').classList.remove('hidden');
-  $('loginScreen').classList.add('flex');
-  $('loginRegister').value = '';
-  $('loginPassword').value = '';
-  $('loginCaptchaInput').value = '';
-  $('adminUserInput').value = '';
-  $('adminPassInput').value = '';
+  $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
+  $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  $('adminUserInput').value = ''; $('adminPassInput').value = '';
   clearLoginMessages();
   generateCaptcha();
   switchLoginTab('student');
@@ -1118,9 +1214,12 @@ async function saveNewPassword() {
   const newHash = await hashPassword(nw);
 
   if (session.role === 'admin') {
-    if (!state.adminConfig || curHash !== state.adminConfig.passwordHash) { show('Current password is incorrect.', false); return; }
-    state.adminConfig.passwordHash = newHash;
-    state.adminConfig.updatedAt = Date.now();
+    const admins = getAdmins();
+    const idx = admins.findIndex(a => a.username === session.register);
+    if (idx === -1 || curHash !== admins[idx].passwordHash) { show('Current password is incorrect.', false); return; }
+    admins[idx].passwordHash = newHash;
+    admins[idx].updatedAt = Date.now();
+    state.adminConfig = { ...(state.adminConfig || {}), admins };
     publishKey('adminConfig');
     show('Password updated.', true);
     toast('Password changed.', 'success');
@@ -1140,12 +1239,12 @@ function showForgotHelp() {
   showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask teacher to reset.');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════════════════════ */
 function go(view) {
   const isAdminUser = session.role === 'admin';
-  if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) {
-    toast('Teacher access required.', 'warn');
-    return;
-  }
+  if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) { toast('Teacher access required.', 'warn'); return; }
   activeView = view;
   ['overview','catalog','loans','dashboard','poster','sync'].forEach(v => {
     const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view);
@@ -1162,6 +1261,9 @@ function go(view) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   FIREBASE
+   ═══════════════════════════════════════════════════════════════ */
 function initFirebase() {
   try {
     if (!firebase.apps.length) fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
@@ -1191,11 +1293,11 @@ function connectStation() {
         if (val && typeof val === 'object') state.adminConfig = val;
         else state.adminConfig = null;
         updateAuthScreen();
-      }
-      else return;
+      } else return;
       lastRecvAt = Date.now();
       sanitizeCart();
       renderAll();
+      checkOverdueForCurrentUser(false);
       if (activeView === 'sync') renderSyncPage();
     });
   });
@@ -1216,23 +1318,18 @@ function connectStation() {
 
 function updateAuthScreen() {
   if (session && session.role) return;
-  const hasAdmin = state.adminConfig && state.adminConfig.passwordHash;
+  const admins = getAdmins();
+  const hasAdmin = admins.length > 0;
   const setupEl = $('setupScreen');
   const loginEl = $('loginScreen');
 
   if (hasAdmin) {
-    setupEl.classList.add('hidden');
-    setupEl.classList.remove('flex');
-    loginEl.classList.remove('hidden');
-    loginEl.classList.add('flex');
-  } else {
-    if (connected) {
-      loginEl.classList.add('hidden');
-      loginEl.classList.remove('flex');
-      setupEl.classList.remove('hidden');
-      setupEl.classList.add('flex');
-      setTimeout(() => $('setupTeacherNo').focus(), 150);
-    }
+    setupEl.classList.add('hidden'); setupEl.classList.remove('flex');
+    loginEl.classList.remove('hidden'); loginEl.classList.add('flex');
+  } else if (connected) {
+    loginEl.classList.add('hidden'); loginEl.classList.remove('flex');
+    setupEl.classList.remove('hidden'); setupEl.classList.add('flex');
+    setTimeout(() => $('setupTeacherNo').focus(), 150);
   }
 }
 
@@ -1260,6 +1357,7 @@ async function pullLatest() {
     lastRecvAt = Date.now();
     updateAuthScreen();
     renderAll();
+    checkOverdueForCurrentUser(false);
   } catch (e) {}
 }
 
@@ -1283,6 +1381,9 @@ function forceSync() {
   pullLatest().then(() => toast('Pulled latest from server.', 'success'));
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PERSISTENCE
+   ═══════════════════════════════════════════════════════════════ */
 function saveLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
     inventory: state.inventory, loans: state.loans, history: state.history,
@@ -1311,6 +1412,53 @@ function loadLocal() {
 }
 function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
 
+/* ═══════════════════════════════════════════════════════════════
+   OVERDUE NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════════ */
+function checkOverdueForCurrentUser(showModalNow) {
+  if (!session || !session.register || session.role === 'admin') {
+    // hide banner for admins/guests
+    const banner = $('overdueAlertBanner');
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+  const myOverdue = state.loans.filter(l => l.borrowerId === session.register && isOverdue(l, now()));
+  const banner = $('overdueAlertBanner');
+  if (banner) {
+    if (myOverdue.length) {
+      banner.classList.remove('hidden');
+      $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · please return immediately`;
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  // Show popup modal once per session per loan id
+  let notified = {};
+  try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
+  const newOnes = myOverdue.filter(l => !notified[l.loanId]);
+  if (newOnes.length && (showModalNow || true)) {
+    const list = $('overdueItemsList');
+    if (list) {
+      list.innerHTML = newOnes.map(l => `
+        <div class="flex items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-950/30 p-3">
+          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-500/20 text-rose-300"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div>
+          <div class="min-w-0 flex-1">
+            <div class="truncate text-xs font-bold text-white">${esc(l.itemName)}</div>
+            <div class="mono text-[10px] text-rose-300/80">${esc(l.loanId)} · overdue by ${fmtDurShort(now() - l.dueTimeMs)}</div>
+          </div>
+        </div>`).join('');
+    }
+    openModal('mOverdue');
+    newOnes.forEach(l => { notified[l.loanId] = true; });
+    try { sessionStorage.setItem(OVERDUE_NOTIFIED_KEY, JSON.stringify(notified)); } catch {}
+    toast(`You have ${newOnes.length} overdue item${newOnes.length===1?'':'s'}!`, 'error', 6000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER: OVERVIEW
+   ═══════════════════════════════════════════════════════════════ */
 function renderOverview() {
   const t = now();
   const total = state.inventory.reduce((s,i) => s + i.totalStock, 0);
@@ -1333,6 +1481,9 @@ function renderOverview() {
     : `${state.settings.loanDurationMinutes} minutes`;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   RENDER: CATALOG
+   ═══════════════════════════════════════════════════════════════ */
 function populateCategories() {
   const sel = $('catalogCategory'); if (!sel) return;
   const cur = sel.value || 'ALL';
@@ -1393,6 +1544,9 @@ function quickAdd() {
   input.value = ''; input.focus();
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   CART
+   ═══════════════════════════════════════════════════════════════ */
 function openCart() {
   $('borrowerName').value = state.borrower.name || (session.name || '');
   $('borrowerId').value = state.borrower.id || (session.register || '');
@@ -1455,6 +1609,9 @@ function checkoutCart() {
   go('loans');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   LOANS
+   ═══════════════════════════════════════════════════════════════ */
 function renderLoans() {
   const box = $('loanList'); if (!box) return;
   const t = now();
@@ -1484,6 +1641,7 @@ async function returnLoan(loanId) {
   logActivity('return', `${loan.borrowerName} returned ${loan.quantity} × ${loan.itemName}`);
   saveAndPublish('loans', 'history', 'activity');
   renderAll();
+  checkOverdueForCurrentUser(false);
   toast(`Returned ${loan.itemName}.`, 'success');
 }
 
@@ -1500,9 +1658,13 @@ async function returnAllLoans() {
   logActivity('return', `All ${count} active loan(s) returned`);
   saveAndPublish('loans', 'history', 'activity');
   renderAll();
+  checkOverdueForCurrentUser(false);
   toast(`Returned ${count}.`, 'success');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
 function renderDashboard() {
   if (session.role !== 'admin') return;
   const t = now();
@@ -1510,6 +1672,7 @@ function renderDashboard() {
   $('admOnLoan').textContent = state.loans.reduce((s,l) => s+l.quantity, 0);
   $('admBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
   $('admOverdue').textContent = state.loans.filter(l => isOverdue(l, t)).length;
+  $('dashCurrentUser').textContent = session.register || '—';
 
   const tbody = $('ledgerBody');
   const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
@@ -1536,13 +1699,89 @@ function renderDashboard() {
 
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
-  const adminUser = (state.adminConfig && state.adminConfig.username) || '';
-  $('setAdminUser').value = adminUser;
 
+  renderTeachersList();
+  renderStudentsList();
+}
+
+function renderTeachersList() {
+  const admins = getAdmins();
+  const badge = $('teacherCountBadge');
+  if (badge) badge.textContent = admins.length;
+  const list = $('teachersList');
+  if (!list) return;
+  if (!admins.length) { list.innerHTML = `<p class="text-xs text-slate-500">No teachers configured.</p>`; return; }
+  list.innerHTML = admins.map(a => {
+    const isMe = a.username === session.register;
+    return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/20 bg-ink-900/60 p-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-rose-500 to-rose-700 text-xs font-bold text-white">${esc(a.username.slice(0,1))}</div>
+        <div class="min-w-0">
+          <div class="mono text-xs font-bold text-white flex items-center gap-2">
+            ${esc(a.username)}
+            ${isMe ? '<span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-300">You</span>' : ''}
+          </div>
+          <div class="text-[10px] text-slate-500">Added ${relTime(a.createdAt || Date.now())}</div>
+        </div>
+      </div>
+      ${isMe ? '' : `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/30 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>`}
+    </div>`;
+  }).join('');
+}
+
+function renderStudentsList() {
   const students = Object.values(state.students || {}).sort((a,b) => b.createdAt - a.createdAt);
-  const studentsList = $('studentsList');
-  if (!students.length) studentsList.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
-  else studentsList.innerHTML = students.map(s => `<div class="flex items-center justify-between rounded-lg border border-ink-700/60 bg-ink-900/50 px-3 py-2"><div class="min-w-0"><div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div><div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div></div><button onclick="resetStudentPassword('${esc(s.register)}')" class="text-[10px] font-semibold text-amber-400 hover:text-amber-300">Reset password</button></div>`).join('');
+  const list = $('studentsList');
+  if (!list) return;
+  if (!students.length) list.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
+  else list.innerHTML = students.map(s => `<div class="flex items-center justify-between rounded-lg border border-ink-700/60 bg-ink-900/50 px-3 py-2"><div class="min-w-0"><div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div><div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div></div><button onclick="resetStudentPassword('${esc(s.register)}')" class="text-[10px] font-semibold text-amber-400 hover:text-amber-300">Reset password</button></div>`).join('');
+}
+
+/* ── MULTI-ADMIN ACTIONS ── */
+function openAddTeacherModal() {
+  if (session.role !== 'admin') return;
+  $('newTeacherNo').value = ''; $('newTeacherPass').value = ''; $('newTeacherPassConfirm').value = '';
+  $('addTeacherError').classList.add('hidden');
+  openModal('mAddTeacher');
+  setTimeout(() => $('newTeacherNo').focus(), 100);
+}
+
+async function saveNewTeacher() {
+  if (session.role !== 'admin') return;
+  const no = $('newTeacherNo').value.trim().toUpperCase();
+  const pw = $('newTeacherPass').value;
+  const cf = $('newTeacherPassConfirm').value;
+  const err = $('addTeacherError');
+  const showErr = msg => { err.textContent = msg; err.classList.remove('hidden'); };
+  err.classList.add('hidden');
+
+  if (no.length < MIN_ADMIN_USER_LEN) { showErr(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
+  if (no.length > MAX_ADMIN_USER_LEN) { showErr(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`); return; }
+  if (!/^[A-Z0-9]+$/.test(no)) { showErr('Teacher No can only contain letters and digits.'); return; }
+  if (pw.length < MIN_ADMIN_PASS_LEN) { showErr(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`); return; }
+  if (pw !== cf) { showErr('Passwords do not match.'); return; }
+  if (findAdminByUsername(no)) { showErr(`Teacher No "${no}" already exists.`); return; }
+
+  const hash = await hashPassword(pw);
+  const admins = getAdmins();
+  admins.push({ username: no, passwordHash: hash, createdAt: Date.now() });
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  closeModal('mAddTeacher');
+  renderTeachersList();
+  toast(`Teacher "${no}" added.`, 'success');
+}
+
+async function removeTeacher(username) {
+  if (session.role !== 'admin') return;
+  if (username === session.register) { toast('You cannot remove yourself.', 'warn'); return; }
+  const ok = await confirmDialog('Remove teacher', `Remove teacher "${username}"? They will no longer be able to sign in.`, 'Remove');
+  if (!ok) return;
+  const admins = getAdmins().filter(a => a.username !== username);
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  renderTeachersList();
+  toast(`Teacher "${username}" removed.`, 'success');
 }
 
 function saveSettings() {
@@ -1552,37 +1791,6 @@ function saveSettings() {
   publishKey('settings');
   renderAll();
   toast('Settings saved.', 'success');
-}
-
-async function saveAdminCredentials() {
-  if (session.role !== 'admin') return;
-  const newUser = $('setAdminUser').value.trim().toUpperCase();
-  const newPass = $('setAdminPass').value;
-  const confirmPass = $('setAdminPassConfirm').value;
-  const msg = $('credMessage');
-  const show = (t, ok) => { msg.textContent = t; msg.className = `mt-3 text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 4000); };
-
-  if (newUser.length < MIN_ADMIN_USER_LEN) { show(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`, false); return; }
-  if (newUser.length > MAX_ADMIN_USER_LEN) { show(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`, false); return; }
-  if (!/^[A-Z0-9]+$/.test(newUser)) { show('Teacher No can only contain letters and digits.', false); return; }
-  if (newPass || confirmPass) {
-    if (newPass !== confirmPass) { show('Passwords do not match.', false); return; }
-    if (newPass.length < MIN_ADMIN_PASS_LEN) { show(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`, false); return; }
-  }
-
-  const cfg = { ...(state.adminConfig || {}) };
-  cfg.username = newUser;
-  if (newPass) cfg.passwordHash = await hashPassword(newPass);
-  if (!cfg.passwordHash) { show('Password is required.', false); return; }
-  cfg.updatedAt = Date.now();
-
-  state.adminConfig = cfg;
-  publishKey('adminConfig');
-
-  $('setAdminPass').value = '';
-  $('setAdminPassConfirm').value = '';
-  show('Credentials updated successfully.', true);
-  toast('Teacher credentials updated.', 'success');
 }
 
 async function resetStudentPassword(reg) {
@@ -1672,21 +1880,19 @@ async function clearHistory() {
   if (session.role !== 'admin') return;
   const totalRecords = state.history.length;
   if (!totalRecords) { toast('History is already empty.', 'warn'); return; }
-  const ok = await confirmDialog(
-    'Clear transaction history',
+  const ok = await confirmDialog('Clear transaction history',
     `Permanently delete ${totalRecords} transaction record(s)? The current inventory and active loans stay intact. Do this after you've downloaded the Excel backup.`,
-    'Erase history'
-  );
+    'Erase history');
   if (!ok) return;
-  state.history = [];
-  state.activity = [];
-  publishKey('history');
-  publishKey('activity');
-  saveLocal();
+  state.history = []; state.activity = [];
+  publishKey('history'); publishKey('activity'); saveLocal();
   renderDashboard();
   toast(`${totalRecords} records erased.`, 'success', 4000);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   POSTER
+   ═══════════════════════════════════════════════════════════════ */
 function getJoinUrl() {
   const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
   return base + '/';
@@ -1702,10 +1908,6 @@ function renderPoster() {
   $('posterInstructionsPreview').textContent = s.posterInstructions;
   const url = getJoinUrl();
   $('posterUrlPreview').textContent = url;
-  const warn = $('posterUrlWarning');
-  const local = !deployUrl || location.protocol === 'file:';
-  if (local) { warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 mt-0.5 shrink-0"></i><span><strong>Set the URL above</strong> to the deployed site.</span>`; warn.classList.remove('hidden'); warn.classList.add('flex'); }
-  else { warn.classList.add('hidden'); warn.classList.remove('flex'); }
   $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
 }
 function onPosterInput() {
@@ -1727,6 +1929,9 @@ async function downloadPoster() {
   }).catch(() => toast('Export failed.', 'error'));
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SYNC PAGE
+   ═══════════════════════════════════════════════════════════════ */
 function renderSyncPage() {
   const conn = $('syncStatConn');
   if (conn) conn.innerHTML = connected
@@ -1742,6 +1947,9 @@ function copyJoinUrl() {
   navigator.clipboard.writeText(url).then(() => toast('URL copied.', 'success')).catch(() => prompt('Copy:', url));
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   EXCEL EXPORT
+   ═══════════════════════════════════════════════════════════════ */
 function exportExcel() {
   if (session.role !== 'admin') return;
   if (!state.history.length && !state.inventory.length) { toast('Nothing to export.', 'warn'); return; }
@@ -1781,6 +1989,9 @@ function exportExcel() {
   toast('Excel downloaded.', 'success');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BADGES + RENDER ALL
+   ═══════════════════════════════════════════════════════════════ */
 function updateBadges() {
   const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
   const badge = $('cartCount');
@@ -1800,6 +2011,9 @@ function renderAll() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   TICK
+   ═══════════════════════════════════════════════════════════════ */
 let lastStatusKey = '';
 function tick() {
   const t = now();
@@ -1820,11 +2034,16 @@ function tick() {
     lastStatusKey = key;
     renderLoans(); renderOverview();
     if (session.role === 'admin') renderDashboard();
+    checkOverdueForCurrentUser(false);
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ═══════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal();
+  loadTheme();
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
   generateCaptcha();
 
@@ -1840,12 +2059,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initFirebase();
 
   if (!session.role) {
-    if (state.adminConfig && state.adminConfig.passwordHash) {
-      $('loginScreen').classList.remove('hidden');
-      $('loginScreen').classList.add('flex');
+    if (getAdmins().length) {
+      $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
     } else {
-      $('setupScreen').classList.remove('hidden');
-      $('setupScreen').classList.add('flex');
+      $('setupScreen').classList.remove('hidden'); $('setupScreen').classList.add('flex');
     }
   }
 
@@ -1857,8 +2074,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(tick, 1000);
   setInterval(updateSyncPill, 3000);
+  setInterval(() => checkOverdueForCurrentUser(false), 30000);
 });
 
+/* ═══════════════════════════════════════════════════════════════
+   EXPOSE
+   ═══════════════════════════════════════════════════════════════ */
 window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
 window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
 window.returnLoan = returnLoan; window.returnAllLoans = returnAllLoans;
@@ -1866,7 +2087,6 @@ window.renderCatalog = renderCatalog;
 window.onPosterInput = onPosterInput; window.downloadPoster = downloadPoster; window.showQr = showQr;
 window.openComponentModal = openComponentModal; window.saveComponent = saveComponent;
 window.deleteComponent = deleteComponent; window.saveSettings = saveSettings;
-window.saveAdminCredentials = saveAdminCredentials;
 window.resetDemo = resetDemo; window.clearHistory = clearHistory;
 window.switchLoginTab = switchLoginTab;
 window.attemptStudentLogin = attemptStudentLogin;
@@ -1883,6 +2103,10 @@ window.copyJoinUrl = copyJoinUrl;
 window.exportExcel = exportExcel;
 window.openModal = openModal;
 window.closeModal = closeModal;
+window.toggleTheme = toggleTheme;
+window.openAddTeacherModal = openAddTeacherModal;
+window.saveNewTeacher = saveNewTeacher;
+window.removeTeacher = removeTeacher;
 </script>
 </body>
 </html>
