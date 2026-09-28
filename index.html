@@ -56,11 +56,10 @@
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
 <!-- ══════════════════════════════════════════════════════════
-     FIRST-TIME SETUP SCREEN
+     SETUP SCREEN (first-time admin account creation)
      ══════════════════════════════════════════════════════════ -->
 <div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
-
     <div class="mb-6 flex justify-center">
       <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
@@ -88,10 +87,10 @@
 
         <div class="flex items-center gap-4">
           <label class="w-36 shrink-0 text-sm font-semibold text-slate-700">Teacher No</label>
-          <input id="setupTeacherNo" type="text" maxlength="4" autocomplete="off" placeholder="e.g. 1234"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
+          <input id="setupTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
                  onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()"
-                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.3em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
+                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
 
         <div class="flex items-center gap-4">
@@ -119,7 +118,7 @@
         <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
 
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
-          <p><b class="text-slate-700">Teacher No</b> must be exactly <b>4 characters</b> (letters + digits).</p>
+          <p><b class="text-slate-700">Teacher No</b> must be at least <b>4 characters</b> (letters + digits).</p>
           <p class="mt-0.5"><b class="text-slate-700">Password</b> must be at least 6 characters.</p>
         </div>
       </div>
@@ -136,15 +135,14 @@
      ══════════════════════════════════════════════════════════ -->
 <div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-8">
-
     <div class="mb-6 flex justify-center">
       <svg viewBox="0 0 500 130" class="h-24 w-auto" xmlns="http://www.w3.org/2000/svg" aria-label="BAJAJ BEST">
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
         <g transform="translate(60,60)">
-          <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white" opacity="0.98"/>
-          <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white" opacity="0.98"/>
+          <path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/>
+          <path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/>
         </g>
-        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white" letter-spacing="1">BAJAJ</text>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
         <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
         <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
         <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
@@ -153,7 +151,6 @@
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-
       <div class="flex border-b border-slate-200 bg-slate-50">
         <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500">
           <i class="fa-solid fa-graduation-cap mr-1.5"></i> Student
@@ -170,7 +167,6 @@
         <h1 class="text-sm font-extrabold uppercase tracking-[.2em] text-white">Teacher Login</h1>
       </div>
 
-      <!-- STUDENT FORM -->
       <div id="studentForm" class="p-7 space-y-5">
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Register No</label>
@@ -212,14 +208,13 @@
         </div>
       </div>
 
-      <!-- ADMIN FORM -->
       <div id="adminForm" class="hidden p-7 space-y-5">
         <div class="flex items-center gap-4">
           <label class="w-32 shrink-0 text-sm font-semibold text-slate-700">Teacher No</label>
-          <input id="adminUserInput" type="text" maxlength="4" autocomplete="username" placeholder="4 characters"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
+          <input id="adminUserInput" type="text" maxlength="12" autocomplete="username" placeholder="min 4 characters"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
                  onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
-                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.3em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
+                 class="mono flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-1.5 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
 
         <div class="flex items-center gap-4">
@@ -254,8 +249,10 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app" class="hidden min-h-screen flex flex-col">
+<!-- ══════════════════════════════════════════════════════════
+     MAIN APP
+     ══════════════════════════════════════════════════════════ -->
+<div id="app" class="hidden min-h-screen flex-col">
 
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
   <div class="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 lg:px-6">
@@ -495,13 +492,13 @@
 
   <div class="rounded-2xl border border-rose-500/25 bg-rose-950/10 p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-key text-xs text-rose-400"></i> Teacher Credentials</h3>
-    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the Teacher No and Password. Teacher No must be exactly 4 characters.</p>
+    <p class="mb-4 text-xs leading-relaxed text-slate-400">Change the Teacher No and Password. Teacher No must be at least 4 characters.</p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
-        <input id="setAdminUser" type="text" maxlength="4" autocomplete="off"
-               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)"
-               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs tracking-[.3em] text-white" />
+        <input id="setAdminUser" type="text" maxlength="12" autocomplete="off"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
+               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs tracking-[.2em] text-white" />
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">New password</label>
@@ -609,6 +606,7 @@
 </footer>
 </div>
 
+<!-- CART DRAWER -->
 <div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
   <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
     <div class="flex items-center justify-between border-b border-ink-700/60 px-5 py-4">
@@ -628,6 +626,7 @@
   </div>
 </div>
 
+<!-- MODALS -->
 <div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-6">
     <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -695,10 +694,13 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const SINGLE_STATION = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v1';
-const SESSION_KEY = 'bajaj.session.v1';
+const STORAGE_KEY = 'bajaj.lending.v2';
+const SESSION_KEY = 'bajaj.session.v2';
 const MAX_ACTIVITY = 40;
 const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity', 'students', 'adminConfig'];
+const MIN_ADMIN_USER_LEN = 4;
+const MAX_ADMIN_USER_LEN = 12;
+const MIN_ADMIN_PASS_LEN = 6;
 
 const SEED_INVENTORY = [
   { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
@@ -897,9 +899,10 @@ async function completeSetup() {
   const btnTxt = $('setupBtnText');
   $('setupError').classList.add('hidden');
 
-  if (teacherNo.length !== 4) { showSetupError('Teacher No must be exactly 4 characters.'); return; }
-  if (!/^[A-Z0-9]{4}$/.test(teacherNo)) { showSetupError('Teacher No can only contain letters and digits.'); return; }
-  if (pw.length < 6) { showSetupError('Password must be at least 6 characters.'); return; }
+  if (teacherNo.length < MIN_ADMIN_USER_LEN) { showSetupError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
+  if (teacherNo.length > MAX_ADMIN_USER_LEN) { showSetupError(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`); return; }
+  if (!/^[A-Z0-9]+$/.test(teacherNo)) { showSetupError('Teacher No can only contain letters and digits.'); return; }
+  if (pw.length < MIN_ADMIN_PASS_LEN) { showSetupError(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`); return; }
   if (pw !== cf) { showSetupError('Passwords do not match.'); return; }
 
   btn.disabled = true;
@@ -997,14 +1000,13 @@ async function attemptAdminLogin() {
 
   clearLoginMessages();
   if (!teacherNo) { showLoginError('Please enter your Teacher No.'); return; }
-  if (teacherNo.length !== 4) { showLoginError('Teacher No must be exactly 4 characters.'); return; }
+  if (teacherNo.length < MIN_ADMIN_USER_LEN) { showLoginError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
   if (!password) { showLoginError('Please enter your Password.'); return; }
 
   btn.disabled = true;
   btnTxt.textContent = 'Verifying…';
 
   try {
-    // Wait for adminConfig to load if we're still connecting
     if (!state.adminConfig || !state.adminConfig.passwordHash) {
       await new Promise(r => setTimeout(r, 1000));
     }
@@ -1110,7 +1112,7 @@ async function saveNewPassword() {
 
   if (!cur || !nw || !cf) { show('Please fill all fields.', false); return; }
   if (nw !== cf) { show('New passwords do not match.', false); return; }
-  if (nw.length < 6) { show('New password must be at least 6 characters.', false); return; }
+  if (nw.length < MIN_ADMIN_PASS_LEN) { show(`New password must be at least ${MIN_ADMIN_PASS_LEN} characters.`, false); return; }
 
   const curHash = await hashPassword(cur);
   const newHash = await hashPassword(nw);
@@ -1186,12 +1188,8 @@ function connectStation() {
       else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
       else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
       else if (key === 'adminConfig') {
-        if (val && typeof val === 'object') {
-          state.adminConfig = val;
-        } else {
-          state.adminConfig = null;
-        }
-        // Update screen based on adminConfig presence
+        if (val && typeof val === 'object') state.adminConfig = val;
+        else state.adminConfig = null;
         updateAuthScreen();
       }
       else return;
@@ -1217,9 +1215,7 @@ function connectStation() {
 }
 
 function updateAuthScreen() {
-  // Don't switch screens if user is already logged in
   if (session && session.role) return;
-
   const hasAdmin = state.adminConfig && state.adminConfig.passwordHash;
   const setupEl = $('setupScreen');
   const loginEl = $('loginScreen');
@@ -1230,7 +1226,6 @@ function updateAuthScreen() {
     loginEl.classList.remove('hidden');
     loginEl.classList.add('flex');
   } else {
-    // No admin yet — show setup screen (unless we're still waiting for Firebase)
     if (connected) {
       loginEl.classList.add('hidden');
       loginEl.classList.remove('flex');
@@ -1567,11 +1562,12 @@ async function saveAdminCredentials() {
   const msg = $('credMessage');
   const show = (t, ok) => { msg.textContent = t; msg.className = `mt-3 text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 4000); };
 
-  if (newUser.length !== 4) { show('Teacher No must be exactly 4 characters.', false); return; }
-  if (!/^[A-Z0-9]{4}$/.test(newUser)) { show('Teacher No can only contain letters and digits.', false); return; }
+  if (newUser.length < MIN_ADMIN_USER_LEN) { show(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`, false); return; }
+  if (newUser.length > MAX_ADMIN_USER_LEN) { show(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`, false); return; }
+  if (!/^[A-Z0-9]+$/.test(newUser)) { show('Teacher No can only contain letters and digits.', false); return; }
   if (newPass || confirmPass) {
     if (newPass !== confirmPass) { show('Passwords do not match.', false); return; }
-    if (newPass.length < 6) { show('Password must be at least 6 characters.', false); return; }
+    if (newPass.length < MIN_ADMIN_PASS_LEN) { show(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`, false); return; }
   }
 
   const cfg = { ...(state.adminConfig || {}) };
@@ -1832,7 +1828,6 @@ document.addEventListener('DOMContentLoaded', () => {
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
   generateCaptcha();
 
-  // Check session
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
@@ -1844,13 +1839,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initFirebase();
 
-  // Show login/setup screen immediately based on local state
   if (!session.role) {
     if (state.adminConfig && state.adminConfig.passwordHash) {
       $('loginScreen').classList.remove('hidden');
       $('loginScreen').classList.add('flex');
     } else {
-      // Wait for Firebase to answer before deciding — show setup temporarily
       $('setupScreen').classList.remove('hidden');
       $('setupScreen').classList.add('flex');
     }
