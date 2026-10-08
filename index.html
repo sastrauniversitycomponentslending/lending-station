@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#05080f" />
 <title>BEST — Component Lending Station</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%230063b1'/%3E%3Cg fill='white'%3E%3Cpath d='M100 42L152 68L100 94L48 68Z'/%3E%3Cpath d='M48 68L100 94L100 106L66 89L66 104L100 121L100 133L48 107Z'/%3E%3Cpath d='M152 68L100 94L100 106L134 89L134 104L100 121L100 133L152 107Z'/%3E%3C/g%3E%3Ctext x='100' y='172' text-anchor='middle' font-family='Arial Black, sans-serif' font-weight='900' font-size='32' fill='white' letter-spacing='2'%3EBAJAJ%3C/text%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231e5fa8'/%3E%3Cpath d='M40 30h30v8H40zm0 16h30v8H40zm0 16h20v8H40z' fill='white'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -20,13 +20,27 @@
       colors: {
         ink: { 950:'#05080f',900:'#0a0f1a',850:'#0e1421',800:'#131b2a',750:'#182233',700:'#1e2a3d',600:'#2b3a52',500:'#3d4f6b' },
         brand: { 50:'#eef4ff',100:'#dde7ff',200:'#bcd0ff',300:'#90aeff',400:'#5b83fc',500:'#3b62f6',600:'#2544eb',700:'#1d33d8',800:'#1e2caf',900:'#1e2b8a' },
-        bajaj: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#0063b1',600:'#00529c',700:'#004280',800:'#003366',900:'#00244a' },
+        bajaj: { 50:'#eff8ff',100:'#dff0fe',200:'#b8e0fd',300:'#7ac8fc',400:'#34acf8',500:'#0a92eb',600:'#0073c8',700:'#015ba2',800:'#064d86',900:'#0b416f' },
         neon: { pink:'#ff3d9a', violet:'#8b5cf6', cyan:'#22d3ee', lime:'#a3e635', amber:'#fbbf24' }
       },
       boxShadow: {
-        'glow-sm': '0 0 12px -2px rgba(0,99,177,.35)',
-        'glow': '0 0 24px -4px rgba(0,99,177,.45)',
-        'card': '0 8px 32px -12px rgba(0,0,0,.5)'
+        'glow-sm': '0 0 12px -2px rgba(59,98,246,.45)',
+        'glow': '0 0 24px -4px rgba(59,98,246,.55)',
+        'glow-pink': '0 0 24px -4px rgba(255,61,154,.55)',
+        'glow-cyan': '0 0 24px -4px rgba(34,211,238,.55)',
+        'glow-lime': '0 0 24px -4px rgba(163,230,53,.5)',
+        'card': '0 8px 32px -12px rgba(0,0,0,.5)',
+        'lift': '0 12px 40px -12px rgba(0,0,0,.7)'
+      },
+      keyframes: {
+        'float': { '0%,100%': { transform:'translateY(0)' }, '50%': { transform:'translateY(-6px)' } },
+        'glowPulse': { '0%,100%': { opacity:'.35' }, '50%': { opacity:'.9' } },
+        'gradientShift': { '0%,100%': { backgroundPosition:'0% 50%' }, '50%': { backgroundPosition:'100% 50%' } }
+      },
+      animation: {
+        'float': 'float 4s ease-in-out infinite',
+        'glowPulse': 'glowPulse 3s ease-in-out infinite',
+        'gradient': 'gradientShift 8s ease infinite'
       }
     }}
   };
@@ -41,27 +55,35 @@
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    transition: background-color .25s ease, color .25s ease;
+    transition: background-color .3s ease, color .3s ease;
     overflow-x: hidden;
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
   .mono { font-family:'JetBrains Mono',monospace; font-variant-numeric: tabular-nums; }
-  .glass { background: rgba(19,27,42,.85); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
+  .glass { background: linear-gradient(180deg, rgba(19,27,42,.85), rgba(14,20,33,.85)); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
 
+  /* ─── Animated background orbs ─── */
   .orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: .22; pointer-events: none; z-index: 0; }
 
+  /* ─── Animations ─── */
   .fade-up { animation: fadeUp .3s cubic-bezier(.16,1,.3,1); }
   @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
   .scale-in { animation: scaleIn .2s cubic-bezier(.16,1,.3,1); }
   @keyframes scaleIn { from { opacity:0; transform: scale(.95); } to { opacity:1; transform:none; } }
   @keyframes pulseRing { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.55); } 50% { box-shadow: 0 0 0 14px rgba(244,63,94,0); } }
   .overdue-pulse { animation: pulseRing 2s infinite; }
-  .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
+  @keyframes shakeAlert { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .shake-alert { animation: shakeAlert .4s ease-in-out 3; }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  .shimmer { position: relative; overflow: hidden; }
+  .shimmer::after { content:''; position:absolute; inset:0; transform:translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); animation: shimmer 2s infinite; }
   @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.85); } }
+  .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
 
+  /* ─── Navigation ─── */
   .nav-btn { position: relative; }
-  .nav-btn::after { content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:3px; background: #0063b1; border-radius:2px; transform: scaleX(0); transition: transform .25s; }
+  .nav-btn::after { content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:3px; background: linear-gradient(90deg,#3b62f6,#22d3ee); border-radius:2px; transform: scaleX(0); transition: transform .25s; }
   .nav-btn.active::after { transform: scaleX(1); }
 
   .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
@@ -69,190 +91,360 @@
 
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
   input[type=number] { -moz-appearance:textfield; }
-  .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px currentColor, 0 0 0 4px rgba(0,99,177,.4); }
+  .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px currentColor, 0 0 0 4px rgba(59,98,246,.5); }
+  .tab-pill { transition: all .2s ease; }
 
-  /* Gradient text (Dark mode) */
-  .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #22d3ee 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* ─── Gradient text ─── */
+  .gradient-text { background: linear-gradient(135deg, #5b83fc 0%, #8b5cf6 50%, #22d3ee 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradientShift 6s ease infinite; }
+  .gradient-text-warm { background: linear-gradient(135deg, #fbbf24 0%, #ff3d9a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-  /* Theme switch button styling */
+  /* ─── Cards with gradient borders ─── */
+  .card-gradient { position: relative; }
+  .card-gradient::before { content:''; position:absolute; inset:0; padding:1px; border-radius: inherit; background: linear-gradient(135deg, rgba(91,131,252,.5), rgba(139,92,246,.3), rgba(34,211,238,.4)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+
+  /* ─── Mobile: better tap targets, stack fixes ─── */
+  @media (max-width: 640px) {
+    .grid-mobile-1 { grid-template-columns: 1fr !important; }
+    button, a { min-height: 40px; }
+    .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .mobile-scroll-x::-webkit-scrollbar { height: 4px; }
+  }
+
+  /* ─── Theme toggle switch styling ─── */
   .theme-switch {
-    width: 52px; height: 28px; border-radius: 999px;
-    position: relative; transition: all .3s ease; cursor: pointer;
-    background: #1e2a3d; border: 1px solid rgba(255,255,255,.1);
+    width: 56px; height: 32px; border-radius: 999px;
+    position: relative;
+    transition: background .3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(148,163,184,.25);
   }
   .theme-switch .knob {
-    position: absolute; top: 2px; left: 2px; width: 22px; height: 22px;
-    border-radius: 50%; background: #fbbf24; transition: all .3s cubic-bezier(.4,.2,.2,1);
-    display: flex; align-items: center; justify-content: center; font-size: 10px; color: #78350f;
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    box-shadow: 0 2px 8px rgba(251,191,36,.5);
+    transition: all .3s cubic-bezier(.4,.2,.2,1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #422006;
   }
-  .theme-switch.light { background: #e2e8f0; border-color: #cbd5e1; }
-  .theme-switch.light .knob { left: calc(100% - 24px); background: #0063b1; color: #ffffff; }
+  .theme-switch.light .knob {
+    left: calc(100% - 27px);
+    background: linear-gradient(135deg, #3b62f6, #8b5cf6);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(59,98,246,.5);
+  }
+
+  @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
 
   /* ══════════════════════════════════════════════════════════
-     CLEAN, PROFESSIONAL LIGHT THEME OVERRIDES
+     LIGHT THEME — vibrant, colorful, high-contrast
      ══════════════════════════════════════════════════════════ */
   body.theme-light {
-    background-color: #f8fafc !important;
-    background-image: none !important;
+    background-color: #f5f7fc !important;
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(91,131,252,.10), transparent 45%),
+      radial-gradient(circle at 90% 5%, rgba(139,92,246,.10), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(34,211,238,.08), transparent 50%) !important;
     color: #0f172a !important;
   }
-  body.theme-light .orb { display: none !important; }
+  body.theme-light .orb { display: none; }
 
   /* Surfaces */
-  body.theme-light .bg-ink-950,
-  body.theme-light .bg-ink-900,
+  body.theme-light .bg-ink-950 { background-color: #f5f7fc !important; }
+  body.theme-light .bg-ink-900 { background-color: #ffffff !important; }
   body.theme-light .bg-ink-850 { background-color: #ffffff !important; }
-  body.theme-light .bg-ink-800 { background-color: #f1f5f9 !important; }
-  body.theme-light .bg-ink-750 { background-color: #e2e8f0 !important; }
-  body.theme-light .bg-ink-700 { background-color: #cbd5e1 !important; }
+  body.theme-light .bg-ink-800 { background-color: #f1f5fb !important; }
+  body.theme-light .bg-ink-750 { background-color: #e5ebf5 !important; }
+  body.theme-light .bg-ink-700 { background-color: #d6dfec !important; }
 
-  body.theme-light [class*="bg-ink-950\/"],
-  body.theme-light [class*="bg-ink-900\/"],
-  body.theme-light [class*="bg-ink-850\/"],
-  body.theme-light [class*="bg-ink-800\/"] { background-color: #ffffff !important; }
+  body.theme-light [class*="bg-ink-950\/"] { background-color: rgba(255,255,255,.92) !important; }
+  body.theme-light [class*="bg-ink-900\/"] { background-color: #ffffff !important; }
+  body.theme-light [class*="bg-ink-850\/"] { background-color: #ffffff !important; }
+  body.theme-light [class*="bg-ink-800\/"] { background-color: #f8fafd !important; }
+  body.theme-light [class*="bg-ink-750\/"] { background-color: #eef3fa !important; }
 
-  /* Text color fixes */
-  body.theme-light .text-white { color: #0f172a !important; }
-  body.theme-light .text-slate-100,
-  body.theme-light .text-slate-200 { color: #1e293b !important; }
-  body.theme-light .text-slate-300,
-  body.theme-light .text-slate-400 { color: #475569 !important; }
-  body.theme-light .text-slate-500,
-  body.theme-light .text-slate-600 { color: #64748b !important; }
-  body.theme-light .gradient-text { background: none !important; color: #0063b1 !important; -webkit-text-fill-color: initial !important; }
+  /* Text */
+  body.theme-light .text-white { color: #0a1120 !important; }
+  body.theme-light .text-slate-100 { color: #1a2332 !important; }
+  body.theme-light .text-slate-200 { color: #1f2a3d !important; }
+  body.theme-light .text-slate-300 { color: #2f3e56 !important; }
+  body.theme-light .text-slate-400 { color: #566a86 !important; }
+  body.theme-light .text-slate-500 { color: #7084a1 !important; }
+  body.theme-light .text-slate-600 { color: #8a9bb6 !important; }
 
-  /* Borders & Dividers */
-  body.theme-light [class*="border-ink-"],
-  body.theme-light [class*="border-slate-"],
-  body.theme-light [class*="divide-ink-"] { border-color: #e2e8f0 !important; }
+  /* Borders */
+  body.theme-light [class*="border-ink-"] { border-color: #e0e7f1 !important; }
+  body.theme-light [class*="border-slate-6"],
+  body.theme-light [class*="border-slate-7"] { border-color: #e0e7f1 !important; }
+  body.theme-light [class*="divide-ink-"] { border-color: #e8eef6 !important; }
 
-  /* Header Glass */
+  /* Glass header */
   body.theme-light .glass {
-    background: rgba(255,255,255,.95) !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05) !important;
+    background: rgba(255,255,255,.9) !important;
+    border-bottom: 1px solid #e0e7f1 !important;
+    box-shadow: 0 1px 3px rgba(15,23,42,.04) !important;
   }
 
-  /* Cards */
-  body.theme-light .card-gradient,
-  body.theme-light [class*="from-ink-850"] {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.04) !important;
+  /* Grid pattern + gradient backgrounds */
+  body.theme-light .grid-bg {
+    background-image:
+      linear-gradient(rgba(15,23,42,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,23,42,.05) 1px, transparent 1px) !important;
   }
-  body.theme-light .card-gradient::before { display: none !important; }
+  body.theme-light [class*="from-ink-850"][class*="via-ink-900"] {
+    background: linear-gradient(135deg,
+      #eef4ff 0%,
+      #ffffff 35%,
+      #f5f0ff 70%,
+      #eefaff 100%) !important;
+    border-color: #d8e3f3 !important;
+  }
 
-  /* Primary Brand Buttons */
-  body.theme-light [class*="bg-brand-500"],
-  body.theme-light [class*="from-brand-500"] { background: #0063b1 !important; color: #ffffff !important; }
-  body.theme-light [class*="hover:bg-brand-"]:hover { background: #00529c !important; }
+  /* Header badge */
+  body.theme-light [class*="border-bajaj-500\/30"][class*="bg-bajaj-500\/10"] {
+    background: linear-gradient(135deg, rgba(10,146,235,.12), rgba(139,92,246,.10)) !important;
+    border-color: rgba(10,146,235,.35) !important;
+    color: #0369a1 !important;
+  }
+
+  /* ── VIBRANT COLOR SYSTEM ── */
+
+  /* Brand blue */
+  body.theme-light [class*="bg-brand-600"] { background: linear-gradient(135deg,#2544eb,#3b62f6) !important; color:#ffffff !important; }
+  body.theme-light [class*="bg-brand-600"]:hover,
+  body.theme-light [class*="hover:bg-brand-500"]:hover { background: linear-gradient(135deg,#3b62f6,#5b83fc) !important; }
+  body.theme-light [class*="bg-brand-500\/"] { background-color: rgba(59,98,246,.13) !important; }
+  body.theme-light [class*="bg-brand-500\/10"] { background-color: rgba(59,98,246,.10) !important; }
+  body.theme-light [class*="bg-brand-500\/15"] { background-color: rgba(59,98,246,.14) !important; }
+  body.theme-light [class*="bg-brand-500\/20"] { background-color: rgba(59,98,246,.18) !important; }
+  body.theme-light [class*="bg-brand-500\/25"] { background-color: rgba(59,98,246,.22) !important; }
+  body.theme-light [class*="bg-brand-500\/30"] { background-color: rgba(59,98,246,.26) !important; }
   body.theme-light .text-brand-300,
-  body.theme-light .text-brand-400 { color: #0063b1 !important; }
+  body.theme-light .text-brand-400 { color: #1d33d8 !important; }
+  body.theme-light [class*="border-brand-500\/"] { border-color: rgba(59,98,246,.4) !important; }
+  body.theme-light [class*="from-brand-600"] { --tw-gradient-from: #2544eb !important; }
+  body.theme-light [class*="from-brand-500"] { --tw-gradient-from: #3b62f6 !important; }
+  body.theme-light [class*="to-brand-700"] { --tw-gradient-to: #1d33d8 !important; }
+  body.theme-light [class*="to-brand-400"] { --tw-gradient-to: #5b83fc !important; }
 
-  /* Inputs & Selects */
+  /* Emerald */
+  body.theme-light [class*="bg-emerald-600"] { background: linear-gradient(135deg,#059669,#10b981) !important; color:#ffffff !important; }
+  body.theme-light [class*="bg-emerald-600"]:hover,
+  body.theme-light [class*="hover:bg-emerald-500"]:hover { background: linear-gradient(135deg,#10b981,#34d399) !important; }
+  body.theme-light [class*="bg-emerald-500\/"] { background-color: rgba(5,150,105,.12) !important; }
+  body.theme-light [class*="bg-emerald-500\/10"] { background-color: rgba(5,150,105,.10) !important; }
+  body.theme-light [class*="bg-emerald-500\/20"] { background-color: rgba(5,150,105,.16) !important; }
+  body.theme-light [class*="bg-emerald-500\/25"] { background-color: rgba(5,150,105,.20) !important; }
+  body.theme-light .text-emerald-300,
+  body.theme-light .text-emerald-400 { color: #047857 !important; }
+  body.theme-light [class*="border-emerald-500\/"] { border-color: rgba(5,150,105,.4) !important; }
+  body.theme-light [class*="from-emerald-500"] { --tw-gradient-from: #059669 !important; }
+
+  /* Amber */
+  body.theme-light [class*="bg-amber-600"] { background: linear-gradient(135deg,#d97706,#f59e0b) !important; color:#ffffff !important; }
+  body.theme-light [class*="bg-amber-500\/"] { background-color: rgba(217,119,6,.12) !important; }
+  body.theme-light [class*="bg-amber-500\/10"] { background-color: rgba(217,119,6,.10) !important; }
+  body.theme-light [class*="bg-amber-500\/20"] { background-color: rgba(217,119,6,.16) !important; }
+  body.theme-light [class*="bg-amber-500\/25"] { background-color: rgba(217,119,6,.20) !important; }
+  body.theme-light .text-amber-300,
+  body.theme-light .text-amber-400 { color: #b45309 !important; }
+  body.theme-light [class*="border-amber-500\/"] { border-color: rgba(217,119,6,.4) !important; }
+
+  /* Rose */
+  body.theme-light [class*="bg-rose-600"] { background: linear-gradient(135deg,#e11d48,#f43f5e) !important; color:#ffffff !important; }
+  body.theme-light [class*="bg-rose-600"]:hover,
+  body.theme-light [class*="hover:bg-rose-500"]:hover { background: linear-gradient(135deg,#f43f5e,#fb7185) !important; }
+  body.theme-light [class*="bg-rose-500\/"] { background-color: rgba(225,29,72,.12) !important; }
+  body.theme-light [class*="bg-rose-500\/10"] { background-color: rgba(225,29,72,.10) !important; }
+  body.theme-light [class*="bg-rose-500\/20"] { background-color: rgba(225,29,72,.16) !important; }
+  body.theme-light [class*="bg-rose-500\/25"] { background-color: rgba(225,29,72,.20) !important; }
+  body.theme-light [class*="bg-rose-500\/30"] { background-color: rgba(225,29,72,.24) !important; }
+  body.theme-light .text-rose-300,
+  body.theme-light .text-rose-400 { color: #be123c !important; }
+  body.theme-light [class*="border-rose-500\/"] { border-color: rgba(225,29,72,.4) !important; }
+  body.theme-light [class*="bg-rose-950"] { background-color: #fef2f2 !important; }
+  body.theme-light [class*="bg-rose-900"] { background-color: #fee2e2 !important; }
+
+  /* Slate pills */
+  body.theme-light [class*="bg-slate-500\/10"] { background-color: #f1f5f9 !important; }
+  body.theme-light [class*="border-slate-500\/30"] { border-color: #e0e7f1 !important; }
+
+  /* Admin headers */
+  body.theme-light [class*="from-brand-950\/40"] {
+    background: linear-gradient(90deg, #eef3ff 0%, #f5f7fc 100%) !important;
+    border-color: rgba(59,98,246,.3) !important;
+  }
+  body.theme-light [class*="from-emerald-950\/30"] {
+    background: linear-gradient(135deg, #ecfdf5 0%, #f5f7fc 50%, #f0fdff 100%) !important;
+    border-color: rgba(5,150,105,.3) !important;
+  }
+
+  /* Overdue */
+  body.theme-light .overdue-pulse {
+    animation: pulseRingLight 2s infinite !important;
+    background: #fef2f2 !important;
+    border-color: #f43f5e !important;
+  }
+  @keyframes pulseRingLight {
+    0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.4); }
+    50% { box-shadow: 0 0 0 14px rgba(244,63,94,0); }
+  }
+
+  /* Inputs */
   body.theme-light input,
   body.theme-light textarea,
   body.theme-light select {
     background-color: #ffffff !important;
-    color: #0f172a !important;
-    border: 1px solid #cbd5e1 !important;
+    color: #0a1120 !important;
+    border-color: #d6dfec !important;
   }
   body.theme-light input::placeholder,
-  body.theme-light textarea::placeholder { color: #94a3b8 !important; }
+  body.theme-light textarea::placeholder { color: #9aabc5 !important; }
+  body.theme-light input:focus,
+  body.theme-light textarea:focus,
+  body.theme-light select:focus {
+    border-color: #3b62f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,98,246,.15) !important;
+  }
+
+  /* Theme toggle in light */
+  body.theme-light .theme-switch {
+    background: #ffffff;
+    border-color: #d6dfec;
+  }
+
+  /* Scrollbars */
+  body.theme-light ::-webkit-scrollbar-thumb { background: #c8d3e3 !important; }
+  body.theme-light ::-webkit-scrollbar-thumb:hover { background: #a8b6cd !important; }
+
+  /* Kbd */
+  body.theme-light .kbd {
+    background: #f1f5f9 !important;
+    border-color: #d6dfec !important;
+    color: #475569 !important;
+  }
+
+  /* Hovers */
+  body.theme-light [class*="hover:bg-ink-800"]:hover { background-color: #eef3fa !important; }
+  body.theme-light [class*="hover:bg-ink-700"]:hover { background-color: #e0e7f1 !important; }
+  body.theme-light [class*="hover:bg-ink-800\/"]:hover { background-color: #f5f7fc !important; }
+  body.theme-light [class*="hover:text-white"]:hover { color: #0a1120 !important; }
+  body.theme-light [class*="hover:text-slate-200"]:hover { color: #1f2a3d !important; }
+  body.theme-light [class*="hover:border-ink-500"]:hover { border-color: #c8d3e3 !important; }
+  body.theme-light [class*="hover:border-ink-600"]:hover { border-color: #c8d3e3 !important; }
+
+  /* Toasts */
+  body.theme-light #toasts > div {
+    background: #ffffff !important;
+    border-color: #e0e7f1 !important;
+    box-shadow: 0 12px 40px -12px rgba(15,23,42,.2) !important;
+  }
+  body.theme-light #toasts > div p { color: #1f2a3d !important; }
 
   /* Tables */
-  body.theme-light thead { background-color: #f8fafc !important; }
-  body.theme-light tr:hover { background-color: #f1f5f9 !important; }
+  body.theme-light thead[class*="bg-ink-900\/60"] { background-color: #f5f7fc !important; }
 
-  /* Modals Overlay */
-  body.theme-light [class*="bg-ink-950\/8"] { background-color: rgba(15,23,42,.4) !important; }
+  /* Modals overlay */
+  body.theme-light [class*="bg-ink-950\/8"] { background-color: rgba(15,23,42,.5) !important; }
+  body.theme-light [class*="bg-ink-950\/7"] { background-color: rgba(15,23,42,.5) !important; }
+
+  /* Overdue banner */
+  body.theme-light #overdueAlertBanner > div {
+    background: linear-gradient(135deg, #fef2f2, #fff1f2) !important;
+    border-color: #f43f5e !important;
+  }
+
+  /* ─── Mobile-specific tweaks ─── */
+  @media (max-width: 640px) {
+    body.theme-light .grid-bg { background-size: 24px 24px !important; }
+  }
 </style>
 </head>
 
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
-<!-- Background Orbs -->
-<div class="orb" style="width:400px;height:400px;background:#0063b1;top:-100px;left:-100px;"></div>
-<div class="orb" style="width:350px;height:350px;background:#3b82f6;top:40%;right:-150px;"></div>
+<!-- Decorative animated orbs (dark mode only) -->
+<div class="orb" style="width:400px;height:400px;background:#3b62f6;top:-100px;left:-100px;"></div>
+<div class="orb" style="width:350px;height:350px;background:#8b5cf6;top:40%;right:-150px;"></div>
+<div class="orb" style="width:300px;height:300px;background:#22d3ee;bottom:-100px;left:20%;"></div>
 
 <!-- ═══════════════════════════════════════════════════════
-     REUSABLE EXACT BAJAJ LOGO COMPONENT
+     SETUP SCREEN
      ═══════════════════════════════════════════════════════ -->
-<template id="bajajLogoTemplate">
-  <svg viewBox="0 0 450 140" class="h-16 sm:h-20 w-auto" xmlns="http://www.w3.org/2000/svg">
-    <!-- Blue Container Box -->
-    <rect x="0" y="0" width="140" height="140" rx="4" fill="#0063b1"/>
-    
-    <!-- Exact Bajaj Flying-Wings Emblem -->
-    <g fill="#ffffff">
-      <!-- Top Rhombus Face -->
-      <polygon points="70,22 110,43 70,64 30,43" />
-      <!-- Left Angled Wing -->
-      <polygon points="30,43 70,64 70,75 44,61 44,73 70,87 70,98 30,77" />
-      <!-- Right Angled Wing -->
-      <polygon points="110,43 70,64 70,75 96,61 96,73 70,87 70,98 110,77" />
-      
-      <!-- Bajaj Logotype Wordmark in Square -->
-      <text x="70" y="123" text-anchor="middle" font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="24" fill="#ffffff" letter-spacing="2">BAJAJ</text>
-    </g>
-
-    <!-- Right Side Typography Layout -->
-    <g fill="#0063b1" font-family="'Arial Black', 'Inter', sans-serif">
-      <text x="160" y="52" font-size="54" font-weight="900" letter-spacing="3">BEST</text>
-      <text x="162" y="78" font-size="18" font-weight="800" letter-spacing="1">BAJAJ</text>
-      <text x="162" y="98" font-size="18" font-weight="800" letter-spacing="1">ENGINEERING</text>
-      <text x="162" y="118" font-size="18" font-weight="800" letter-spacing="1">SKILLS TRAINING</text>
-    </g>
-  </svg>
-</template>
-
-<!-- SETUP SCREEN -->
-<div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 p-3 sm:p-4 overflow-y-auto">
+<div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
-    <div class="mb-5 sm:mb-6 flex justify-center logo-target"></div>
+    <div class="mb-5 sm:mb-6 flex justify-center">
+      <svg viewBox="0 0 500 130" class="h-20 sm:h-24 w-auto" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
+        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+      </svg>
+    </div>
+
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-      <div class="bg-rose-600 py-3.5 text-center">
-        <h1 class="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white px-3">First-Time Setup · Create First Teacher</h1>
+      <div class="bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
+        <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">First-Time Setup · Create First Teacher</h1>
       </div>
       <div class="p-5 sm:p-7 space-y-4 sm:space-y-5">
-        <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-xs font-medium text-amber-800">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i> This creates the primary teacher account.
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-[11px] font-medium text-amber-800">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> This creates the first teacher. You can add more later.
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Teacher No</label>
-          <input id="setupTeacherNo" type="text" maxlength="12" placeholder="min 4 chars"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm font-bold tracking-widest text-slate-900 focus:border-rose-600 focus:outline-none" />
+          <input id="setupTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
+                 onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()"
+                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Password</label>
-          <input id="setupPassword" type="password" placeholder="min 6 chars"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-rose-600 focus:outline-none" />
+          <input id="setupPassword" type="password" autocomplete="new-password" placeholder="min 6 characters"
+                 onkeydown="if(event.key==='Enter')document.getElementById('setupConfirm').focus()"
+                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Confirm Password</label>
-          <input id="setupConfirm" type="password" placeholder="repeat password"
+          <input id="setupConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
                  onkeydown="if(event.key==='Enter')completeSetup()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-rose-600 focus:outline-none" />
+                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
         <button id="setupBtn" onclick="completeSetup()"
-                class="w-full rounded-full bg-rose-600 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg hover:bg-rose-700 transition">
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-plus text-xs"></i>
           <span id="setupBtnText">Create First Teacher</span>
         </button>
-        <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-center text-xs font-semibold text-rose-700"></p>
+        <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-slate-100 p-3 sm:p-4 overflow-y-auto">
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN SCREEN
+     ═══════════════════════════════════════════════════════ -->
+<div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
-    <div class="mb-5 sm:mb-6 flex justify-center logo-target"></div>
+    <div class="mb-5 sm:mb-6 flex justify-center">
+      <svg viewBox="0 0 500 130" class="h-20 sm:h-24 w-auto" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
+        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+      </svg>
+    </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="flex border-b border-slate-200 bg-slate-50">
-        <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-600 bg-white border-b-2 border-bajaj-500">
+        <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500">
           <i class="fa-solid fa-graduation-cap mr-1.5"></i> Student
         </button>
         <button id="tabAdmin" onclick="switchLoginTab('admin')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100">
@@ -260,90 +452,123 @@
         </button>
       </div>
 
-      <div id="studentHeader" class="bg-bajaj-500 py-3 text-center">
-        <h1 class="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white px-3">Student Web Interface</h1>
+      <div id="studentHeader" class="bg-gradient-to-r from-bajaj-500 via-bajaj-600 to-bajaj-700 py-3.5 text-center">
+        <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Student Web Interface</h1>
       </div>
-      <div id="adminHeader" class="hidden bg-rose-600 py-3 text-center">
-        <h1 class="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-white px-3">Teacher Login</h1>
+      <div id="adminHeader" class="hidden bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
+        <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Teacher Login</h1>
       </div>
 
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Register No</label>
-          <input id="loginRegister" type="text" placeholder="e.g. STU001"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
+          <input id="loginRegister" type="text" autocomplete="username" placeholder="e.g. STU001"
+                 onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()"
+                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
-          <input id="loginPassword" type="password" placeholder="ddmmyyyy"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy"
+                 onkeydown="if(event.key==='Enter')document.getElementById('loginCaptchaInput').focus()"
+                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Captcha</label>
+          <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Enter captcha</label>
           <div class="flex items-center gap-3 w-full sm:flex-1">
-            <input id="loginCaptchaInput" type="text" maxlength="6"
+            <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off"
                    onkeydown="if(event.key==='Enter')attemptStudentLogin()"
                    class="w-24 sm:w-28 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
-            <canvas id="captchaCanvas" width="130" height="40" class="cursor-pointer rounded border border-slate-300" onclick="generateCaptcha()"></canvas>
+            <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()"></canvas>
           </div>
         </div>
         <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
-                class="w-full rounded-full bg-bajaj-500 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg hover:bg-bajaj-600 transition">
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
+          <i class="fa-solid fa-right-to-bracket text-xs"></i>
           <span id="loginSubmitText">Submit</span>
         </button>
         <div class="text-right">
-          <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-600 underline">Forgot password?</button>
+          <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-700 underline decoration-dotted hover:text-bajaj-900">Forgot password?</button>
+        </div>
+        <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
+          <p>First login: use your <b class="text-slate-700">Date of Birth</b> (ddmmyyyy).</p>
         </div>
       </div>
 
       <div id="adminForm" class="hidden p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Teacher No</label>
-          <input id="adminUserInput" type="text" maxlength="12" placeholder="min 4 chars"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-widest text-slate-900 focus:border-rose-600 focus:outline-none" />
+          <input id="adminUserInput" type="text" maxlength="12" autocomplete="username" placeholder="min 4 characters"
+                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
+                 onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
+                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
-          <input id="adminPassInput" type="password" placeholder="••••••••"
+          <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="••••••••"
                  onkeydown="if(event.key==='Enter')attemptAdminLogin()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-rose-600 focus:outline-none" />
+                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
         <button id="adminLoginBtn" onclick="attemptAdminLogin()"
-                class="w-full rounded-full bg-rose-600 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg hover:bg-rose-700 transition">
+                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-shield text-xs"></i>
           <span id="adminLoginBtnText">Sign in as Teacher</span>
         </button>
       </div>
 
-      <div class="px-5 sm:px-7 pb-5 space-y-2">
-        <p id="loginError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-center text-xs font-semibold text-rose-700"></p>
-        <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-xs font-semibold text-emerald-700"></p>
+      <div class="px-5 sm:px-7 pb-5 sm:pb-6 space-y-3">
+        <p id="loginError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
+        <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-center text-xs font-semibold text-emerald-700"></p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+     ═══════════════════════════════════════════════════════ -->
 <div id="app" class="hidden min-h-screen flex flex-col relative z-10">
 
 <!-- HEADER -->
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
-  <div class="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-2.5">
-    <button onclick="go('overview')" class="flex shrink-0 items-center logo-target scale-90 origin-left"></button>
+  <div class="mx-auto flex max-w-[1400px] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 lg:px-6">
 
-    <nav class="ml-4 hidden items-center gap-1 lg:flex">
-      <button data-nav="overview" onclick="go('overview')" class="nav-btn px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">Overview</button>
-      <button data-nav="catalog" onclick="go('catalog')" class="nav-btn px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">Catalog</button>
-      <button data-nav="loans" onclick="go('loans')" class="nav-btn px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">My Loans</button>
-      <button id="navDashboard" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn hidden px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">Dashboard</button>
-      <button id="navPoster" data-nav="poster" onclick="go('poster')" class="nav-btn hidden px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">Poster</button>
-      <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn hidden px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white">Sync</button>
+    <!-- Brand -->
+    <button onclick="go('overview')" class="focus-ring flex shrink-0 items-center gap-2 sm:gap-3 rounded-xl p-0.5 sm:p-1">
+      <svg viewBox="0 0 500 130" class="h-8 sm:h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
+        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+      </svg>
+    </button>
+
+    <!-- Desktop nav -->
+    <nav class="ml-2 hidden items-center gap-0.5 lg:flex">
+      <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-gauge-high mr-2 text-xs"></i>Overview</button>
+      <button data-nav="catalog" onclick="go('catalog')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-boxes-stacked mr-2 text-xs"></i>Catalog</button>
+      <button data-nav="loans" onclick="go('loans')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-clock-rotate-left mr-2 text-xs"></i>My Loans</button>
+      <button id="navDashboard" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-sliders mr-2 text-xs"></i>Dashboard</button>
+      <button id="navPoster" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
+      <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
     </nav>
 
-    <div class="ml-auto flex items-center gap-2.5">
-      <div id="syncPill" class="hidden md:flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-2.5 py-1 text-[11px] font-medium text-slate-400">
+    <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+      <!-- Sync pill (hidden on small) -->
+      <div id="syncPill" class="hidden md:flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-2.5 py-1.5 text-[11px] font-medium text-slate-400">
         <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span>
         <span id="syncPillText">Offline</span>
+      </div>
+
+      <!-- Clock (hidden on smaller) -->
+      <div class="hidden xl:flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3 py-1.5">
+        <i class="fa-regular fa-clock text-[11px] text-amber-400"></i>
+        <div class="leading-none">
+          <div id="clockTime" class="mono text-[12px] font-semibold text-amber-300">--:--:--</div>
+          <div id="clockDate" class="mt-0.5 text-[9px] text-slate-500">--</div>
+        </div>
       </div>
 
       <!-- THEME SWITCH -->
@@ -352,29 +577,29 @@
       </button>
 
       <!-- Cart -->
-      <button onclick="openCart()" class="relative flex items-center gap-2 rounded-xl bg-bajaj-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-bajaj-600 transition">
-        <i class="fa-solid fa-cart-shopping text-xs"></i>
+      <button onclick="openCart()" class="focus-ring relative flex items-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3 sm:px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 active:scale-[.97] transition">
+        <i class="fa-solid fa-cart-shopping text-[11px]"></i>
         <span class="hidden sm:inline">Cart</span>
         <span id="cartCount" class="hidden min-w-[18px] rounded-full bg-white/30 px-1.5 py-0.5 text-[10px] font-extrabold">0</span>
       </button>
 
       <!-- User menu -->
       <div class="relative">
-        <button onclick="toggleUserMenu()" class="flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-2.5 py-1.5 text-xs text-slate-300 hover:text-white transition">
-          <div class="grid h-6 w-6 place-items-center rounded bg-bajaj-500 text-[10px] font-bold text-white" id="userAvatar">?</div>
-          <span class="hidden sm:inline" id="userLabel">User</span>
-          <i class="fa-solid fa-chevron-down text-[9px]"></i>
+        <button onclick="toggleUserMenu()" class="focus-ring flex items-center gap-1.5 sm:gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium text-slate-300 hover:border-brand-500/50 hover:text-white transition">
+          <div class="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-bajaj-500 to-brand-600 text-[10px] font-bold text-white" id="userAvatar">?</div>
+          <span class="hidden sm:inline max-w-[80px] truncate" id="userLabel">User</span>
+          <i class="fa-solid fa-chevron-down text-[9px] text-slate-500"></i>
         </button>
-        <div id="userMenu" class="absolute right-0 top-full mt-2 hidden w-56 rounded-xl border border-ink-700 bg-ink-850 p-2 shadow-2xl z-50">
-          <div class="border-b border-ink-700 px-3 py-2">
-            <div class="text-[10px] text-slate-500">Signed in as</div>
-            <div class="text-xs font-bold text-white truncate" id="menuRegister">—</div>
-            <div class="mt-1 inline-block rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase" id="menuRoleBadge">—</div>
+        <div id="userMenu" class="absolute right-0 top-full mt-2 hidden w-60 overflow-hidden rounded-xl border border-ink-600/70 bg-ink-850 shadow-2xl z-50">
+          <div class="border-b border-ink-700 px-4 py-3 bg-gradient-to-br from-ink-800 to-ink-850">
+            <div class="mono text-[11px] text-slate-500">Signed in as</div>
+            <div class="mt-0.5 text-sm font-bold text-white truncate" id="menuRegister">—</div>
+            <div class="mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase" id="menuRoleBadge">—</div>
           </div>
-          <button onclick="openChangePassword()" class="flex w-full items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-ink-800 rounded-lg">
+          <button onclick="openChangePassword()" class="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-slate-300 hover:bg-ink-800 transition">
             <i class="fa-solid fa-key text-[11px] text-amber-400"></i> Change password
           </button>
-          <button onclick="logout()" class="flex w-full items-center gap-2 border-t border-ink-700 px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 rounded-lg">
+          <button onclick="logout()" class="flex w-full items-center gap-3 border-t border-ink-700 px-4 py-2.5 text-xs font-medium text-rose-300 hover:bg-rose-500/10 transition">
             <i class="fa-solid fa-right-from-bracket text-[11px]"></i> Sign out
           </button>
         </div>
@@ -383,49 +608,81 @@
   </div>
 
   <!-- Mobile nav -->
-  <nav class="flex gap-1 overflow-x-auto border-t border-ink-700/60 px-3 py-2 lg:hidden">
-    <button data-nav="overview" onclick="go('overview')" class="nav-btn whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">Overview</button>
-    <button data-nav="catalog" onclick="go('catalog')" class="nav-btn whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">Catalog</button>
-    <button data-nav="loans" onclick="go('loans')" class="nav-btn whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">My Loans</button>
-    <button id="navDashboardMobile" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn hidden whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">Dashboard</button>
-    <button id="navPosterMobile" data-nav="poster" onclick="go('poster')" class="nav-btn hidden whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">Poster</button>
-    <button id="navSyncMobile" data-nav="sync" onclick="go('sync')" class="nav-btn hidden whitespace-nowrap rounded px-2.5 py-1 text-xs font-medium text-slate-400">Sync</button>
+  <nav class="flex gap-1 overflow-x-auto border-t border-ink-700/60 px-2 sm:px-3 py-2 lg:hidden mobile-scroll-x">
+    <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Overview</button>
+    <button data-nav="catalog" onclick="go('catalog')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Catalog</button>
+    <button data-nav="loans" onclick="go('loans')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">My Loans</button>
+    <button id="navDashboardMobile" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Dashboard</button>
+    <button id="navPosterMobile" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Poster</button>
+    <button id="navSyncMobile" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Sync</button>
   </nav>
 </header>
 
-<main class="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6">
+<!-- Overdue banner -->
+<div id="overdueAlertBanner" class="hidden mx-auto w-full max-w-[1400px] px-3 sm:px-4 pt-3 sm:pt-4 lg:px-6">
+  <div class="overdue-pulse flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-2xl border-2 border-rose-500 bg-rose-950/40 p-3.5 sm:p-4">
+    <div class="grid h-10 w-10 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 text-white shadow-lg shadow-rose-500/40">
+      <i class="fa-solid fa-bell text-base sm:text-xl"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <h3 class="text-sm font-extrabold text-rose-200">You have overdue components!</h3>
+      <p id="overdueAlertDetail" class="mt-0.5 text-xs text-rose-300/90"></p>
+    </div>
+    <button onclick="go('loans')" class="focus-ring w-full sm:w-auto rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 px-4 py-2 text-xs font-bold text-white hover:from-rose-500 hover:to-rose-600 transition">View items</button>
+  </div>
+</div>
 
-<!-- OVERVIEW -->
-<section id="view-overview" class="space-y-6">
-  <div class="relative overflow-hidden rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-6 sm:p-8">
-    <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-bajaj-500/30 bg-bajaj-500/10 px-3 py-1 text-xs font-semibold text-bajaj-300">
+<main class="mx-auto w-full max-w-[1400px] flex-1 px-3 sm:px-4 py-4 sm:py-6 lg:px-6 lg:py-8">
+
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<section id="view-overview" class="space-y-4 sm:space-y-6">
+  <!-- Hero -->
+  <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-5 sm:p-8 lg:p-9">
+    <div class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 sm:h-72 sm:w-72 rounded-full bg-bajaj-500/20 blur-3xl animate-glowPulse"></div>
+    <div class="pointer-events-none absolute -left-24 -bottom-24 h-56 w-56 sm:h-72 sm:w-72 rounded-full bg-neon-violet/15 blur-3xl animate-glowPulse" style="animation-delay: 1.5s;"></div>
+
+    <div class="relative flex flex-col gap-6 lg:gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div class="max-w-2xl">
+        <div class="mb-3 sm:mb-4 inline-flex items-center gap-2 rounded-full border border-bajaj-500/40 bg-gradient-to-r from-bajaj-500/15 to-neon-violet/15 px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-bajaj-300">
           <i class="fa-solid fa-graduation-cap"></i> Bajaj Engineering Skills Training
         </div>
-        <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight text-white">
-          Component Lending Station<br/>
-          <span class="gradient-text">Fast, Automated Hardware Station</span>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-[1.15] text-white tracking-tight">
+          Borrow lab hardware<br/>
+          <span class="gradient-text">in under a minute.</span>
         </h1>
-        <p class="mt-3 max-w-xl text-xs sm:text-sm text-slate-400">
-          Live inventory tracking, automated due timers, and multi-device sync for lab components.
+        <p class="mt-3 sm:mt-4 max-w-xl text-xs sm:text-sm leading-relaxed text-slate-400">
+          Real-time inventory · automatic due dates · instant returns.
         </p>
-        <button onclick="go('catalog')" class="mt-5 rounded-xl bg-bajaj-500 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-bajaj-600 transition">
-          Browse Catalog <i class="fa-solid fa-arrow-right ml-1"></i>
-        </button>
+        <div class="mt-5 sm:mt-7 flex flex-wrap items-center gap-2 sm:gap-3">
+          <button onclick="go('catalog')" class="focus-ring group flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 transition active:scale-[.98]">
+            <i class="fa-solid fa-boxes-stacked text-xs"></i> Browse catalog
+            <i class="fa-solid fa-arrow-right text-[10px] transition group-hover:translate-x-0.5"></i>
+          </button>
+        </div>
       </div>
-
-      <div class="w-full shrink-0 lg:w-80">
-        <div class="rounded-2xl border border-ink-700 bg-ink-900/80 p-4 space-y-3">
-          <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Station Status</span>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
-              <div class="text-[10px] font-semibold uppercase text-emerald-400">Available</div>
-              <div class="mono text-2xl font-bold text-emerald-300" id="heroAvailable">0</div>
+      <div class="w-full shrink-0 lg:w-[380px]">
+        <div class="rounded-2xl border border-ink-700/70 bg-ink-900/80 backdrop-blur p-4 sm:p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <span class="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500">Live station status</span>
+            <span class="mono text-[10px] text-slate-600" id="heroSyncLabel">—</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 p-3 sm:p-3.5">
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400/80">Available</div>
+              <div class="mono mt-2 text-xl sm:text-2xl font-bold text-emerald-300" id="heroAvailable">0</div>
             </div>
-            <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-              <div class="text-[10px] font-semibold uppercase text-amber-400">On Loan</div>
-              <div class="mono text-2xl font-bold text-amber-300" id="heroOnLoan">0</div>
+            <div class="rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-3 sm:p-3.5">
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-amber-400/80">On loan</div>
+              <div class="mono mt-2 text-xl sm:text-2xl font-bold text-amber-300" id="heroOnLoan">0</div>
+            </div>
+          </div>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-500">Utilization</span>
+              <span class="mono font-semibold text-slate-300" id="heroUtil">0%</span>
+            </div>
+            <div class="h-1.5 overflow-hidden rounded-full bg-ink-750">
+              <div id="heroUtilBar" class="h-full rounded-full bg-gradient-to-r from-bajaj-500 via-neon-violet to-neon-cyan transition-all duration-700" style="width:0%"></div>
             </div>
           </div>
         </div>
@@ -433,135 +690,1730 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-ink-850 p-4">
-      <div class="mono text-2xl font-bold text-white" id="kpiSkus">0</div>
-      <div class="mt-1 text-xs text-slate-400">Component Types</div>
+  <!-- KPI cards -->
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-4 sm:p-5 relative overflow-hidden">
+      <div class="absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-lg bg-brand-500/15 text-brand-400"><i class="fa-solid fa-microchip text-[11px]"></i></div>
+      <div class="mono text-xl sm:text-2xl font-bold text-white" id="kpiSkus">0</div>
+      <div class="mt-1 text-[10px] sm:text-xs text-slate-500">Component types</div>
     </div>
-    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-ink-850 p-4">
-      <div class="mono text-2xl font-bold text-amber-300" id="kpiLoans">0</div>
-      <div class="mt-1 text-xs text-slate-400">Active Loans</div>
+    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-4 sm:p-5 relative overflow-hidden">
+      <div class="absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-lg bg-amber-500/15 text-amber-400"><i class="fa-solid fa-clock-rotate-left text-[11px]"></i></div>
+      <div class="mono text-xl sm:text-2xl font-bold text-amber-300" id="kpiLoans">0</div>
+      <div class="mt-1 text-[10px] sm:text-xs text-slate-500">Active loans</div>
     </div>
-    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-ink-850 p-4">
-      <div class="mono text-2xl font-bold text-cyan-400" id="kpiBorrowers">0</div>
-      <div class="mt-1 text-xs text-slate-400">Borrowers</div>
+    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-4 sm:p-5 relative overflow-hidden">
+      <div class="absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-lg bg-neon-cyan/15 text-neon-cyan"><i class="fa-solid fa-users text-[11px]"></i></div>
+      <div class="mono text-xl sm:text-2xl font-bold text-neon-cyan" id="kpiBorrowers">0</div>
+      <div class="mt-1 text-[10px] sm:text-xs text-slate-500">Borrowers</div>
     </div>
-    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-ink-850 p-4">
-      <div class="mono text-2xl font-bold text-rose-400" id="kpiOverdue">0</div>
-      <div class="mt-1 text-xs text-slate-400">Overdue</div>
+    <div class="card-gradient rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-4 sm:p-5 relative overflow-hidden">
+      <div class="absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-lg bg-rose-500/15 text-rose-400"><i class="fa-solid fa-triangle-exclamation text-[11px]"></i></div>
+      <div class="mono text-xl sm:text-2xl font-bold text-rose-400" id="kpiOverdue">0</div>
+      <div class="mt-1 text-[10px] sm:text-xs text-slate-500">Overdue</div>
     </div>
   </div>
 </section>
 
-<!-- CATALOG -->
-<section id="view-catalog" class="hidden space-y-5">
-  <div class="rounded-2xl border border-ink-700 bg-ink-850 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+<!-- ══════════════ CATALOG ══════════════ -->
+<section id="view-catalog" class="hidden space-y-4 sm:space-y-5">
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
+    <div class="flex flex-col gap-3 sm:gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-white">Component Catalog</h1>
+          <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Loan period <span id="loanPeriodLabel" class="font-semibold text-brand-300">2 hours</span> · <span id="catalogResultCount">0 items</span></p>
+        </div>
+        <div class="relative w-full sm:w-56">
+          <i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
+          <input id="skuInput" type="text" onkeydown="if(event.key==='Enter'){quickAdd();}" placeholder="Scan or type SKU"
+                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="relative flex-1 min-w-[180px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
+          <input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search…"
+                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
+        </div>
+        <select id="catalogCategory" onchange="renderCatalog()" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200"><option value="ALL">All categories</option></select>
+        <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400">
+          <input id="catalogInStock" type="checkbox" onchange="renderCatalog()" class="h-3.5 w-3.5 accent-brand-500" /> In stock
+        </label>
+      </div>
+    </div>
+  </div>
+  <div id="catalogGrid" class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+</section>
+
+<!-- ══════════════ LOANS ══════════════ -->
+<section id="view-loans" class="hidden space-y-4 sm:space-y-5">
+  <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
     <div>
-      <h1 class="text-lg font-bold text-white">Component Catalog</h1>
-      <p class="text-xs text-slate-400">Loan period <span id="loanPeriodLabel" class="font-semibold text-brand-300">2 hours</span></p>
+      <h1 class="text-base sm:text-lg font-bold text-white">Active Borrowed Items</h1>
+      <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · one-click returns</p>
     </div>
-    <div class="flex items-center gap-2 w-full sm:w-auto">
-      <input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search..."
-             class="w-full sm:w-64 rounded-xl border border-ink-600 bg-ink-900 px-3 py-2 text-xs text-white" />
-      <select id="catalogCategory" onchange="renderCatalog()" class="rounded-xl border border-ink-600 bg-ink-900 px-3 py-2 text-xs text-white">
-        <option value="ALL">All Categories</option>
-      </select>
+    <button onclick="returnAllLoans()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition w-full sm:w-auto">
+      <i class="fa-solid fa-rotate-left text-[11px]"></i> Return all
+    </button>
+  </div>
+  <div id="loanList" class="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2"></div>
+</section>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<section id="view-dashboard" class="hidden space-y-4 sm:space-y-5">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-brand-500/30 bg-gradient-to-r from-brand-950/50 via-ink-850/70 to-neon-violet/10 p-3.5 sm:p-5">
+    <div class="flex items-center gap-3">
+      <div class="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/30"><i class="fa-solid fa-user-shield text-base sm:text-lg"></i></div>
+      <div>
+        <h1 class="text-sm sm:text-base font-bold text-white">Teacher Console</h1>
+        <p class="mt-0.5 text-[10px] sm:text-xs text-brand-300/80">Real-time stock control</p>
+      </div>
+    </div>
+    <div class="rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-3 py-2 text-[11px] sm:text-xs font-semibold text-emerald-300">
+      Signed in as <span id="dashCurrentUser" class="mono font-bold">—</span>
     </div>
   </div>
-  <div id="catalogGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-3.5 sm:p-4">
+      <span class="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-slate-500">Total SKUs</span>
+      <div class="mono mt-1.5 sm:mt-2 text-xl sm:text-2xl font-bold text-white" id="admSkus">0</div>
+    </div>
+    <div class="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-ink-900/80 p-3.5 sm:p-4">
+      <span class="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-amber-400/80">Units on loan</span>
+      <div class="mono mt-1.5 sm:mt-2 text-xl sm:text-2xl font-bold text-amber-300" id="admOnLoan">0</div>
+    </div>
+    <div class="rounded-2xl border border-neon-cyan/30 bg-gradient-to-br from-neon-cyan/10 to-ink-900/80 p-3.5 sm:p-4">
+      <span class="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-neon-cyan/80">Borrowers</span>
+      <div class="mono mt-1.5 sm:mt-2 text-xl sm:text-2xl font-bold text-neon-cyan" id="admBorrowers">0</div>
+    </div>
+    <div class="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500/10 to-ink-900/80 p-3.5 sm:p-4">
+      <span class="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-rose-400/80">Overdue</span>
+      <div class="mono mt-1.5 sm:mt-2 text-xl sm:text-2xl font-bold text-rose-400" id="admOverdue">0</div>
+    </div>
+  </div>
+
+  <!-- Ledger -->
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
+      <div>
+        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-list text-brand-400 text-xs"></i> Live Borrowed Items</h3>
+        <p class="mt-0.5 text-[10px] text-slate-500">Scroll horizontally on mobile</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:from-emerald-600 hover:to-emerald-800 transition"><i class="fa-solid fa-file-excel text-[11px]"></i> Export</button>
+        <button onclick="clearHistory()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition"><i class="fa-solid fa-eraser text-[11px]"></i> Clear</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto mobile-scroll-x">
+      <table class="w-full text-left text-xs min-w-[900px]">
+        <thead class="border-b border-ink-700 bg-ink-900/60 text-[10px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-3 py-3 font-semibold">TXN</th><th class="px-3 py-3 font-semibold">Borrower</th><th class="px-3 py-3 font-semibold">ID</th>
+            <th class="px-3 py-3 font-semibold">Component</th><th class="px-3 py-3 font-semibold">Qty</th><th class="px-3 py-3 font-semibold">Borrowed</th>
+            <th class="px-3 py-3 font-semibold">Due</th><th class="px-3 py-3 font-semibold">Elapsed</th><th class="px-3 py-3 font-semibold">Status</th><th class="px-3 py-3 text-right font-semibold">Action</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody" class="divide-y divide-ink-700/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Inventory -->
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
+      <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-warehouse text-amber-400 text-xs"></i> Master Inventory</h3>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="openComponentModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:from-emerald-600 hover:to-emerald-800 transition"><i class="fa-solid fa-plus text-[11px]"></i> Add</button>
+        <button onclick="resetDemo()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-brand-500/60 hover:text-white transition"><i class="fa-solid fa-rotate text-[11px]"></i> Reset</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto mobile-scroll-x">
+      <table class="w-full text-left text-xs min-w-[800px]">
+        <thead class="border-b border-ink-700 bg-ink-900/60 text-[10px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-3 py-3 font-semibold">SKU</th><th class="px-3 py-3 font-semibold">Component</th><th class="px-3 py-3 font-semibold">Category</th>
+            <th class="px-3 py-3 font-semibold">Total</th><th class="px-3 py-3 font-semibold">Available</th><th class="px-3 py-3 font-semibold">Out</th>
+            <th class="px-3 py-3 font-semibold">QR</th><th class="px-3 py-3 text-right font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryBody" class="divide-y divide-ink-700/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Loan period (min)</label>
+        <input id="setLoanMinutes" type="number" min="5" step="5" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Low-stock threshold</label>
+        <input id="setLowStock" type="number" min="0" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button onclick="saveSettings()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-5 py-2.5 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition shadow-lg shadow-brand-600/20">
+        <i class="fa-solid fa-check text-[11px]"></i> Save settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Teachers -->
+  <div class="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/20 to-ink-850/50 p-4 sm:p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h3 class="flex items-center gap-2 text-sm font-bold text-white">
+        <i class="fa-solid fa-users text-xs text-rose-400"></i> Manage Teachers
+        <span id="teacherCountBadge" class="rounded-full border border-rose-500/30 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300">0</span>
+      </h3>
+      <button onclick="openAddTeacherModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 px-4 py-2 text-xs font-semibold text-white hover:from-rose-600 hover:to-rose-800 transition shadow-lg shadow-rose-600/20">
+        <i class="fa-solid fa-user-plus text-[11px]"></i> Add Teacher
+      </button>
+    </div>
+    <p class="mb-4 text-xs leading-relaxed text-slate-400">Any teacher listed here can sign in. You cannot remove yourself.</p>
+    <div id="teachersList" class="space-y-2"></div>
+  </div>
+
+  <!-- Students -->
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-graduation-cap text-xs text-brand-400"></i> Registered Students</h3>
+    <div id="studentsList" class="max-h-64 space-y-1.5 overflow-y-auto"></div>
+  </div>
 </section>
 
-<!-- LOANS -->
-<section id="view-loans" class="hidden space-y-5">
-  <div class="flex items-center justify-between rounded-2xl border border-ink-700 bg-ink-850 p-4">
-    <h1 class="text-lg font-bold text-white">Active Borrowed Items</h1>
-    <button onclick="returnAllLoans()" class="rounded-xl border border-rose-500/40 bg-rose-500/10 px-3.5 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-500/20">Return All</button>
+<!-- ══════════════ POSTER ══════════════ -->
+<section id="view-poster" class="hidden space-y-4 sm:space-y-5">
+  <div class="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-5">
+    <div class="space-y-3 sm:space-y-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5 lg:col-span-2">
+      <div class="flex items-center gap-2.5 border-b border-ink-700/60 pb-3">
+        <i class="fa-solid fa-pen-ruler text-xs text-brand-400"></i><h2 class="text-sm font-bold text-white">Poster designer</h2>
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Station title</label>
+        <input id="posterTitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Subtitle</label>
+        <input id="posterSubtitle" type="text" oninput="onPosterInput()" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Portal URL</label>
+        <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.com/"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Instructions</label>
+        <textarea id="posterInstructions" rows="3" oninput="onPosterInput()" class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white"></textarea>
+      </div>
+      <div class="space-y-2 pt-1">
+        <button onclick="downloadPoster()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition shadow-lg shadow-brand-600/20">
+          <i class="fa-solid fa-download text-[11px]"></i> Download PNG
+        </button>
+        <button onclick="window.print()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">
+          <i class="fa-solid fa-print text-[11px]"></i> Print
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-start justify-center overflow-auto rounded-2xl border border-ink-700/60 bg-ink-900/40 p-4 sm:p-6 lg:col-span-3 lg:p-10">
+      <div id="posterCanvas" class="w-full max-w-sm space-y-6 rounded-2xl border-[5px] border-brand-600 bg-white p-6 sm:p-8 text-center shadow-2xl">
+        <div class="space-y-2 border-b border-slate-200 pb-5">
+          <span class="inline-block rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-brand-700">Self-Service Lending</span>
+          <h2 id="posterTitlePreview" class="pt-1 text-lg sm:text-xl font-extrabold leading-tight text-slate-900">—</h2>
+          <p id="posterSubtitlePreview" class="text-[11px] font-medium text-slate-500">—</p>
+        </div>
+        <div class="flex justify-center py-1">
+          <div class="inline-block rounded-2xl border-2 border-brand-100 bg-white p-4"><div id="posterQrTarget" class="flex justify-center"></div></div>
+        </div>
+        <div class="rounded-xl border border-brand-100 bg-brand-50/70 p-3.5">
+          <p id="posterInstructionsPreview" class="text-[11px] font-medium leading-relaxed text-slate-700">—</p>
+        </div>
+        <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+          <span id="posterUrlPreview" class="truncate font-mono text-[9px] text-slate-400">—</span>
+          <span class="text-[9px] font-semibold uppercase tracking-wider text-slate-400">Open 24/7</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="loanList" class="grid grid-cols-1 gap-4 lg:grid-cols-2"></div>
 </section>
 
-<!-- DASHBOARD -->
-<section id="view-dashboard" class="hidden space-y-5">
-  <div class="rounded-2xl border border-ink-700 bg-ink-850 p-4">
-    <h1 class="text-base font-bold text-white">Teacher Console</h1>
-    <p class="text-xs text-slate-400">Inventory & User Management</p>
+<!-- ══════════════ SYNC ══════════════ -->
+<section id="view-sync" class="hidden space-y-4 sm:space-y-5">
+  <div class="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-ink-850/50 to-neon-cyan/10 p-5 sm:p-8">
+    <div class="flex items-start gap-3 sm:gap-4">
+      <div class="grid h-11 w-11 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-600/30">
+        <i class="fa-solid fa-tower-broadcast text-lg sm:text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-extrabold text-white">Live sync is active</h1>
+        <p class="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-400">Every device that opens this URL joins the same live station.</p>
+      </div>
+    </div>
   </div>
-  <div class="rounded-2xl border border-ink-700 bg-ink-850 overflow-hidden">
-    <div class="p-4 border-b border-ink-700"><h3 class="text-sm font-bold text-white">Master Inventory</h3></div>
-    <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="inventoryBody" class="divide-y divide-ink-700"></tbody></table></div>
+  <div class="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2">
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-brand-300"><i class="fa-solid fa-link text-xs"></i></div>
+        <h2 class="text-sm font-bold text-white">Sync status</h2>
+      </div>
+      <div class="mt-4 space-y-2">
+        <div class="flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+          <span class="text-[10px] uppercase tracking-wider text-slate-500">Station</span>
+          <span class="mono text-sm font-bold text-emerald-300">LAB-MAIN</span>
+        </div>
+        <div class="flex items-center justify-between rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2">
+          <span class="text-[10px] uppercase tracking-wider text-slate-500">Connection</span>
+          <span id="syncStatConn" class="flex items-center gap-1.5 text-xs font-bold"><span class="h-2 w-2 rounded-full bg-amber-400 pulse-dot"></span><span class="text-amber-300">Connecting…</span></span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2"><div class="text-[10px] uppercase tracking-wider text-slate-500">Last send</div><div id="syncStatSent" class="mono mt-0.5 text-[11px] text-slate-400">never</div></div>
+          <div class="rounded-lg border border-ink-700 bg-ink-950/60 px-3 py-2"><div class="text-[10px] uppercase tracking-wider text-slate-500">Last receive</div><div id="syncStatRecv" class="mono mt-0.5 text-[11px] text-slate-400">never</div></div>
+        </div>
+      </div>
+      <button onclick="forceSync()" class="mt-3 flex items-center justify-center gap-2 w-full sm:w-auto rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-medium text-slate-300 hover:border-brand-500/60 hover:text-white transition">
+        <i class="fa-solid fa-rotate text-[10px]"></i> Pull latest from server
+      </button>
+    </div>
+    <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500/15 text-brand-300"><i class="fa-solid fa-mobile-screen-button text-xs"></i></div>
+        <h2 class="text-sm font-bold text-white">Join from any phone</h2>
+      </div>
+      <p class="mt-3 text-xs text-slate-400">Scan this QR with the phone camera.</p>
+      <div class="mt-3 flex justify-center rounded-xl border border-ink-700 bg-white p-4"><img id="syncJoinQr" width="180" height="180" alt="Join QR" /></div>
+      <button onclick="copyJoinUrl()" class="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-medium text-slate-300 hover:border-brand-500/60 hover:text-white transition">
+        <i class="fa-solid fa-link text-[10px]"></i> Copy join URL
+      </button>
+    </div>
   </div>
 </section>
-
-<!-- POSTER -->
-<section id="view-poster" class="hidden space-y-5"></section>
-
-<!-- SYNC -->
-<section id="view-sync" class="hidden space-y-5"></section>
-
 </main>
 
-<footer class="border-t border-ink-700/60 px-4 py-5 text-center text-xs text-slate-500">
+<footer class="border-t border-ink-700/60 px-4 py-5 text-center text-[11px] text-slate-600">
   Bajaj Engineering Skills Training · Component Lending Station
 </footer>
 </div>
 
-<!-- CART DRAWER -->
-<div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-black/60 backdrop-blur-sm">
-  <div class="ml-auto flex h-full w-full max-w-md flex-col bg-ink-900 border-l border-ink-700 shadow-2xl">
-    <div class="flex items-center justify-between border-b border-ink-700 p-4">
-      <h3 class="text-sm font-bold text-white">Borrow Cart</h3>
-      <button onclick="closeCart()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+<!-- ═══════════════════════════════════════════════════════
+     CART DRAWER
+     ═══════════════════════════════════════════════════════ -->
+<div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
+  <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-ink-700/60 px-4 sm:px-5 py-4">
+      <div class="flex items-center gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white"><i class="fa-solid fa-cart-shopping text-xs"></i></div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Borrow Cart</h3>
+          <p class="text-[10px] text-slate-500" id="cartSummary">Empty</p>
+        </div>
+      </div>
+      <button onclick="closeCart()" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800 hover:text-white transition"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div id="cartItems" class="flex-1 p-4 space-y-3 overflow-y-auto"></div>
-    <div class="border-t border-ink-700 p-4 space-y-3">
-      <input id="borrowerName" type="text" placeholder="Full Name" class="w-full rounded-xl border border-ink-600 bg-ink-950 p-2.5 text-xs text-white" />
-      <input id="borrowerId" type="text" placeholder="Student ID" class="w-full rounded-xl border border-ink-600 bg-ink-950 p-2.5 text-xs text-white" />
-      <button onclick="checkoutCart()" class="w-full rounded-xl bg-bajaj-500 py-3 text-xs font-bold text-white hover:bg-bajaj-600 transition">Complete Checkout</button>
+    <div id="cartItems" class="flex-1 space-y-3 overflow-y-auto p-4"></div>
+    <div class="space-y-3.5 border-t border-ink-700/60 p-4 sm:p-5">
+      <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Borrower details</h4>
+      <input id="borrowerName" type="text" placeholder="Full name" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="borrowerId" type="text" placeholder="Student ID / Phone" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <button onclick="checkoutCart()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-3 text-xs font-bold text-white hover:from-brand-600 hover:to-brand-800 active:scale-[.98] transition shadow-lg shadow-brand-600/25">
+        <i class="fa-solid fa-check text-[11px]"></i> Complete checkout
+      </button>
     </div>
   </div>
 </div>
 
-<div id="toasts" class="fixed bottom-4 right-4 z-[110] flex flex-col gap-2"></div>
+<!-- ═══════════════════════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════════════════════ -->
+<div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-lg space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
+    <input type="hidden" id="cmpOriginalId" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <input id="cmpSku" type="text" placeholder="SKU" class="focus-ring mono w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpStock" type="number" min="0" placeholder="Stock" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpName" type="text" placeholder="Component name" class="focus-ring sm:col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpCategory" type="text" placeholder="Category" class="focus-ring sm:col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <textarea id="cmpDesc" rows="2" placeholder="Description" class="focus-ring sm:col-span-2 w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mComponent')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="saveComponent()" class="w-1/2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-bold text-white hover:from-emerald-600 hover:to-emerald-800 transition">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="mAddTeacher" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-md space-y-4 sm:space-y-5 rounded-2xl border border-rose-700/50 bg-ink-850 p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white">Add New Teacher</h3>
+      <button onclick="closeModal('mAddTeacher')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
+        <input id="newTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
+               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs tracking-[.2em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Password</label>
+        <input id="newTeacherPass" type="password" autocomplete="new-password" placeholder="min 6 characters"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm Password</label>
+        <input id="newTeacherPassConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
+               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
+    </div>
+    <p id="addTeacherError" class="hidden text-xs font-medium text-rose-400"></p>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mAddTeacher')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="saveNewTeacher()" class="w-1/2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white hover:from-rose-600 hover:to-rose-800 transition">Add Teacher</button>
+    </div>
+  </div>
+</div>
+
+<div id="mQr" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-xs space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6 text-center">
+    <h3 id="qrTitle" class="text-sm font-bold text-white">Component QR</h3>
+    <div class="inline-block rounded-2xl bg-white p-4"><div id="qrTarget" class="flex justify-center"></div></div>
+    <p id="qrSku" class="mono text-xs text-brand-400"></p>
+    <button onclick="closeModal('mQr')" class="w-full rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Close</button>
+  </div>
+</div>
+
+<div id="mConfirm" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-sm space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6">
+    <div class="flex items-start gap-3.5">
+      <div id="confirmIconWrap" class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/15 text-rose-400"><i id="confirmIcon" class="fa-solid fa-triangle-exclamation"></i></div>
+      <div>
+        <h3 id="confirmTitle" class="text-sm font-bold text-white">Confirm</h3>
+        <p id="confirmMessage" class="mt-1 text-xs leading-relaxed text-slate-400"></p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button id="confirmCancel" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button id="confirmOk" class="w-1/2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white hover:from-rose-600 hover:to-rose-800 transition">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="mChangePassword" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-sm space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white">Change password</h3>
+      <button onclick="closeModal('mChangePassword')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="space-y-3">
+      <input id="cpCurrent" type="password" placeholder="Current password" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cpNew" type="password" placeholder="New password" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cpConfirm" type="password" placeholder="Confirm new password" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+    </div>
+    <p id="cpMessage" class="hidden text-xs font-medium"></p>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mChangePassword')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="saveNewPassword()" class="w-1/2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-bold text-white hover:from-brand-600 hover:to-brand-800 transition">Update</button>
+    </div>
+  </div>
+</div>
+
+<div id="mOverdue" class="fixed inset-0 z-[97] hidden items-center justify-center bg-rose-950/70 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in shake-alert w-full max-w-md space-y-4 sm:space-y-5 rounded-2xl border-2 border-rose-500 bg-ink-850 p-5 sm:p-6 shadow-2xl shadow-rose-500/30 max-h-[90vh] overflow-y-auto">
+    <div class="text-center">
+      <div class="mx-auto grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 text-white shadow-lg shadow-rose-500/40">
+        <i class="fa-solid fa-bell text-xl sm:text-2xl"></i>
+      </div>
+      <h3 class="mt-4 text-lg font-extrabold text-rose-300">Overdue Notice</h3>
+      <p class="mt-1 text-xs text-slate-400">The following components are past their due time</p>
+    </div>
+    <div id="overdueItemsList" class="max-h-60 space-y-2 overflow-y-auto"></div>
+    <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-xs leading-relaxed text-rose-200">
+      <i class="fa-solid fa-circle-info mr-1"></i> Please return these items to the lab immediately.
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mOverdue')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Dismiss</button>
+      <button onclick="closeModal('mOverdue'); go('loans');" class="w-1/2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white hover:from-rose-600 hover:to-rose-800 transition">View my loans</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[110] flex w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2"></div>
 
 <script>
-// Insert logo SVGs dynamically into all logo-target containers
-function injectLogos() {
-  const tpl = document.getElementById('bajajLogoTemplate');
-  if (!tpl) return;
-  document.querySelectorAll('.logo-target').forEach(el => {
-    el.innerHTML = '';
-    el.appendChild(tpl.content.cloneNode(true));
-  });
-}
+/* ═══════════════════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════════════════ */
+const BUILTIN_FIREBASE = {
+  apiKey: "AIzaSyCmg42q2ZN_GNH65pCSprXHyu7ZZ1RKZTE",
+  authDomain: "components-8893a.firebaseapp.com",
+  databaseURL: "https://components-8893a-default-rtdb.firebaseio.com",
+  projectId: "components-8893a",
+  storageBucket: "components-8893a.firebasestorage.app",
+  messagingSenderId: "13293708546",
+  appId: "1:13293708546:web:b1344c74fc5e8483a6ce1b",
+  measurementId: "G-DP20GNZX7X"
+};
+const SINGLE_STATION = 'LAB-MAIN';
+const STORAGE_KEY = 'bajaj.lending.v5';
+const SESSION_KEY = 'bajaj.session.v5';
+const THEME_KEY = 'bajaj.theme.v2';
+const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
+const MAX_ACTIVITY = 40;
+const SYNC_KEYS = ['inventory', 'loans', 'history', 'settings', 'activity', 'students', 'adminConfig'];
+const MIN_ADMIN_USER_LEN = 4;
+const MAX_ADMIN_USER_LEN = 12;
+const MIN_ADMIN_PASS_LEN = 6;
 
-// Basic Theme functions
+const SEED_INVENTORY = [
+  { id:'SKU-1001', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
+  { id:'SKU-1002', name:'Raspberry Pi 4 Model B (4GB)',         category:'Microcontrollers',   totalStock:6,  description:'Quad-core 64-bit SBC with dual 4K output.' },
+  { id:'SKU-1003', name:'Digital Multimeter Auto-Ranging',      category:'Tools & Equipment',  totalStock:8,  description:'AC/DC voltage, current, resistance tester.' },
+  { id:'SKU-1004', name:'DHT22 Temperature & Humidity Sensor',  category:'Sensors',            totalStock:20, description:'Calibrated capacitive temperature/humidity.' },
+  { id:'SKU-1005', name:'Ultrasonic Distance Sensor (HC-SR04)', category:'Sensors',            totalStock:15, description:'2cm–400cm non-contact distance module.' },
+  { id:'SKU-1006', name:'60W Temperature Controlled Iron',      category:'Tools & Equipment',  totalStock:5,  description:'Adjustable 200°C–450°C soldering station.' },
+  { id:'SKU-1007', name:'SG90 Micro Servo Motor 9g',            category:'Actuators & Motors', totalStock:25, description:'180-degree rotation miniature servo.' },
+  { id:'SKU-1008', name:'Solderless Breadboard 830 Point',      category:'Passives & Boards',  totalStock:30, description:'Standard tie-point prototyping board.' },
+  { id:'SKU-1009', name:'ESP32 DevKit V1 WiFi + BLE',           category:'Microcontrollers',   totalStock:10, description:'Dual-core WiFi/BLE development board.' },
+  { id:'SKU-1010', name:'Logic Analyzer 8-Channel 24MHz',       category:'Tools & Equipment',  totalStock:4,  description:'USB logic analyzer with clip leads.' }
+];
+const DEFAULT_SETTINGS = {
+  loanDurationMinutes: 120, lowStockThreshold: 3,
+  posterTitle: 'BEST Component Lending Station',
+  posterSubtitle: 'Bajaj Engineering Skills Training',
+  posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.'
+};
+
+function defaultState() {
+  return {
+    inventory: SEED_INVENTORY.map(x => ({ ...x })),
+    loans: [], history: [], cart: {},
+    borrower: { name:'', id:'' },
+    settings: { ...DEFAULT_SETTINGS },
+    activity: [], simOffsetMs: 0,
+    students: {},
+    adminConfig: null
+  };
+}
+let state = defaultState();
+let session = { role: null, register: null, name: null };
+let activeView = 'overview';
+let deployUrl = '';
+let serverClockOffsetMs = 0;
+let fbApp = null, fbDb = null, stationRef = null, connected = false;
+let lastSentAt = 0, lastRecvAt = 0;
+let captchaCode = '';
+let loginTab = 'student';
 let currentTheme = 'dark';
+
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2, '0');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Theme */
 function applyTheme(theme) {
   currentTheme = theme === 'light' ? 'light' : 'dark';
-  const icon = document.getElementById('themeIcon');
-  const sw = document.getElementById('themeSwitch');
+  const icon = $('themeIcon');
+  const sw = $('themeSwitch');
+  const meta = document.querySelector('meta[name="theme-color"]');
   if (currentTheme === 'light') {
     document.body.classList.add('theme-light');
     if (icon) icon.className = 'fa-solid fa-moon';
     if (sw) sw.classList.add('light');
+    if (meta) meta.setAttribute('content', '#f5f7fc');
   } else {
     document.body.classList.remove('theme-light');
     if (icon) icon.className = 'fa-solid fa-sun';
     if (sw) sw.classList.remove('light');
+    if (meta) meta.setAttribute('content', '#05080f');
   }
+  try { localStorage.setItem(THEME_KEY, currentTheme); } catch {}
 }
 function toggleTheme() {
   applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+  toast(`Switched to ${currentTheme} mode.`, 'info', 1500);
+}
+function loadTheme() {
+  let saved = 'dark';
+  try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch {}
+  applyTheme(saved);
 }
 
-// App Logic placeholder initialization
-document.addEventListener('DOMContentLoaded', () => {
-  injectLogos();
-  applyTheme('dark');
-  // Initialize UI displays
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginScreen').classList.add('flex');
+function stableHash(text) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return ('00000000' + (h2 >>> 0).toString(16)).slice(-8) + ('00000000' + (h1 >>> 0).toString(16)).slice(-8);
+}
+async function hashPassword(pw) {
+  try {
+    if (window.crypto && window.crypto.subtle && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      const buf = new TextEncoder().encode('best::' + pw);
+      const d = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch {}
+  return stableHash('best::' + pw);
+}
+
+function now() { return Date.now() + serverClockOffsetMs + state.simOffsetMs; }
+function findItem(id) { return state.inventory.find(i => i.id === id); }
+function fmtTime(ms) { return new Date(ms).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function fmtDate(ms) { return new Date(ms).toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' }); }
+function fmtDateTime(ms) { const d = new Date(ms); return d.toLocaleDateString([], { month:'short', day:'numeric' }) + ' · ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
+function fmtDuration(ms) { const t = Math.max(0, Math.floor(ms/1000)); const h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = t%60; return `${pad2(h)}:${pad2(m)}:${pad2(s)}`; }
+function fmtDurShort(ms) { const m = Math.max(0, Math.round(ms/60000)); const h = Math.floor(m/60); return h > 0 ? `${h}h ${pad2(m%60)}m` : `${m}m`; }
+function relTime(ms) { const d = now() - ms; if (d < 45000) return 'just now'; if (d < 3600000) return `${Math.floor(d/60000)}m ago`; if (d < 86400000) return `${Math.floor(d/3600000)}h ago`; return `${Math.floor(d/86400000)}d ago`; }
+
+function borrowedQty(id) { return state.loans.reduce((s,l) => l.itemId === id ? s + l.quantity : s, 0); }
+function availableQty(id) { const it = findItem(id); return it ? Math.max(0, it.totalStock - borrowedQty(id)) : 0; }
+function selectableQty(id) { return Math.max(0, availableQty(id) - (state.cart[id]||0)); }
+function loanMs() { return state.settings.loanDurationMinutes * 60000; }
+function isOverdue(l, t=now()) { return t > l.dueTimeMs; }
+function isDueSoon(l, t=now()) { const r = l.dueTimeMs - t; return r > 0 && r < 15*60000; }
+function newLoanId() { return 'TXN-' + Math.floor(100000 + Math.random()*900000); }
+function sanitizeCart() { Object.keys(state.cart).forEach(id => { const it = findItem(id); const q = Number(state.cart[id])||0; if (!it || q <= 0) { delete state.cart[id]; return; } const max = availableQty(id); if (q > max) { max <= 0 ? delete state.cart[id] : state.cart[id] = max; } }); }
+function logActivity(type, message) { state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() }); if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY; }
+
+function getAdmins() {
+  if (!state.adminConfig) return [];
+  if (Array.isArray(state.adminConfig.admins)) return state.adminConfig.admins;
+  if (state.adminConfig.username && state.adminConfig.passwordHash) {
+    return [{ username: state.adminConfig.username, passwordHash: state.adminConfig.passwordHash, createdAt: state.adminConfig.createdAt || Date.now() }];
+  }
+  return [];
+}
+function findAdminByUsername(name) {
+  return getAdmins().find(a => (a.username || '').toUpperCase() === (name || '').toUpperCase());
+}
+
+function toast(message, type='info', ttl=3500) {
+  const cfg = {
+    info:    { icon:'fa-circle-info',          color:'text-brand-400',   border:'border-brand-500/40',   bg:'bg-gradient-to-br from-brand-500/15 to-brand-500/5' },
+    success: { icon:'fa-circle-check',         color:'text-emerald-400', border:'border-emerald-500/40', bg:'bg-gradient-to-br from-emerald-500/15 to-emerald-500/5' },
+    warn:    { icon:'fa-triangle-exclamation', color:'text-amber-400',   border:'border-amber-500/40',   bg:'bg-gradient-to-br from-amber-500/15 to-amber-500/5' },
+    error:   { icon:'fa-circle-xmark',         color:'text-rose-400',    border:'border-rose-500/40',    bg:'bg-gradient-to-br from-rose-500/15 to-rose-500/5' }
+  }[type] || {};
+  const el = document.createElement('div');
+  el.className = `pointer-events-auto fade-up flex items-start gap-3 rounded-xl border ${cfg.border} bg-ink-850/95 ${cfg.bg} p-3.5 shadow-2xl backdrop-blur`;
+  el.innerHTML = `<i class="fa-solid ${cfg.icon} ${cfg.color} mt-0.5 text-sm"></i><p class="flex-1 text-xs text-slate-200">${esc(message)}</p><button class="-m-1 rounded p-1 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-[11px]"></i></button>`;
+  const dismiss = () => { el.style.transition = 'opacity .25s, transform .25s'; el.style.opacity = '0'; el.style.transform = 'translateX(12px)'; setTimeout(() => el.remove(), 260); };
+  el.querySelector('button').onclick = dismiss;
+  $('toasts').appendChild(el);
+  setTimeout(dismiss, ttl);
+}
+function openModal(id) { $(id).classList.remove('hidden'); $(id).classList.add('flex'); }
+function closeModal(id) { $(id).classList.add('hidden'); $(id).classList.remove('flex'); }
+function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-triangle-exclamation') {
+  return new Promise(resolve => {
+    $('confirmTitle').textContent = title; $('confirmMessage').textContent = message;
+    $('confirmIcon').className = `fa-solid ${icon}`;
+    $('confirmIconWrap').className = `grid h-10 w-10 shrink-0 place-items-center rounded-xl ${danger ? 'bg-rose-500/15 text-rose-400' : 'bg-brand-500/15 text-brand-400'}`;
+    const ok = $('confirmOk'); ok.textContent = okText;
+    ok.className = `w-1/2 rounded-xl py-2.5 text-xs font-bold text-white ${danger ? 'bg-gradient-to-br from-rose-500 to-rose-700 hover:from-rose-600 hover:to-rose-800' : 'bg-gradient-to-br from-brand-500 to-brand-700 hover:from-brand-600 hover:to-brand-800'} transition`;
+    const finish = v => { closeModal('mConfirm'); ok.onclick = null; $('confirmCancel').onclick = null; resolve(v); };
+    ok.onclick = () => finish(true); $('confirmCancel').onclick = () => finish(false);
+    openModal('mConfirm');
+  });
+}
+
+function generateCaptcha() {
+  const canvas = $('captchaCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  captchaCode = '';
+  for (let i = 0; i < 5; i++) captchaCode += chars[Math.floor(Math.random()*chars.length)];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  grad.addColorStop(0, '#f1f5f9'); grad.addColorStop(1, '#e2e8f0');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < 5; i++) {
+    ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
+    ctx.lineWidth = 1 + Math.random();
+    ctx.beginPath(); ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.stroke();
+  }
+  for (let i = 0; i < 40; i++) {
+    ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
+    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 1.5);
+  }
+  for (let i = 0; i < captchaCode.length; i++) {
+    ctx.save();
+    ctx.translate(16 + i * 26, 32); ctx.rotate((Math.random() - 0.5) * 0.6);
+    ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`;
+    ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`;
+    ctx.fillText(captchaCode[i], 0, 0); ctx.restore();
+  }
+}
+
+function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
+function showLoginInfo(msg) { const i = $('loginInfo'); i.textContent = msg; i.classList.remove('hidden'); $('loginError').classList.add('hidden'); }
+function clearLoginMessages() { $('loginError').classList.add('hidden'); $('loginInfo').classList.add('hidden'); }
+function showSetupError(msg) { const e = $('setupError'); e.textContent = msg; e.classList.remove('hidden'); }
+
+function switchLoginTab(tab) {
+  loginTab = tab;
+  clearLoginMessages();
+  const studentForm = $('studentForm');
+  const adminForm = $('adminForm');
+  const tabStudent = $('tabStudent');
+  const tabAdmin = $('tabAdmin');
+  const studentHeader = $('studentHeader');
+  const adminHeader = $('adminHeader');
+
+  if (tab === 'student') {
+    studentForm.classList.remove('hidden'); adminForm.classList.add('hidden');
+    studentHeader.classList.remove('hidden'); adminHeader.classList.add('hidden');
+    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
+    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    setTimeout(() => $('loginRegister').focus(), 100);
+  } else {
+    studentForm.classList.add('hidden'); adminForm.classList.remove('hidden');
+    studentHeader.classList.add('hidden'); adminHeader.classList.remove('hidden');
+    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
+    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    setTimeout(() => $('adminUserInput').focus(), 100);
+  }
+}
+
+async function completeSetup() {
+  const teacherNo = $('setupTeacherNo').value.trim().toUpperCase();
+  const pw = $('setupPassword').value;
+  const cf = $('setupConfirm').value;
+  const btn = $('setupBtn');
+  const btnTxt = $('setupBtnText');
+  $('setupError').classList.add('hidden');
+  if (teacherNo.length < MIN_ADMIN_USER_LEN) { showSetupError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
+  if (teacherNo.length > MAX_ADMIN_USER_LEN) { showSetupError(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`); return; }
+  if (!/^[A-Z0-9]+$/.test(teacherNo)) { showSetupError('Teacher No can only contain letters and digits.'); return; }
+  if (pw.length < MIN_ADMIN_PASS_LEN) { showSetupError(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`); return; }
+  if (pw !== cf) { showSetupError('Passwords do not match.'); return; }
+  btn.disabled = true; btnTxt.textContent = 'Creating…';
+  try {
+    const hash = await hashPassword(pw);
+    state.adminConfig = { admins: [{ username: teacherNo, passwordHash: hash, createdAt: Date.now() }], createdAt: Date.now() };
+    saveLocal(); publishKey('adminConfig');
+    $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
+    $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
+    generateCaptcha(); switchLoginTab('admin');
+    $('adminUserInput').value = teacherNo;
+    setTimeout(() => $('adminPassInput').focus(), 200);
+    toast(`First teacher "${teacherNo}" created.`, 'success', 5000);
+  } catch (e) { console.error(e); showSetupError('Setup failed. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Create First Teacher'; }
+}
+
+async function attemptStudentLogin() {
+  const reg = $('loginRegister').value.trim().toUpperCase();
+  const pw = $('loginPassword').value;
+  const captchaInput = $('loginCaptchaInput').value.trim().toUpperCase();
+  const btn = $('loginSubmitBtn');
+  const btnTxt = $('loginSubmitText');
+  clearLoginMessages();
+  if (!reg) { showLoginError('Please enter your Register No.'); return; }
+  if (!pw) { showLoginError('Please enter your Password.'); return; }
+  if (!captchaInput) { showLoginError('Please enter the captcha.'); return; }
+  if (captchaInput !== captchaCode) { showLoginError('Captcha does not match. Try again.'); generateCaptcha(); $('loginCaptchaInput').value = ''; return; }
+  btn.disabled = true; btnTxt.textContent = 'Verifying…';
+  try {
+    const hash = await hashPassword(pw);
+    const students = state.students || {};
+    const existing = students[reg];
+    if (existing) {
+      if (hash === existing.passwordHash) { enterApp('user', reg, existing.name || reg); }
+      else { showLoginError('Incorrect password.'); $('loginPassword').select(); }
+      return;
+    }
+    if (!/^\d{8}$/.test(pw)) { showLoginError('First-time login: use your Date of Birth (ddmmyyyy).'); return; }
+    state.students = state.students || {};
+    state.students[reg] = { register: reg, name: 'Student ' + reg, passwordHash: hash, createdAt: Date.now() };
+    publishKey('students');
+    enterApp('user', reg, state.students[reg].name);
+    toast('Welcome! Your password is now your DOB.', 'success', 5000);
+  } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
+}
+
+async function attemptAdminLogin() {
+  const teacherNo = $('adminUserInput').value.trim().toUpperCase();
+  const password = $('adminPassInput').value;
+  const btn = $('adminLoginBtn');
+  const btnTxt = $('adminLoginBtnText');
+  clearLoginMessages();
+  if (!teacherNo) { showLoginError('Please enter your Teacher No.'); return; }
+  if (teacherNo.length < MIN_ADMIN_USER_LEN) { showLoginError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
+  if (!password) { showLoginError('Please enter your Password.'); return; }
+  btn.disabled = true; btnTxt.textContent = 'Verifying…';
+  try {
+    if (!state.adminConfig) { await new Promise(r => setTimeout(r, 1000)); }
+    const admins = getAdmins();
+    if (!admins.length) { showLoginError('No teacher accounts found. Please refresh the page.'); return; }
+    const admin = findAdminByUsername(teacherNo);
+    if (!admin) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
+    const hash = await hashPassword(password);
+    if (hash !== admin.passwordHash) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
+    enterApp('admin', teacherNo, admin.username);
+  } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Teacher'; }
+}
+
+function enterApp(role, register, name) {
+  session = { role, register, name };
+  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
+  $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
+  $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
+  $('app').classList.remove('hidden');
+  applyRoleUI(); renderAll(); tick();
+  checkOverdueForCurrentUser(true);
+}
+
+function applyRoleUI() {
+  const isAdminUser = session.role === 'admin';
+  ['navDashboard','navPoster','navSync','navDashboardMobile','navPosterMobile','navSyncMobile'].forEach(id => {
+    const el = $(id); if (!el) return;
+    if (isAdminUser) el.classList.remove('hidden');
+    else el.classList.add('hidden');
+  });
+  if (session.register) {
+    $('userAvatar').textContent = session.register.slice(0, 1).toUpperCase();
+    $('userLabel').textContent = session.register;
+    $('menuRegister').textContent = session.register;
+    const badge = $('menuRoleBadge');
+    if (isAdminUser) {
+      badge.textContent = 'Teacher';
+      badge.className = 'mt-1 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[9px] font-bold uppercase text-rose-300';
+    } else {
+      badge.textContent = 'Student';
+      badge.className = 'mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-300';
+    }
+  }
+  go('overview');
+}
+
+function logout() {
+  session = { role: null, register: null, name: null };
+  try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+  $('app').classList.add('hidden');
+  $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
+  $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  $('adminUserInput').value = ''; $('adminPassInput').value = '';
+  clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
+}
+
+function toggleUserMenu() { $('userMenu').classList.toggle('hidden'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('#userMenu') && !e.target.closest('[onclick="toggleUserMenu()"]')) {
+    const m = $('userMenu'); if (m) m.classList.add('hidden');
+  }
 });
+
+function openChangePassword() {
+  $('userMenu').classList.add('hidden');
+  $('cpCurrent').value = ''; $('cpNew').value = ''; $('cpConfirm').value = '';
+  $('cpMessage').classList.add('hidden');
+  openModal('mChangePassword');
+}
+
+async function saveNewPassword() {
+  const cur = $('cpCurrent').value;
+  const nw = $('cpNew').value;
+  const cf = $('cpConfirm').value;
+  const msg = $('cpMessage');
+  const show = (t, ok) => { msg.textContent = t; msg.className = `text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); };
+  if (!cur || !nw || !cf) { show('Please fill all fields.', false); return; }
+  if (nw !== cf) { show('New passwords do not match.', false); return; }
+  if (nw.length < MIN_ADMIN_PASS_LEN) { show(`New password must be at least ${MIN_ADMIN_PASS_LEN} characters.`, false); return; }
+  const curHash = await hashPassword(cur);
+  const newHash = await hashPassword(nw);
+  if (session.role === 'admin') {
+    const admins = getAdmins();
+    const idx = admins.findIndex(a => a.username === session.register);
+    if (idx === -1 || curHash !== admins[idx].passwordHash) { show('Current password is incorrect.', false); return; }
+    admins[idx].passwordHash = newHash;
+    admins[idx].updatedAt = Date.now();
+    state.adminConfig = { ...(state.adminConfig || {}), admins };
+    publishKey('adminConfig');
+    show('Password updated.', true);
+    toast('Password changed.', 'success');
+  } else {
+    const s = (state.students || {})[session.register];
+    if (!s || curHash !== s.passwordHash) { show('Current password is incorrect.', false); return; }
+    s.passwordHash = newHash;
+    s.passwordUpdatedAt = Date.now();
+    publishKey('students');
+    show('Password updated.', true);
+    toast('Password changed.', 'success');
+  }
+  setTimeout(() => closeModal('mChangePassword'), 1200);
+}
+
+function showForgotHelp() {
+  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask teacher to reset.');
+}
+
+function go(view) {
+  const isAdminUser = session.role === 'admin';
+  if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) { toast('Teacher access required.', 'warn'); return; }
+  activeView = view;
+  ['overview','catalog','loans','dashboard','poster','sync'].forEach(v => {
+    const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view);
+  });
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    const a = btn.dataset.nav === view;
+    btn.classList.toggle('active', a);
+    btn.classList.toggle('text-slate-200', a);
+    btn.classList.toggle('text-slate-400', !a);
+  });
+  if (view === 'poster') renderPoster();
+  if (view === 'sync') renderSyncPage();
+  if (view === 'dashboard') renderDashboard();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
+    else fbApp = firebase.app();
+    fbDb = firebase.database();
+    fbDb.ref('.info/serverTimeOffset').on('value', s => { serverClockOffsetMs = s.val() || 0; });
+    fbDb.ref('.info/connected').on('value', s => { connected = s.val() === true; updateSyncPill(); });
+    return true;
+  } catch (e) { console.error('[firebase]', e); return false; }
+}
+
+function connectStation() {
+  if (!fbDb) return;
+  if (stationRef) stationRef.off();
+  stationRef = fbDb.ref('stations/' + SINGLE_STATION);
+  SYNC_KEYS.forEach(key => {
+    stationRef.child(key).on('value', snap => {
+      const val = snap.val();
+      if (key === 'settings') { if (val) state.settings = { ...DEFAULT_SETTINGS, ...val }; }
+      else if (key === 'inventory') { if (Array.isArray(val) && val.length) state.inventory = val; }
+      else if (key === 'loans') state.loans = Array.isArray(val) ? val : [];
+      else if (key === 'history') state.history = Array.isArray(val) ? val : [];
+      else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
+      else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
+      else if (key === 'adminConfig') {
+        if (val && typeof val === 'object') state.adminConfig = val;
+        else state.adminConfig = null;
+        updateAuthScreen();
+      } else return;
+      lastRecvAt = Date.now();
+      sanitizeCart(); renderAll(); checkOverdueForCurrentUser(false);
+      if (activeView === 'sync') renderSyncPage();
+    });
+  });
+  stationRef.child('inventory').once('value').then(snap => {
+    const val = snap.val();
+    if (!val || !Array.isArray(val) || !val.length) {
+      setTimeout(() => { publishKey('inventory'); publishKey('settings'); }, 700);
+    }
+  });
+  if (window._pollTimer) clearInterval(window._pollTimer);
+  window._pollTimer = setInterval(() => { if (stationRef) pullLatest(); }, 5000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) pullLatest(); });
+  window.addEventListener('focus', pullLatest);
+  updateSyncPill();
+}
+
+function updateAuthScreen() {
+  if (session && session.role) return;
+  const admins = getAdmins();
+  const hasAdmin = admins.length > 0;
+  const setupEl = $('setupScreen');
+  const loginEl = $('loginScreen');
+  if (hasAdmin) {
+    setupEl.classList.add('hidden'); setupEl.classList.remove('flex');
+    loginEl.classList.remove('hidden'); loginEl.classList.add('flex');
+  } else if (connected) {
+    loginEl.classList.add('hidden'); loginEl.classList.remove('flex');
+    setupEl.classList.remove('hidden'); setupEl.classList.add('flex');
+    setTimeout(() => $('setupTeacherNo').focus(), 150);
+  }
+}
+
+function publishKey(key) {
+  if (!stationRef) return;
+  const val = state[key];
+  if (val === undefined) return;
+  stationRef.child(key).set(val).then(() => { lastSentAt = Date.now(); }).catch(e => console.warn('[publish]', key, e));
+}
+
+async function pullLatest() {
+  if (!stationRef) return;
+  try {
+    const snap = await stationRef.once('value');
+    const data = snap.val() || {};
+    SYNC_KEYS.forEach(key => {
+      if (key === 'settings') { if (data[key]) state.settings = { ...DEFAULT_SETTINGS, ...data[key] }; }
+      else if (key === 'inventory') { if (Array.isArray(data[key]) && data[key].length) state.inventory = data[key]; }
+      else if (key === 'loans') state.loans = Array.isArray(data[key]) ? data[key] : [];
+      else if (key === 'history') state.history = Array.isArray(data[key]) ? data[key] : [];
+      else if (key === 'activity') state.activity = Array.isArray(data[key]) ? data[key] : [];
+      else if (key === 'students') state.students = (data[key] && typeof data[key] === 'object') ? data[key] : {};
+      else if (key === 'adminConfig') state.adminConfig = (data[key] && typeof data[key] === 'object') ? data[key] : null;
+    });
+    lastRecvAt = Date.now();
+    updateAuthScreen(); renderAll(); checkOverdueForCurrentUser(false);
+  } catch (e) {}
+}
+
+function updateSyncPill() {
+  const pill = $('syncPill'), txt = $('syncPillText');
+  if (!pill || !txt) return;
+  const dot = pill.querySelector('span');
+  if (connected) {
+    pill.className = 'hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 px-2.5 py-1.5 text-[11px] font-medium text-emerald-300';
+    if (dot) dot.className = 'h-1.5 w-1.5 rounded-full bg-emerald-400';
+    txt.textContent = 'Synced';
+  } else {
+    pill.className = 'hidden md:flex items-center gap-2 rounded-xl border border-amber-500/40 bg-gradient-to-br from-amber-500/15 to-amber-500/5 px-2.5 py-1.5 text-[11px] font-medium text-amber-300';
+    if (dot) dot.className = 'h-1.5 w-1.5 rounded-full bg-amber-400 pulse-dot';
+    txt.textContent = 'Connecting…';
+  }
+}
+
+function forceSync() {
+  if (!stationRef) { toast('Not connected.', 'warn'); return; }
+  pullLatest().then(() => toast('Pulled latest from server.', 'success'));
+}
+
+function saveLocal() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    inventory: state.inventory, loans: state.loans, history: state.history,
+    cart: state.cart, borrower: state.borrower, settings: state.settings,
+    activity: state.activity, students: state.students, adminConfig: state.adminConfig
+  })); } catch {}
+}
+function loadLocal() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const base = defaultState();
+    state = {
+      inventory: Array.isArray(s.inventory) && s.inventory.length ? s.inventory : base.inventory,
+      loans: Array.isArray(s.loans) ? s.loans : [],
+      history: Array.isArray(s.history) ? s.history : [],
+      cart: (s.cart && typeof s.cart === 'object') ? s.cart : {},
+      borrower: { ...base.borrower, ...(s.borrower || {}) },
+      settings: { ...base.settings, ...(s.settings || {}) },
+      activity: Array.isArray(s.activity) ? s.activity : [],
+      simOffsetMs: 0,
+      students: (s.students && typeof s.students === 'object') ? s.students : {},
+      adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : null
+    };
+    sanitizeCart();
+  } catch {}
+}
+function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
+
+function checkOverdueForCurrentUser() {
+  if (!session || !session.register || session.role === 'admin') {
+    const banner = $('overdueAlertBanner');
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+  const myOverdue = state.loans.filter(l => l.borrowerId === session.register && isOverdue(l, now()));
+  const banner = $('overdueAlertBanner');
+  if (banner) {
+    if (myOverdue.length) {
+      banner.classList.remove('hidden');
+      $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · please return immediately`;
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+  let notified = {};
+  try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
+  const newOnes = myOverdue.filter(l => !notified[l.loanId]);
+  if (newOnes.length) {
+    const list = $('overdueItemsList');
+    if (list) {
+      list.innerHTML = newOnes.map(l => `
+        <div class="flex items-center gap-3 rounded-xl border border-rose-500/40 bg-gradient-to-br from-rose-500/15 to-rose-500/5 p-3">
+          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-500/25 text-rose-300"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div>
+          <div class="min-w-0 flex-1">
+            <div class="truncate text-xs font-bold text-white">${esc(l.itemName)}</div>
+            <div class="mono text-[10px] text-rose-300/80">${esc(l.loanId)} · overdue by ${fmtDurShort(now() - l.dueTimeMs)}</div>
+          </div>
+        </div>`).join('');
+    }
+    openModal('mOverdue');
+    newOnes.forEach(l => { notified[l.loanId] = true; });
+    try { sessionStorage.setItem(OVERDUE_NOTIFIED_KEY, JSON.stringify(notified)); } catch {}
+    toast(`You have ${newOnes.length} overdue item${newOnes.length===1?'':'s'}!`, 'error', 6000);
+  }
+}
+
+function renderOverview() {
+  const t = now();
+  const total = state.inventory.reduce((s,i) => s + i.totalStock, 0);
+  const onLoan = state.loans.reduce((s,l) => s + l.quantity, 0);
+  const avail = Math.max(0, total - onLoan);
+  const util = total ? Math.round((onLoan/total)*100) : 0;
+  const overdue = state.loans.filter(l => isOverdue(l, t)).length;
+  $('heroAvailable').textContent = avail;
+  $('heroOnLoan').textContent = onLoan;
+  $('heroUtil').textContent = util + '%';
+  $('heroUtilBar').style.width = Math.min(100, util) + '%';
+  $('heroSyncLabel').textContent = connected ? 'live' : 'offline';
+  $('kpiSkus').textContent = state.inventory.length;
+  $('kpiLoans').textContent = state.loans.length;
+  $('kpiBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
+  $('kpiOverdue').textContent = overdue;
+  $('loanPeriodLabel').textContent = state.settings.loanDurationMinutes >= 60
+    ? `${(state.settings.loanDurationMinutes / 60).toFixed(1)} hours`
+    : `${state.settings.loanDurationMinutes} minutes`;
+}
+
+function populateCategories() {
+  const sel = $('catalogCategory'); if (!sel) return;
+  const cur = sel.value || 'ALL';
+  const cats = [...new Set(state.inventory.map(i => i.category))].sort();
+  sel.innerHTML = `<option value="ALL">All categories</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  sel.value = cats.includes(cur) || cur === 'ALL' ? cur : 'ALL';
+}
+
+function renderCatalog() {
+  const grid = $('catalogGrid'); if (!grid) return;
+  const q = ($('catalogSearch').value || '').trim().toLowerCase();
+  const cat = $('catalogCategory').value || 'ALL';
+  const inStockOnly = $('catalogInStock').checked;
+  let list = state.inventory.filter(it => {
+    const hay = `${it.name} ${it.id} ${it.category} ${it.description}`.toLowerCase();
+    if (q && !hay.includes(q)) return false;
+    if (cat !== 'ALL' && it.category !== cat) return false;
+    if (inStockOnly && availableQty(it.id) <= 0) return false;
+    return true;
+  }).sort((a,b) => a.name.localeCompare(b.name));
+  $('catalogResultCount').textContent = `${list.length} item${list.length===1?'':'s'}`;
+  if (!list.length) { grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`; return; }
+  const low = state.settings.lowStockThreshold;
+  grid.innerHTML = list.map(item => {
+    const avail = availableQty(item.id);
+    const inCart = state.cart[item.id] || 0;
+    const canAdd = selectableQty(item.id) > 0;
+    const isLow = avail > 0 && avail <= low;
+    const pct = item.totalStock ? (avail/item.totalStock)*100 : 0;
+    let sCls = 'border-rose-500/40 bg-rose-500/15 text-rose-400', sTxt = 'Out of stock', bCls = 'from-rose-500 to-rose-600';
+    if (avail > 0 && isLow) { sCls = 'border-amber-500/40 bg-amber-500/15 text-amber-400'; sTxt = `Low · ${avail}`; bCls = 'from-amber-500 to-amber-600'; }
+    else if (avail > 0) { sCls = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400'; sTxt = `${avail} available`; bCls = 'from-emerald-500 to-emerald-600'; }
+    const action = inCart > 0
+      ? `<div class="flex items-center justify-between rounded-xl border border-brand-500/40 bg-brand-500/15 p-1"><button onclick="changeQty('${item.id}',-1)" class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30 transition"><i class="fa-solid fa-minus text-[10px]"></i></button><span class="mono text-sm font-bold text-brand-300">${inCart}</span><button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30 disabled:opacity-30 transition"><i class="fa-solid fa-plus text-[10px]"></i></button></div>`
+      : `<button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 shadow-lg shadow-brand-600/20 disabled:cursor-not-allowed disabled:bg-ink-750 disabled:bg-none disabled:text-slate-500 disabled:shadow-none active:scale-[.98] transition"><i class="fa-solid fa-cart-plus text-[11px]"></i> Add</button>`;
+    return `<article class="fade-up flex flex-col rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/70 to-ink-900/70 p-4 hover:border-brand-500/40 transition">
+      <div class="flex items-start justify-between gap-3">
+        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500/20 to-neon-violet/20 text-brand-300">
+          <i class="fa-solid fa-microchip text-sm"></i>
+        </div>
+        <span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sCls}">${sTxt}</span>
+      </div>
+      <div class="mt-3.5 flex-1">
+        <div class="mono text-[10px] text-slate-600">${esc(item.id)}</div>
+        <h3 class="mt-1 text-sm font-bold text-white line-clamp-2">${esc(item.name)}</h3>
+        <p class="line-clamp-2 mt-1.5 text-[11px] text-slate-500">${esc(item.description)}</p>
+      </div>
+      <div class="mt-4 space-y-2">
+        <div class="flex items-center justify-between text-[10px]">
+          <span class="text-slate-500">${esc(item.category)}</span>
+          <span class="mono text-slate-600">${avail} / ${item.totalStock}</span>
+        </div>
+        <div class="h-1 overflow-hidden rounded-full bg-ink-800">
+          <div class="h-full rounded-full bg-gradient-to-r ${bCls} transition-all" style="width:${pct}%"></div>
+        </div>
+      </div>
+      <div class="mt-4">${action}</div>
+    </article>`;
+  }).join('');
+}
+
+function changeQty(id, delta) {
+  const item = findItem(id); if (!item) return;
+  const cur = state.cart[id] || 0;
+  const next = cur + delta;
+  if (next <= 0) delete state.cart[id];
+  else if (next <= availableQty(id)) state.cart[id] = next;
+  else { toast(`Only ${availableQty(id)} available.`, 'warn', 2500); return; }
+  renderCatalog(); renderCart(); updateBadges();
+}
+
+function quickAdd() {
+  const input = $('skuInput');
+  const q = input.value.trim().toUpperCase(); if (!q) return;
+  const item = state.inventory.find(i => i.id.toUpperCase() === q || i.name.toUpperCase().includes(q));
+  if (!item) { toast(`No component for "${q}"`, 'error'); input.select(); return; }
+  if (selectableQty(item.id) <= 0) { toast(`${item.name} fully reserved.`, 'warn'); input.select(); return; }
+  changeQty(item.id, 1);
+  toast(`Added ${item.name}.`, 'success', 2000);
+  input.value = ''; input.focus();
+}
+
+function openCart() {
+  $('borrowerName').value = state.borrower.name || (session.name || '');
+  $('borrowerId').value = state.borrower.id || (session.register || '');
+  $('cartDrawer').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderCart();
+}
+function closeCart() { $('cartDrawer').classList.add('hidden'); document.body.style.overflow = ''; }
+
+function renderCart() {
+  const box = $('cartItems');
+  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
+  const total = entries.reduce((s,[,q]) => s + q, 0);
+  $('cartSummary').textContent = entries.length ? `${entries.length} item${entries.length===1?'':'s'} · ${total} unit${total===1?'':'s'}` : 'Empty';
+  if (!entries.length) { box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`; return; }
+  box.innerHTML = entries.map(([id, qty]) => {
+    const item = findItem(id); if (!item) return '';
+    const maxed = selectableQty(id) <= 0;
+    return `<div class="flex items-center gap-3 rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-3">
+      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-500/15 text-brand-300"><i class="fa-solid fa-microchip text-xs"></i></div>
+      <div class="min-w-0 flex-1">
+        <h4 class="line-clamp-1 text-xs font-bold text-white">${esc(item.name)}</h4>
+        <span class="mono text-[10px] text-slate-600">${esc(item.id)}</span>
+      </div>
+      <div class="flex shrink-0 items-center gap-1.5">
+        <button onclick="changeQty('${id}',-1)" class="grid h-7 w-7 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700 transition"><i class="fa-solid fa-minus text-[9px]"></i></button>
+        <span class="mono w-5 text-center text-xs font-bold text-brand-300">${qty}</span>
+        <button onclick="changeQty('${id}',1)" ${maxed?'disabled':''} class="grid h-7 w-7 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700 disabled:opacity-30 transition"><i class="fa-solid fa-plus text-[9px]"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function checkoutCart() {
+  const name = $('borrowerName').value.trim();
+  const idRef = $('borrowerId').value.trim();
+  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
+  if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
+  if (!name) { toast('Borrower name required.', 'warn'); return; }
+  if (!idRef) { toast('Student ID required.', 'warn'); return; }
+  for (const [itemId, qty] of entries) {
+    const item = findItem(itemId);
+    if (!item) { toast('A component no longer exists.', 'error'); return; }
+    if (availableQty(itemId) < qty) { toast(`Only ${availableQty(itemId)} × ${item.name} available.`, 'error'); sanitizeCart(); renderAll(); return; }
+  }
+  const t = now(); const due = t + loanMs();
+  const lineCount = entries.length;
+  const unitCount = entries.reduce((s,[,q]) => s + q, 0);
+  entries.forEach(([itemId, qty]) => {
+    const item = findItem(itemId);
+    const record = {
+      loanId: newLoanId(), itemId, itemName: item.name, category: item.category, quantity: qty,
+      borrowerName: name, borrowerId: idRef,
+      borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
+      dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
+      status: 'ACTIVE'
+    };
+    state.loans.unshift(record);
+    state.history.unshift({ ...record });
+  });
+  state.cart = {};
+  state.borrower = { name, id: idRef };
+  logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'}`);
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll(); closeCart();
+  toast(`Checkout complete — due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
+  go('loans');
+}
+
+function renderLoans() {
+  const box = $('loanList'); if (!box) return;
+  const t = now();
+  const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
+  if (!loans.length) { box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-2 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition">Browse catalog</button></div>`; return; }
+  box.innerHTML = loans.map(loan => {
+    const overdue = isOverdue(loan, t); const dueSoon = !overdue && isDueSoon(loan, t);
+    const elapsed = Math.max(0, t - loan.borrowTimeMs);
+    const pct = Math.min(100, (elapsed / loanMs()) * 100);
+    const rem = loan.dueTimeMs - t;
+    let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/40 bg-emerald-500/15 text-emerald-300', pTxt='Active', bCls='from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
+    if (overdue) { cCls='border-rose-500/50 bg-gradient-to-br from-rose-950/40 to-ink-850/50 overdue-pulse'; pCls='bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; pTxt='Overdue'; bCls='from-rose-500 to-rose-600'; tCls='text-rose-400'; tLbl='Overdue by'; }
+    else if (dueSoon) { cCls='border-amber-500/50 bg-gradient-to-br from-amber-950/20 to-ink-850/50'; pCls='border-amber-500/40 bg-amber-500/15 text-amber-300'; pTxt='Due soon'; bCls='from-amber-500 to-amber-600'; tCls='text-amber-400'; }
+    return `<article class="fade-up flex flex-col gap-4 rounded-2xl border p-4 sm:p-5 ${cCls}">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="mono text-[10px] text-brand-400">${esc(loan.loanId)}</div>
+          <h3 class="mt-1.5 text-sm font-bold text-white line-clamp-2">${esc(loan.itemName)} <span class="text-slate-500">×${loan.quantity}</span></h3>
+          <p class="mt-1 text-[11px] text-slate-500 line-clamp-1">${esc(loan.borrowerName)} · <span class="mono">${esc(loan.borrowerId)}</span></p>
+        </div>
+        <span class="shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${pCls}">${pTxt}</span>
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-[11px]"><span class="text-slate-500">${tLbl}</span><span data-remaining="${loan.loanId}" class="mono font-bold ${tCls}">${fmtDuration(Math.abs(rem))}</span></div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-ink-800"><div data-bar="${loan.loanId}" class="h-full rounded-full bg-gradient-to-r ${bCls}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 border-t border-ink-700/50 pt-4">
+        <div><span class="block text-[10px] uppercase text-slate-600">Elapsed</span><span data-elapsed="${loan.loanId}" class="mono text-xs font-semibold text-slate-300">${fmtDuration(elapsed)}</span></div>
+        <div class="text-right"><span class="block text-[10px] uppercase text-slate-600">Due</span><span class="mono text-xs font-semibold text-slate-300">${esc(loan.dueTimeFormatted)}</span></div>
+      </div>
+      <button onclick="returnLoan('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300 hover:border-emerald-500/60 hover:bg-gradient-to-br hover:from-emerald-500 hover:to-emerald-700 hover:text-white hover:border-transparent transition">
+        <i class="fa-solid fa-rotate-left text-[11px]"></i> Return
+      </button>
+    </article>`;
+  }).join('');
+}
+
+async function returnLoan(loanId) {
+  const idx = state.loans.findIndex(l => l.loanId === loanId); if (idx === -1) return;
+  const loan = state.loans[idx];
+  const ok = await confirmDialog('Return component', `Return ${loan.quantity} × "${loan.itemName}"?`, 'Return', false, 'fa-rotate-left');
+  if (!ok) return;
+  const t = now();
+  const hist = state.history.find(h => h.loanId === loanId);
+  if (hist) { hist.status = 'RETURNED'; hist.returnTimeMs = t; hist.returnTimeFormatted = fmtDateTime(t); hist.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); hist.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; }
+  state.loans.splice(idx, 1);
+  logActivity('return', `${loan.borrowerName} returned ${loan.quantity} × ${loan.itemName}`);
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll(); checkOverdueForCurrentUser(false);
+  toast(`Returned ${loan.itemName}.`, 'success');
+}
+
+async function returnAllLoans() {
+  if (!state.loans.length) { toast('No active loans.', 'warn'); return; }
+  const ok = await confirmDialog('Return all', `Return all ${state.loans.length} active loan(s)?`, 'Return all');
+  if (!ok) return;
+  const t = now(); const count = state.loans.length;
+  state.loans.forEach(loan => {
+    const h = state.history.find(x => x.loanId === loan.loanId);
+    if (h) { h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t); h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; }
+  });
+  state.loans = [];
+  logActivity('return', `All ${count} active loan(s) returned`);
+  saveAndPublish('loans', 'history', 'activity');
+  renderAll(); checkOverdueForCurrentUser(false);
+  toast(`Returned ${count}.`, 'success');
+}
+
+function renderDashboard() {
+  if (session.role !== 'admin') return;
+  const t = now();
+  $('admSkus').textContent = state.inventory.length;
+  $('admOnLoan').textContent = state.loans.reduce((s,l) => s+l.quantity, 0);
+  $('admBorrowers').textContent = new Set(state.loans.map(l => l.borrowerId)).size;
+  $('admOverdue').textContent = state.loans.filter(l => isOverdue(l, t)).length;
+  $('dashCurrentUser').textContent = session.register || '—';
+
+  const tbody = $('ledgerBody');
+  const loans = [...state.loans].sort((a,b) => a.dueTimeMs - b.dueTimeMs);
+  if (!loans.length) tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`;
+  else {
+    tbody.innerHTML = loans.map(loan => {
+      const overdue = isOverdue(loan, t);
+      const dueSoon = !overdue && isDueSoon(loan, t);
+      const elapsed = Math.max(0, t - loan.borrowTimeMs);
+      let pill = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300', label = 'Normal';
+      if (overdue) { pill = 'bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; label = 'Overdue'; }
+      else if (dueSoon) { pill = 'border-amber-500/40 bg-amber-500/15 text-amber-300'; label = 'Due soon'; }
+      return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40 transition">
+        <td class="mono whitespace-nowrap px-3 py-3 text-[11px] font-semibold text-brand-400">${esc(loan.loanId)}</td>
+        <td class="px-3 py-3 font-semibold text-white">${esc(loan.borrowerName)}</td>
+        <td class="mono px-3 py-3 text-[11px] text-slate-500">${esc(loan.borrowerId)}</td>
+        <td class="px-3 py-3"><div class="text-slate-200">${esc(loan.itemName)}</div><div class="mono text-[10px] text-slate-600">${esc(loan.itemId)}</div></td>
+        <td class="mono px-3 py-3 font-bold text-amber-400">${loan.quantity}</td>
+        <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(loan.borrowTimeFormatted)}</td>
+        <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(loan.dueTimeFormatted)}</td>
+        <td class="mono whitespace-nowrap px-3 py-3 font-semibold text-amber-300" data-admin-elapsed="${loan.loanId}">${fmtDuration(elapsed)}</td>
+        <td class="px-3 py-3"><span class="whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${pill}">${label}</span></td>
+        <td class="px-3 py-3 text-right"><button onclick="returnLoan('${loan.loanId}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20 transition">Return</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  const inv = $('inventoryBody');
+  inv.innerHTML = state.inventory.map(item => {
+    const out = borrowedQty(item.id); const avail = availableQty(item.id);
+    const low = avail > 0 && avail <= state.settings.lowStockThreshold;
+    const aCls = avail === 0 ? 'text-rose-400' : low ? 'text-amber-400' : 'text-emerald-400';
+    return `<tr class="hover:bg-ink-800/40 transition">
+      <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(item.id)}</td>
+      <td class="px-3 py-3 font-semibold text-white">${esc(item.name)}</td>
+      <td class="px-3 py-3 text-slate-400">${esc(item.category)}</td>
+      <td class="mono px-3 py-3 text-slate-300">${item.totalStock}</td>
+      <td class="mono px-3 py-3 font-bold ${aCls}">${avail}</td>
+      <td class="mono px-3 py-3 font-bold text-amber-400">${out}</td>
+      <td class="px-3 py-3"><button onclick="showQr('${item.id}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/60 hover:text-brand-300 transition"><i class="fa-solid fa-qrcode text-[10px]"></i></button></td>
+      <td class="px-3 py-3"><div class="flex justify-end gap-3"><button onclick="openComponentModal('${item.id}')" class="text-[11px] font-semibold text-brand-400 hover:text-brand-300 transition">Edit</button><button onclick="deleteComponent('${item.id}')" class="text-[11px] font-semibold text-rose-400 hover:text-rose-300 transition">Delete</button></div></td>
+    </tr>`;
+  }).join('');
+
+  $('setLoanMinutes').value = state.settings.loanDurationMinutes;
+  $('setLowStock').value = state.settings.lowStockThreshold;
+  renderTeachersList(); renderStudentsList();
+}
+
+function renderTeachersList() {
+  const admins = getAdmins();
+  const badge = $('teacherCountBadge');
+  if (badge) badge.textContent = admins.length;
+  const list = $('teachersList');
+  if (!list) return;
+  if (!admins.length) { list.innerHTML = `<p class="text-xs text-slate-500">No teachers configured.</p>`; return; }
+  list.innerHTML = admins.map(a => {
+    const isMe = a.username === session.register;
+    return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/25 bg-gradient-to-br from-ink-900/60 to-rose-950/10 p-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-rose-500 to-rose-700 text-xs font-bold text-white shadow-lg shadow-rose-500/30">${esc(a.username.slice(0,1))}</div>
+        <div class="min-w-0">
+          <div class="mono text-xs font-bold text-white flex items-center gap-2 flex-wrap">
+            ${esc(a.username)}
+            ${isMe ? '<span class="rounded-full border border-emerald-500/40 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-300">You</span>' : ''}
+          </div>
+          <div class="text-[10px] text-slate-500">Added ${relTime(a.createdAt || Date.now())}</div>
+        </div>
+      </div>
+      ${isMe ? '' : `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20 transition"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>`}
+    </div>`;
+  }).join('');
+}
+
+function renderStudentsList() {
+  const students = Object.values(state.students || {}).sort((a,b) => b.createdAt - a.createdAt);
+  const list = $('studentsList');
+  if (!list) return;
+  if (!students.length) list.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
+  else list.innerHTML = students.map(s => `<div class="flex items-center justify-between gap-2 rounded-lg border border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40 px-3 py-2">
+    <div class="min-w-0">
+      <div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div>
+      <div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div>
+    </div>
+    <button onclick="resetStudentPassword('${esc(s.register)}')" class="shrink-0 text-[10px] font-semibold text-amber-400 hover:text-amber-300 transition">Reset password</button>
+  </div>`).join('');
+}
+
+function openAddTeacherModal() {
+  if (session.role !== 'admin') return;
+  $('newTeacherNo').value = ''; $('newTeacherPass').value = ''; $('newTeacherPassConfirm').value = '';
+  $('addTeacherError').classList.add('hidden');
+  openModal('mAddTeacher');
+  setTimeout(() => $('newTeacherNo').focus(), 100);
+}
+
+async function saveNewTeacher() {
+  if (session.role !== 'admin') return;
+  const no = $('newTeacherNo').value.trim().toUpperCase();
+  const pw = $('newTeacherPass').value;
+  const cf = $('newTeacherPassConfirm').value;
+  const err = $('addTeacherError');
+  const showErr = msg => { err.textContent = msg; err.classList.remove('hidden'); };
+  err.classList.add('hidden');
+  if (no.length < MIN_ADMIN_USER_LEN) { showErr(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
+  if (no.length > MAX_ADMIN_USER_LEN) { showErr(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`); return; }
+  if (!/^[A-Z0-9]+$/.test(no)) { showErr('Teacher No can only contain letters and digits.'); return; }
+  if (pw.length < MIN_ADMIN_PASS_LEN) { showErr(`Password must be at least ${MIN_ADMIN_PASS_LEN} characters.`); return; }
+  if (pw !== cf) { showErr('Passwords do not match.'); return; }
+  if (findAdminByUsername(no)) { showErr(`Teacher No "${no}" already exists.`); return; }
+  const hash = await hashPassword(pw);
+  const admins = getAdmins();
+  admins.push({ username: no, passwordHash: hash, createdAt: Date.now() });
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  closeModal('mAddTeacher');
+  renderTeachersList();
+  toast(`Teacher "${no}" added.`, 'success');
+}
+
+async function removeTeacher(username) {
+  if (session.role !== 'admin') return;
+  if (username === session.register) { toast('You cannot remove yourself.', 'warn'); return; }
+  const ok = await confirmDialog('Remove teacher', `Remove teacher "${username}"? They will no longer be able to sign in.`, 'Remove');
+  if (!ok) return;
+  const admins = getAdmins().filter(a => a.username !== username);
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  renderTeachersList();
+  toast(`Teacher "${username}" removed.`, 'success');
+}
+
+function saveSettings() {
+  if (session.role !== 'admin') return;
+  state.settings.loanDurationMinutes = Math.max(5, parseInt($('setLoanMinutes').value, 10) || 120);
+  state.settings.lowStockThreshold = Math.max(0, parseInt($('setLowStock').value, 10) || 0);
+  publishKey('settings'); renderAll();
+  toast('Settings saved.', 'success');
+}
+
+async function resetStudentPassword(reg) {
+  if (session.role !== 'admin') return;
+  const s = (state.students || {})[reg]; if (!s) return;
+  const ok = await confirmDialog('Reset password', `Reset ${reg}'s password?`, 'Reset');
+  if (!ok) return;
+  delete state.students[reg];
+  publishKey('students'); renderDashboard();
+  toast(`${reg} password reset.`, 'success');
+}
+
+function openComponentModal(id = null) {
+  if (session.role !== 'admin') return;
+  const item = id ? findItem(id) : null;
+  $('componentModalTitle').textContent = item ? 'Edit component' : 'Add component';
+  $('cmpOriginalId').value = item ? item.id : '';
+  $('cmpSku').value = item ? item.id : nextSku();
+  $('cmpName').value = item ? item.name : '';
+  $('cmpCategory').value = item ? item.category : 'Sensors';
+  $('cmpStock').value = item ? item.totalStock : 10;
+  $('cmpDesc').value = item ? item.description : '';
+  openModal('mComponent');
+}
+function nextSku() { const nums = state.inventory.map(i => parseInt(String(i.id).replace(/\D/g,''),10)).filter(n => !isNaN(n)); return 'SKU-' + ((nums.length ? Math.max(...nums) : 1000) + 1); }
+function saveComponent() {
+  if (session.role !== 'admin') return;
+  const orig = $('cmpOriginalId').value;
+  const sku = $('cmpSku').value.trim().toUpperCase();
+  const name = $('cmpName').value.trim();
+  const cat = $('cmpCategory').value.trim() || 'General';
+  const stock = Math.max(0, parseInt($('cmpStock').value, 10) || 0);
+  const desc = $('cmpDesc').value.trim();
+  if (!sku || !name) { toast('SKU and name required.', 'warn'); return; }
+  if (orig) {
+    const item = findItem(orig);
+    if (!item) { toast('Not found.', 'error'); return; }
+    const out = borrowedQty(orig);
+    if (stock < out) { toast(`Cannot set stock below ${out}.`, 'error'); return; }
+    if (sku !== orig && findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
+    if (sku !== orig) {
+      state.loans.forEach(l => { if (l.itemId === orig) { l.itemId = sku; l.itemName = name; } });
+      if (state.cart[orig]) { state.cart[sku] = (state.cart[sku]||0) + state.cart[orig]; delete state.cart[orig]; }
+    }
+    Object.assign(item, { id:sku, name, category:cat, totalStock:stock, description:desc });
+  } else {
+    if (findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
+    state.inventory.push({ id:sku, name, category:cat, totalStock:stock, description:desc || 'Lab component.' });
+  }
+  publishKey('inventory'); populateCategories(); closeModal('mComponent'); renderAll();
+  toast('Saved.', 'success');
+}
+async function deleteComponent(id) {
+  if (session.role !== 'admin') return;
+  const item = findItem(id); if (!item) return;
+  if (borrowedQty(id) > 0) { toast('Cannot delete — items on loan.', 'error'); return; }
+  const ok = await confirmDialog('Delete', `Remove "${item.name}"?`, 'Delete', true, 'fa-trash');
+  if (!ok) return;
+  state.inventory = state.inventory.filter(i => i.id !== id);
+  publishKey('inventory'); populateCategories(); renderAll();
+  toast('Deleted.', 'success');
+}
+
+function showQr(itemId) {
+  const item = findItem(itemId); if (!item) return;
+  $('qrTitle').textContent = item.name; $('qrSku').textContent = item.id;
+  $('qrTarget').innerHTML = `<img crossorigin="anonymous" width="140" height="140" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(item.id)}" />`;
+  openModal('mQr');
+}
+
+async function resetDemo() {
+  if (session.role !== 'admin') return;
+  const ok = await confirmDialog('Reset', 'Restore sample inventory and clear all loans?', 'Reset');
+  if (!ok) return;
+  state.inventory = SEED_INVENTORY.map(x => ({ ...x }));
+  state.loans = []; state.history = []; state.settings = { ...DEFAULT_SETTINGS };
+  publishKey('inventory'); publishKey('loans'); publishKey('history'); publishKey('settings');
+  renderAll(); toast('Reset.', 'success');
+}
+
+async function clearHistory() {
+  if (session.role !== 'admin') return;
+  const totalRecords = state.history.length;
+  if (!totalRecords) { toast('History is already empty.', 'warn'); return; }
+  const ok = await confirmDialog('Clear transaction history',
+    `Permanently delete ${totalRecords} transaction record(s)? The current inventory and active loans stay intact. Do this after you've downloaded the Excel backup.`,
+    'Erase history');
+  if (!ok) return;
+  state.history = []; state.activity = [];
+  publishKey('history'); publishKey('activity'); saveLocal(); renderDashboard();
+  toast(`${totalRecords} records erased.`, 'success', 4000);
+}
+
+function getJoinUrl() {
+  const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
+  return base + '/';
+}
+function renderPoster() {
+  const s = state.settings;
+  $('posterTitle').value = s.posterTitle;
+  $('posterSubtitle').value = s.posterSubtitle;
+  $('posterUrl').value = deployUrl || '';
+  $('posterInstructions').value = s.posterInstructions;
+  $('posterTitlePreview').textContent = s.posterTitle;
+  $('posterSubtitlePreview').textContent = s.posterSubtitle;
+  $('posterInstructionsPreview').textContent = s.posterInstructions;
+  const url = getJoinUrl();
+  $('posterUrlPreview').textContent = url;
+  $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
+}
+function onPosterInput() {
+  state.settings.posterTitle = $('posterTitle').value;
+  state.settings.posterSubtitle = $('posterSubtitle').value;
+  state.settings.posterInstructions = $('posterInstructions').value;
+  const typed = $('posterUrl').value.trim();
+  if (typed) { deployUrl = typed.replace(/\/$/, ''); localStorage.setItem('bajaj.deployUrl', deployUrl); }
+  publishKey('settings'); renderPoster();
+}
+async function downloadPoster() {
+  const node = $('posterCanvas');
+  const img = node.querySelector('#posterQrTarget img');
+  if (img && !img.complete) await new Promise(r => { img.onload = r; img.onerror = r; });
+  html2canvas(node, { scale: 3, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+    const a = document.createElement('a'); a.download = 'bajaj-lending-poster.png'; a.href = canvas.toDataURL('image/png'); a.click();
+    toast('Poster downloaded.', 'success');
+  }).catch(() => toast('Export failed.', 'error'));
+}
+
+function renderSyncPage() {
+  const conn = $('syncStatConn');
+  if (conn) conn.innerHTML = connected
+    ? `<span class="h-2 w-2 rounded-full bg-emerald-400"></span><span class="text-emerald-300">Connected</span>`
+    : `<span class="h-2 w-2 rounded-full bg-amber-400 pulse-dot"></span><span class="text-amber-300">Connecting…</span>`;
+  $('syncStatSent').textContent = lastSentAt ? relTime(lastSentAt) : 'never';
+  $('syncStatRecv').textContent = lastRecvAt ? relTime(lastRecvAt) : 'never';
+  const url = getJoinUrl();
+  $('syncJoinQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(url)}`;
+}
+function copyJoinUrl() {
+  const url = getJoinUrl();
+  navigator.clipboard.writeText(url).then(() => toast('URL copied.', 'success')).catch(() => prompt('Copy:', url));
+}
+
+function exportExcel() {
+  if (session.role !== 'admin') return;
+  if (!state.history.length && !state.inventory.length) { toast('Nothing to export.', 'warn'); return; }
+  const t = now();
+  const loanRows = state.history.map(h => {
+    const active = h.status === 'ACTIVE';
+    const endMs = active ? t : (h.returnTimeMs || h.borrowTimeMs);
+    const mins = ((endMs - h.borrowTimeMs) / 60000).toFixed(1);
+    return {
+      'Transaction ID': h.loanId, 'Borrower Name': h.borrowerName, 'Student ID / Phone': h.borrowerId,
+      'Component SKU': h.itemId, 'Component Name': h.itemName, 'Category': h.category, 'Quantity': h.quantity,
+      'Borrowed At': h.borrowTimeFormatted, 'Due At': h.dueTimeFormatted,
+      'Returned At': active ? 'STILL BORROWED' : (h.returnTimeFormatted || ''),
+      'Status': h.status, 'Elapsed Minutes': parseFloat(mins),
+      'Overdue': active ? (t > h.dueTimeMs ? 'YES' : 'NO') : (h.overdueFlag || 'NO')
+    };
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(loanRows.length ? loanRows : [{ Info: 'No loans yet' }]), 'Loans');
+  const invRows = state.inventory.map(i => ({
+    'SKU': i.id, 'Component Name': i.name, 'Category': i.category, 'Total Stock': i.totalStock,
+    'Available': availableQty(i.id), 'On Loan': borrowedQty(i.id), 'Description': i.description
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invRows), 'Inventory');
+  const summaryRows = [
+    { Metric: 'Total SKUs', Value: state.inventory.length },
+    { Metric: 'Total units', Value: state.inventory.reduce((s,i) => s + i.totalStock, 0) },
+    { Metric: 'Units on loan', Value: state.loans.reduce((s,l) => s + l.quantity, 0) },
+    { Metric: 'Active borrowers', Value: new Set(state.loans.map(l => l.borrowerId)).size },
+    { Metric: 'Overdue loans', Value: state.loans.filter(l => isOverdue(l, t)).length },
+    { Metric: 'Total transactions', Value: state.history.length },
+    { Metric: 'Registered students', Value: Object.keys(state.students || {}).length },
+    { Metric: 'Report generated', Value: fmtDateTime(t) }
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'Summary');
+  XLSX.writeFile(wb, `bajaj-lending-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  toast('Excel downloaded.', 'success');
+}
+
+function updateBadges() {
+  const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
+  const badge = $('cartCount');
+  if (badge) { badge.textContent = cartUnits; badge.classList.toggle('hidden', cartUnits === 0); }
+}
+
+function renderAll() {
+  renderOverview(); renderCatalog(); renderLoans(); renderCart(); updateBadges();
+  if (session.role === 'admin') {
+    if (activeView === 'dashboard') renderDashboard();
+    if (activeView === 'poster') renderPoster();
+    if (activeView === 'sync') renderSyncPage();
+  }
+}
+
+let lastStatusKey = '';
+function tick() {
+  const t = now();
+  const ct = $('clockTime'); if (ct) ct.textContent = fmtTime(t);
+  const cd = $('clockDate'); if (cd) cd.textContent = fmtDate(t);
+  state.loans.forEach(loan => {
+    const elapsed = Math.max(0, t - loan.borrowTimeMs);
+    const rem = Math.abs(loan.dueTimeMs - t);
+    const e1 = document.querySelector(`[data-elapsed="${loan.loanId}"]`); if (e1) e1.textContent = fmtDuration(elapsed);
+    const e2 = document.querySelector(`[data-remaining="${loan.loanId}"]`); if (e2) e2.textContent = fmtDuration(rem);
+    const e3 = document.querySelector(`[data-bar="${loan.loanId}"]`); if (e3) e3.style.width = Math.min(100, (elapsed/loanMs())*100) + '%';
+    const e4 = document.querySelector(`[data-admin-elapsed="${loan.loanId}"]`); if (e4) e4.textContent = fmtDuration(elapsed);
+  });
+  const key = state.loans.map(l => isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N').join('');
+  if (key !== lastStatusKey) {
+    lastStatusKey = key;
+    renderLoans(); renderOverview();
+    if (session.role === 'admin') renderDashboard();
+    checkOverdueForCurrentUser(false);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLocal(); loadTheme();
+  deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
+  generateCaptcha();
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+    if (saved && saved.role && saved.register) {
+      session = saved;
+      $('app').classList.remove('hidden');
+      applyRoleUI();
+    }
+  } catch {}
+  initFirebase();
+  if (!session.role) {
+    if (getAdmins().length) {
+      $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
+    } else {
+      $('setupScreen').classList.remove('hidden'); $('setupScreen').classList.add('flex');
+    }
+  }
+  populateCategories(); renderAll(); tick(); updateSyncPill(); connectStation();
+  setInterval(tick, 1000);
+  setInterval(updateSyncPill, 3000);
+  setInterval(() => checkOverdueForCurrentUser(false), 30000);
+});
+
+window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
+window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
+window.returnLoan = returnLoan; window.returnAllLoans = returnAllLoans;
+window.renderCatalog = renderCatalog;
+window.onPosterInput = onPosterInput; window.downloadPoster = downloadPoster; window.showQr = showQr;
+window.openComponentModal = openComponentModal; window.saveComponent = saveComponent;
+window.deleteComponent = deleteComponent; window.saveSettings = saveSettings;
+window.resetDemo = resetDemo; window.clearHistory = clearHistory;
+window.switchLoginTab = switchLoginTab;
+window.attemptStudentLogin = attemptStudentLogin;
+window.attemptAdminLogin = attemptAdminLogin;
+window.resetStudentPassword = resetStudentPassword;
+window.completeSetup = completeSetup;
+window.logout = logout;
+window.toggleUserMenu = toggleUserMenu;
+window.openChangePassword = openChangePassword;
+window.saveNewPassword = saveNewPassword;
+window.showForgotHelp = showForgotHelp;
+window.forceSync = forceSync;
+window.copyJoinUrl = copyJoinUrl;
+window.exportExcel = exportExcel;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.toggleTheme = toggleTheme;
+window.openAddTeacherModal = openAddTeacherModal;
+window.saveNewTeacher = saveNewTeacher;
+window.removeTeacher = removeTeacher;
 </script>
 </body>
 </html>
