@@ -352,7 +352,6 @@
       <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
     </nav>
     <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
-      <!-- Active lab chip (student) -->
       <button id="activeLabChip" onclick="switchLab()" class="focus-ring hidden items-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-2.5 py-1.5 text-[11px] font-semibold text-brand-200 hover:bg-brand-500/20 transition">
         <i class="fa-solid fa-building-columns text-[10px]"></i>
         <span id="activeLabChipText" class="max-w-[120px] truncate">—</span>
@@ -948,7 +947,8 @@
   </div>
 </div>
 
-<div id="mConfirm" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+<!-- FIX: raised z-index from 95 → 120 so it renders above mReturnVerify (z-96) -->
+<div id="mConfirm" class="fixed inset-0 z-[120] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-sm space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6">
     <div class="flex items-start gap-3.5">
       <div id="confirmIconWrap" class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/15 text-rose-400"><i id="confirmIcon" class="fa-solid fa-triangle-exclamation"></i></div>
@@ -1003,7 +1003,7 @@
   </div>
 </div>
 
-<div id="toasts" class="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[110] flex w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2"></div>
+<div id="toasts" class="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[130] flex w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2"></div>
 
 <script>
 const BUILTIN_FIREBASE = {
@@ -1070,7 +1070,7 @@ function defaultState() {
 }
 let state = defaultState();
 let session = { role: null, register: null, name: null, activeLabId: null };
-let pendingSession = null;  // used while student is choosing a lab
+let pendingSession = null;
 let activeView = 'overview';
 let deployUrl = '';
 let serverClockOffsetMs = 0;
@@ -1347,9 +1347,7 @@ function cancelLabPick() {
 
 function switchLab() {
   if (session.role !== 'user') { toast('Only students switch labs.', 'info'); return; }
-  // Show the lab picker in "switch" mode
   showLabPicker(session.role, session.register, session.name);
-  // When they pick, pendingSession replaces active lab
 }
 
 /* ─── STUDENT LOGIN ─── */
@@ -1370,7 +1368,6 @@ async function attemptStudentLogin() {
     const existing = students[reg];
     if (existing) {
       if (hash === existing.passwordHash) {
-        // CAPTCHA passed, credentials OK → ask which lab
         showLabPicker('user', reg, existing.name || reg);
       } else {
         showLoginError('Incorrect password.'); $('loginPassword').select();
@@ -1381,7 +1378,6 @@ async function attemptStudentLogin() {
     state.students = state.students || {};
     state.students[reg] = { register: reg, name: 'Student ' + reg, passwordHash: hash, createdAt: Date.now() };
     publishKey('students');
-    // First-time registration succeeded → also ask which lab
     showLabPicker('user', reg, state.students[reg].name);
     toast('Welcome! Your password is now your DOB.', 'success', 5000);
   } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
@@ -1406,7 +1402,6 @@ async function attemptAdminLogin() {
     if (!admin) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
     const hash = await hashPassword(password);
     if (hash !== admin.passwordHash) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
-    // Admins do not need to pick a lab — they see all their assigned labs
     enterApp('admin', teacherNo, admin.username, null);
   } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
   finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Teacher'; }
@@ -1421,7 +1416,6 @@ function enterApp(role, register, name, activeLabId) {
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('app').classList.remove('hidden');
 
-  // For students, force the catalog filter to their selected lab
   if (role === 'user' && session.activeLabId) {
     catalogLabFilter = session.activeLabId;
   }
@@ -1435,10 +1429,8 @@ function applyRoleUI() {
     const el = $(id); if (!el) return;
     if (isAdminUser) el.classList.remove('hidden'); else el.classList.add('hidden');
   });
-  // Show / hide "Switch lab" only for students
   const switchBtn = $('menuSwitchLabBtn');
   if (switchBtn) switchBtn.classList.toggle('hidden', isAdminUser);
-  // Header active-lab chip for students
   const chip = $('activeLabChip');
   const chipTxt = $('activeLabChipText');
   if (chip && chipTxt) {
@@ -1592,7 +1584,6 @@ function applyRemoteKey(key, val) {
   else if (key === 'adminConfig') state.adminConfig = (val && typeof val === 'object') ? val : null;
   if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs') {
     migrateInventoryLabs();
-    // If a student's active lab was removed, re-prompt
     if (session.role === 'user' && session.activeLabId && !labById(session.activeLabId)) {
       session.activeLabId = null;
       setTimeout(() => {
@@ -1631,7 +1622,7 @@ function connectStation() {
 
 function updateAuthScreen() {
   if (session && session.role) return;
-  if (pendingSession) return; // lab picker is open
+  if (pendingSession) return;
   const hasAdmin = getAdmins().length > 0;
   const setupEl = $('setupScreen'); const loginEl = $('loginScreen');
   if (hasAdmin) {
@@ -1958,7 +1949,6 @@ function checkoutCart() {
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
   if (!name) { toast('Borrower name required.', 'warn'); return; }
   if (!idRef) { toast('Student ID required.', 'warn'); return; }
-  // Warn if any cart item belongs to a lab other than the student's active lab
   if (session.role === 'user' && session.activeLabId) {
     const foreign = entries.filter(([itemId]) => (findItem(itemId)||{}).labId !== session.activeLabId);
     if (foreign.length) {
@@ -1999,7 +1989,6 @@ function visibleLoans() {
     const mine = myLabIds();
     return state.loans.filter(l => mine.includes(l.labId));
   }
-  // Students: loans for their register, scoped to their currently selected lab
   let list = state.loans.filter(l => l.borrowerId === session.register);
   if (session.activeLabId) list = list.filter(l => l.labId === session.activeLabId);
   return list;
@@ -2073,7 +2062,7 @@ function renderLoans() {
   }).join('');
 }
 
-/* ─── ADMIN RETURN VERIFICATION (with count) ─── */
+/* ─── ADMIN RETURN VERIFICATION ─── */
 function openReturnVerify(loanId) {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   const loan = state.loans.find(l => l.loanId === loanId);
@@ -2706,7 +2695,6 @@ function updateBadges() {
 }
 
 function renderAll() {
-  // Keep catalog filter in sync with the student's active lab
   if (session.role === 'user' && session.activeLabId) {
     if (catalogLabFilter === 'ALL' || !labById(catalogLabFilter)) {
       catalogLabFilter = session.activeLabId;
@@ -2757,7 +2745,6 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
-      // Students must have an active lab; if it's gone, re-prompt
       if (saved.role === 'user') {
         if (saved.activeLabId && labById(saved.activeLabId)) {
           session = saved;
@@ -2765,7 +2752,6 @@ document.addEventListener('DOMContentLoaded', () => {
           catalogLabFilter = saved.activeLabId;
           applyRoleUI();
         } else if (state.labs.length) {
-          // will ask them to pick a lab
           setTimeout(() => showLabPicker('user', saved.register, saved.name || saved.register), 100);
         }
       } else {
