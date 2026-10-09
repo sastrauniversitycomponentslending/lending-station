@@ -71,7 +71,6 @@
   .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px currentColor, 0 0 0 4px rgba(59,98,246,.5); }
   .tab-pill { transition: all .2s ease; }
   .gradient-text { background: linear-gradient(135deg, #5b83fc 0%, #8b5cf6 50%, #22d3ee 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradientShift 6s ease infinite; }
-  .gradient-text-warm { background: linear-gradient(135deg, #fbbf24 0%, #ff3d9a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .card-gradient { position: relative; }
   .card-gradient::before { content:''; position:absolute; inset:0; padding:1px; border-radius: inherit; background: linear-gradient(135deg, rgba(91,131,252,.5), rgba(139,92,246,.3), rgba(34,211,238,.4)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
   @media (max-width: 640px) {
@@ -110,31 +109,23 @@
   body.theme-light [class*="divide-ink-"] { border-color: #e8eef6 !important; }
   body.theme-light .glass { background: rgba(255,255,255,.9) !important; border-bottom: 1px solid #e0e7f1 !important; box-shadow: 0 1px 3px rgba(15,23,42,.04) !important; }
   body.theme-light [class*="from-ink-850"][class*="via-ink-900"] { background: linear-gradient(135deg, #eef4ff 0%, #ffffff 35%, #f5f0ff 70%, #eefaff 100%) !important; border-color: #d8e3f3 !important; }
-  body.theme-light [class*="border-bajaj-500\/30"][class*="bg-bajaj-500\/10"] { background: linear-gradient(135deg, rgba(10,146,235,.12), rgba(139,92,246,.10)) !important; border-color: rgba(10,146,235,.35) !important; color: #0369a1 !important; }
   body.theme-light [class*="bg-brand-600"] { background: linear-gradient(135deg,#2544eb,#3b62f6) !important; color:#ffffff !important; }
   body.theme-light [class*="hover:bg-brand-500"]:hover { background: linear-gradient(135deg,#3b62f6,#5b83fc) !important; }
   body.theme-light [class*="bg-brand-500\/"] { background-color: rgba(59,98,246,.13) !important; }
   body.theme-light .text-brand-300, body.theme-light .text-brand-400 { color: #1d33d8 !important; }
   body.theme-light [class*="border-brand-500\/"] { border-color: rgba(59,98,246,.4) !important; }
   body.theme-light [class*="bg-emerald-600"] { background: linear-gradient(135deg,#059669,#10b981) !important; color:#ffffff !important; }
-  body.theme-light [class*="hover:bg-emerald-500"]:hover { background: linear-gradient(135deg,#10b981,#34d399) !important; }
   body.theme-light [class*="bg-emerald-500\/"] { background-color: rgba(5,150,105,.12) !important; }
   body.theme-light .text-emerald-300, body.theme-light .text-emerald-400 { color: #047857 !important; }
-  body.theme-light [class*="border-emerald-500\/"] { border-color: rgba(5,150,105,.4) !important; }
   body.theme-light [class*="bg-amber-600"] { background: linear-gradient(135deg,#d97706,#f59e0b) !important; color:#ffffff !important; }
   body.theme-light [class*="bg-amber-500\/"] { background-color: rgba(217,119,6,.12) !important; }
   body.theme-light .text-amber-300, body.theme-light .text-amber-400 { color: #b45309 !important; }
-  body.theme-light [class*="border-amber-500\/"] { border-color: rgba(217,119,6,.4) !important; }
   body.theme-light [class*="bg-rose-600"] { background: linear-gradient(135deg,#e11d48,#f43f5e) !important; color:#ffffff !important; }
-  body.theme-light [class*="hover:bg-rose-500"]:hover { background: linear-gradient(135deg,#f43f5e,#fb7185) !important; }
   body.theme-light [class*="bg-rose-500\/"] { background-color: rgba(225,29,72,.12) !important; }
   body.theme-light .text-rose-300, body.theme-light .text-rose-400 { color: #be123c !important; }
-  body.theme-light [class*="border-rose-500\/"] { border-color: rgba(225,29,72,.4) !important; }
   body.theme-light [class*="bg-rose-950"] { background-color: #fef2f2 !important; }
-  body.theme-light [class*="bg-rose-900"] { background-color: #fee2e2 !important; }
   body.theme-light [class*="bg-slate-500\/10"] { background-color: #f1f5f9 !important; }
   body.theme-light [class*="border-slate-500\/30"] { border-color: #e0e7f1 !important; }
-  body.theme-light [class*="from-brand-950\/40"] { background: linear-gradient(90deg, #eef3ff 0%, #f5f7fc 100%) !important; border-color: rgba(59,98,246,.3) !important; }
   body.theme-light .overdue-pulse { animation: pulseRingLight 2s infinite !important; background: #fef2f2 !important; border-color: #f43f5e !important; }
   @keyframes pulseRingLight { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.4); } 50% { box-shadow: 0 0 0 14px rgba(244,63,94,0); } }
   body.theme-light input, body.theme-light textarea, body.theme-light select { background-color: #ffffff !important; color: #0a1120 !important; border-color: #d6dfec !important; }
@@ -146,14 +137,9 @@
   body.theme-light [class*="hover:bg-ink-700"]:hover { background-color: #e0e7f1 !important; }
   body.theme-light [class*="hover:text-white"]:hover { color: #0a1120 !important; }
   body.theme-light [class*="hover:text-slate-200"]:hover { color: #1f2a3d !important; }
-  body.theme-light [class*="hover:border-ink-500"]:hover { border-color: #c8d3e3 !important; }
-  body.theme-light [class*="hover:border-ink-600"]:hover { border-color: #c8d3e3 !important; }
   body.theme-light #toasts > div { background: #ffffff !important; border-color: #e0e7f1 !important; box-shadow: 0 12px 40px -12px rgba(15,23,42,.2) !important; }
   body.theme-light #toasts > div p { color: #1f2a3d !important; }
   body.theme-light thead[class*="bg-ink-900\/60"] { background-color: #f5f7fc !important; }
-  body.theme-light [class*="bg-ink-950\/8"] { background-color: rgba(15,23,42,.5) !important; }
-  body.theme-light [class*="bg-ink-950\/7"] { background-color: rgba(15,23,42,.5) !important; }
-  body.theme-light #overdueAlertBanner > div { background: linear-gradient(135deg, #fef2f2, #fff1f2) !important; border-color: #f43f5e !important; }
 
   .lab-chip { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.1rem .5rem; font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
   .lab-chip-0 { background: rgba(59,98,246,.15); color:#90aeff; border:1px solid rgba(59,98,246,.4); }
@@ -168,6 +154,13 @@
   body.theme-light .lab-chip-3 { background: rgba(217,119,6,.12); color:#b45309; }
   body.theme-light .lab-chip-4 { background: rgba(225,29,72,.10); color:#be123c; }
   body.theme-light .lab-chip-5 { background: rgba(139,92,246,.12); color:#6d28d9; }
+
+  /* Lab picker cards */
+  .lab-pick-card { position: relative; display:flex; align-items:flex-start; gap:.85rem; text-align:left; padding:1rem 1.1rem; border-radius:1rem; border:2px solid #e0e7f1; background:#ffffff; transition: all .2s cubic-bezier(.16,1,.3,1); cursor:pointer; width:100%; }
+  .lab-pick-card:hover { border-color:#3b62f6; box-shadow: 0 12px 28px -12px rgba(59,98,246,.35); transform: translateY(-2px); }
+  .lab-pick-card:active { transform: translateY(0); }
+  .lab-pick-icon { width:2.5rem; height:2.5rem; flex-shrink:0; display:grid; place-items:center; border-radius:.75rem; background: linear-gradient(135deg,#3b62f6,#8b5cf6); color:#ffffff; font-size:1rem; }
+  body.theme-light .lab-pick-card { background:#ffffff; }
 </style>
 </head>
 
@@ -296,6 +289,45 @@
   </div>
 </div>
 
+<!-- LAB PICKER SCREEN (students only) -->
+<div id="labPickerScreen" class="fixed inset-0 z-[205] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
+  <div class="w-full max-w-2xl py-6 sm:py-8">
+    <div class="mb-5 sm:mb-6 flex justify-center">
+      <svg viewBox="0 0 500 130" class="h-16 sm:h-20 w-auto" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
+        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
+        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
+        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+      </svg>
+    </div>
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+      <div class="bg-gradient-to-r from-bajaj-500 via-bajaj-600 to-bajaj-700 py-3.5 text-center">
+        <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Select a Lab to Access</h1>
+      </div>
+      <div class="p-5 sm:p-7 space-y-4 sm:space-y-5">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 rounded-full border border-bajaj-200 bg-bajaj-50 px-3 py-1 text-[11px] font-semibold text-bajaj-700">
+            <i class="fa-solid fa-user-graduate"></i> Signed in as <span id="labPickerUser" class="mono font-bold">—</span>
+          </div>
+          <p class="mt-3 text-xs leading-relaxed text-slate-500">
+            Which lab do you want to work in? Your catalog and loans will be filtered to this lab. You can switch any time later.
+          </p>
+        </div>
+        <div id="labPickerList" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        <div id="labPickerEmpty" class="hidden rounded-xl border border-amber-200 bg-amber-50 p-4 text-center text-xs text-amber-800">
+          <i class="fa-solid fa-circle-info mr-1"></i> No labs have been set up yet. Ask your teacher to create one.
+        </div>
+        <button onclick="cancelLabPick()" class="focus-ring w-full rounded-full border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+          <i class="fa-solid fa-arrow-left mr-1 text-[11px]"></i> Back to login
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div id="app" class="hidden min-h-screen flex flex-col relative z-10">
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
@@ -320,6 +352,12 @@
       <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
     </nav>
     <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+      <!-- Active lab chip (student) -->
+      <button id="activeLabChip" onclick="switchLab()" class="focus-ring hidden items-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-2.5 py-1.5 text-[11px] font-semibold text-brand-200 hover:bg-brand-500/20 transition">
+        <i class="fa-solid fa-building-columns text-[10px]"></i>
+        <span id="activeLabChipText" class="max-w-[120px] truncate">—</span>
+        <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i>
+      </button>
       <div id="syncPill" class="hidden md:flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-2.5 py-1.5 text-[11px] font-medium text-slate-400">
         <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span><span id="syncPillText">Offline</span>
       </div>
@@ -350,6 +388,9 @@
             <div class="mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase" id="menuRoleBadge">—</div>
             <div id="menuLabList" class="mt-2 flex flex-wrap gap-1"></div>
           </div>
+          <button id="menuSwitchLabBtn" onclick="switchLab()" class="hidden w-full items-center gap-3 px-4 py-2.5 text-xs text-slate-300 hover:bg-ink-800 transition">
+            <i class="fa-solid fa-building-columns text-[11px] text-brand-400"></i> Switch lab
+          </button>
           <button onclick="openChangePassword()" class="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-slate-300 hover:bg-ink-800 transition">
             <i class="fa-solid fa-key text-[11px] text-amber-400"></i> Change password
           </button>
@@ -550,7 +591,6 @@
     </div>
   </div>
 
-  <!-- Ledger -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
       <div>
@@ -576,7 +616,6 @@
     </div>
   </div>
 
-  <!-- Inventory -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
       <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-warehouse text-amber-400 text-xs"></i> Master Inventory</h3>
@@ -599,7 +638,6 @@
     </div>
   </div>
 
-  <!-- Settings -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -619,7 +657,6 @@
     </div>
   </div>
 
-  <!-- Labs (super admin) -->
   <div id="labsPanel" class="hidden rounded-2xl border border-neon-cyan/30 bg-gradient-to-br from-neon-cyan/5 to-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="flex items-center gap-2 text-sm font-bold text-white">
@@ -634,7 +671,6 @@
     <div id="labsList" class="space-y-2"></div>
   </div>
 
-  <!-- Teachers -->
   <div class="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/20 to-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="flex items-center gap-2 text-sm font-bold text-white">
@@ -649,7 +685,6 @@
     <div id="teachersList" class="space-y-2"></div>
   </div>
 
-  <!-- Students -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-graduation-cap text-xs text-brand-400"></i> Registered Students</h3>
     <div id="studentsList" class="max-h-64 space-y-1.5 overflow-y-auto"></div>
@@ -877,7 +912,6 @@
   </div>
 </div>
 
-<!-- RETURN VERIFY MODAL (admin only) -->
 <div id="mReturnVerify" class="fixed inset-0 z-[96] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border-2 border-emerald-500/60 bg-ink-850 p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
     <div class="flex items-start gap-3">
@@ -983,8 +1017,8 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const STATION_NODE = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v7';
-const SESSION_KEY = 'bajaj.session.v7';
+const STORAGE_KEY = 'bajaj.lending.v8';
+const SESSION_KEY = 'bajaj.session.v8';
 const THEME_KEY = 'bajaj.theme.v2';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MAX_ACTIVITY = 40;
@@ -1035,7 +1069,8 @@ function defaultState() {
   };
 }
 let state = defaultState();
-let session = { role: null, register: null, name: null };
+let session = { role: null, register: null, name: null, activeLabId: null };
+let pendingSession = null;  // used while student is choosing a lab
 let activeView = 'overview';
 let deployUrl = '';
 let serverClockOffsetMs = 0;
@@ -1107,24 +1142,20 @@ function labName(id) { const l = labById(id); return l ? l.name : 'Unknown lab';
 function labChipClass(labId) { const idx = Math.max(0, state.labs.findIndex(l => l.id === labId)); return 'lab-chip lab-chip-' + (idx % 6); }
 function labChip(labId) { return `<span class="${labChipClass(labId)}"><i class="fa-solid fa-building-columns"></i>${esc(labName(labId))}</span>`; }
 function allLabIds() { return state.labs.map(l => l.id); }
-function defaultLabId() { return state.labs.length ? state.labs[0].id : null; }
 
 /* ─── ADMINS / ROLES ─── */
 function getAdmins() {
   let admins = [];
   if (!state.adminConfig) return [];
-  if (Array.isArray(state.adminConfig.admins)) {
-    admins = state.adminConfig.admins.map(a => ({ ...a }));
-  } else if (state.adminConfig.username && state.adminConfig.passwordHash) {
+  if (Array.isArray(state.adminConfig.admins)) admins = state.adminConfig.admins.map(a => ({ ...a }));
+  else if (state.adminConfig.username && state.adminConfig.passwordHash) {
     admins = [{ username: state.adminConfig.username, passwordHash: state.adminConfig.passwordHash, isSuper: true, labIds: [], createdAt: state.adminConfig.createdAt || Date.now() }];
   }
-  // MIGRATION: if no admin has isSuper set, promote the earliest-created admin to head teacher
   if (admins.length && !admins.some(a => a.isSuper === true)) {
     let earliestIdx = 0;
     admins.forEach((a, i) => { if ((a.createdAt || 0) < (admins[earliestIdx].createdAt || Infinity)) earliestIdx = i; });
     admins[earliestIdx].isSuper = true;
   }
-  // MIGRATION: ensure labIds is always an array
   admins.forEach(a => { if (!Array.isArray(a.labIds)) a.labIds = []; });
   return admins;
 }
@@ -1132,8 +1163,7 @@ function findAdminByUsername(name) { return getAdmins().find(a => (a.username ||
 function myAdminRecord() { if (session.role !== 'admin' || !session.register) return null; return findAdminByUsername(session.register); }
 function isSuperAdmin() { const a = myAdminRecord(); return !!(a && a.isSuper); }
 function myLabIds() {
-  const a = myAdminRecord();
-  if (!a) return [];
+  const a = myAdminRecord(); if (!a) return [];
   if (a.isSuper) return state.labs.map(l => l.id);
   return (a.labIds || []).filter(id => state.labs.some(l => l.id === id));
 }
@@ -1260,6 +1290,68 @@ async function completeSetup() {
   finally { btn.disabled = false; btnTxt.textContent = 'Create Head Teacher'; }
 }
 
+/* ─── LAB PICKER ─── */
+function showLabPicker(role, register, name) {
+  pendingSession = { role, register, name };
+  $('labPickerUser').textContent = register;
+  const listEl = $('labPickerList');
+  const emptyEl = $('labPickerEmpty');
+  if (!state.labs.length) {
+    listEl.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+  } else {
+    emptyEl.classList.add('hidden');
+    listEl.innerHTML = state.labs.map(l => {
+      const items = state.inventory.filter(i => i.labId === l.id).length;
+      const myLoans = state.loans.filter(x => x.labId === l.id && x.borrowerId === register).length;
+      const overdue = state.loans.filter(x => x.labId === l.id && x.borrowerId === register && isOverdue(x)).length;
+      return `<button type="button" onclick="pickLab('${esc(l.id)}')" class="lab-pick-card">
+        <div class="lab-pick-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-bold text-slate-900">${esc(l.name)}</span>
+            ${overdue > 0 ? `<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">${overdue} overdue</span>` : ''}
+          </div>
+          <div class="mt-0.5 text-[11px] text-slate-500 line-clamp-2">${esc(l.description || '')}</div>
+          <div class="mt-2 flex flex-wrap gap-1.5 text-[10px] text-slate-500">
+            <span class="rounded-md bg-slate-100 px-1.5 py-0.5"><b class="text-slate-700">${items}</b> SKUs</span>
+            ${myLoans > 0 ? `<span class="rounded-md bg-amber-100 px-1.5 py-0.5 text-amber-800"><b>${myLoans}</b> of your loan${myLoans===1?'':'s'}</span>` : ''}
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-slate-400 mt-2"></i>
+      </button>`;
+    }).join('');
+  }
+  $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
+  $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
+  $('labPickerScreen').classList.remove('hidden'); $('labPickerScreen').classList.add('flex');
+}
+
+function pickLab(labId) {
+  if (!pendingSession) return;
+  if (!labById(labId)) { toast('Lab not found.', 'error'); return; }
+  const { role, register, name } = pendingSession;
+  pendingSession = null;
+  $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
+  enterApp(role, register, name, labId);
+  toast(`Now browsing ${labName(labId)}.`, 'success', 3000);
+}
+
+function cancelLabPick() {
+  pendingSession = null;
+  $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
+  $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
+  $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
+}
+
+function switchLab() {
+  if (session.role !== 'user') { toast('Only students switch labs.', 'info'); return; }
+  // Show the lab picker in "switch" mode
+  showLabPicker(session.role, session.register, session.name);
+  // When they pick, pendingSession replaces active lab
+}
+
 /* ─── STUDENT LOGIN ─── */
 async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
@@ -1277,15 +1369,20 @@ async function attemptStudentLogin() {
     const students = state.students || {};
     const existing = students[reg];
     if (existing) {
-      if (hash === existing.passwordHash) { enterApp('user', reg, existing.name || reg); }
-      else { showLoginError('Incorrect password.'); $('loginPassword').select(); }
+      if (hash === existing.passwordHash) {
+        // CAPTCHA passed, credentials OK → ask which lab
+        showLabPicker('user', reg, existing.name || reg);
+      } else {
+        showLoginError('Incorrect password.'); $('loginPassword').select();
+      }
       return;
     }
     if (!/^\d{8}$/.test(pw)) { showLoginError('First-time login: use your Date of Birth (ddmmyyyy).'); return; }
     state.students = state.students || {};
     state.students[reg] = { register: reg, name: 'Student ' + reg, passwordHash: hash, createdAt: Date.now() };
     publishKey('students');
-    enterApp('user', reg, state.students[reg].name);
+    // First-time registration succeeded → also ask which lab
+    showLabPicker('user', reg, state.students[reg].name);
     toast('Welcome! Your password is now your DOB.', 'success', 5000);
   } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
   finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
@@ -1309,18 +1406,25 @@ async function attemptAdminLogin() {
     if (!admin) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
     const hash = await hashPassword(password);
     if (hash !== admin.passwordHash) { showLoginError('Incorrect Teacher No or Password.'); $('adminPassInput').select(); return; }
-    enterApp('admin', teacherNo, admin.username);
+    // Admins do not need to pick a lab — they see all their assigned labs
+    enterApp('admin', teacherNo, admin.username, null);
   } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
   finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Teacher'; }
 }
 
 /* ─── ENTER APP ─── */
-function enterApp(role, register, name) {
-  session = { role, register, name };
+function enterApp(role, register, name, activeLabId) {
+  session = { role, register, name, activeLabId: activeLabId || null };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
   $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
   $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
+  $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('app').classList.remove('hidden');
+
+  // For students, force the catalog filter to their selected lab
+  if (role === 'user' && session.activeLabId) {
+    catalogLabFilter = session.activeLabId;
+  }
   applyRoleUI(); renderAll(); tick();
   checkOverdueForCurrentUser(true);
 }
@@ -1331,6 +1435,20 @@ function applyRoleUI() {
     const el = $(id); if (!el) return;
     if (isAdminUser) el.classList.remove('hidden'); else el.classList.add('hidden');
   });
+  // Show / hide "Switch lab" only for students
+  const switchBtn = $('menuSwitchLabBtn');
+  if (switchBtn) switchBtn.classList.toggle('hidden', isAdminUser);
+  // Header active-lab chip for students
+  const chip = $('activeLabChip');
+  const chipTxt = $('activeLabChipText');
+  if (chip && chipTxt) {
+    if (!isAdminUser && session.activeLabId) {
+      chip.classList.remove('hidden'); chip.classList.add('inline-flex');
+      chipTxt.textContent = labName(session.activeLabId);
+    } else {
+      chip.classList.add('hidden'); chip.classList.remove('inline-flex');
+    }
+  }
   if (session.register) {
     $('userAvatar').textContent = session.register.slice(0, 1).toUpperCase();
     $('userLabel').textContent = session.register;
@@ -1346,17 +1464,24 @@ function applyRoleUI() {
     }
     const labList = $('menuLabList');
     if (labList) {
-      const ids = isAdminUser ? myLabIds() : [];
-      labList.innerHTML = ids.length ? ids.map(id => labChip(id)).join('') : (isAdminUser ? '<span class="text-[10px] text-slate-500">No labs assigned</span>' : '');
+      if (isAdminUser) {
+        const ids = myLabIds();
+        labList.innerHTML = ids.length ? ids.map(id => labChip(id)).join('') : '<span class="text-[10px] text-slate-500">No labs assigned</span>';
+      } else {
+        labList.innerHTML = session.activeLabId ? labChip(session.activeLabId) : '<span class="text-[10px] text-slate-500">No lab selected</span>';
+      }
     }
   }
   go('overview');
 }
 
 function logout() {
-  session = { role: null, register: null, name: null };
+  session = { role: null, register: null, name: null, activeLabId: null };
+  pendingSession = null;
+  catalogLabFilter = 'ALL';
   try { sessionStorage.removeItem(SESSION_KEY); } catch {}
   $('app').classList.add('hidden');
+  $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
   $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
   $('adminUserInput').value = ''; $('adminPassInput').value = '';
@@ -1438,19 +1563,16 @@ function initFirebase() {
 }
 
 function migrateInventoryLabs() {
-  // Ensure every inventory item has a valid labId
   if (!state.labs.length) return;
   const validIds = new Set(state.labs.map(l => l.id));
   const fallback = state.labs[0].id;
   state.inventory.forEach(i => { if (!i.labId || !validIds.has(i.labId)) i.labId = fallback; });
-  // Ensure every loan has a valid labId
   state.loans.forEach(l => {
     if (!l.labId || !validIds.has(l.labId)) {
       const it = state.inventory.find(i => i.id === l.itemId);
       l.labId = it ? it.labId : fallback;
     }
   });
-  // Ensure every history record has a valid labId
   state.history.forEach(h => {
     if (!h.labId || !validIds.has(h.labId)) {
       const it = state.inventory.find(i => i.id === h.itemId);
@@ -1468,7 +1590,17 @@ function applyRemoteKey(key, val) {
   else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
   else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
   else if (key === 'adminConfig') state.adminConfig = (val && typeof val === 'object') ? val : null;
-  if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs') migrateInventoryLabs();
+  if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs') {
+    migrateInventoryLabs();
+    // If a student's active lab was removed, re-prompt
+    if (session.role === 'user' && session.activeLabId && !labById(session.activeLabId)) {
+      session.activeLabId = null;
+      setTimeout(() => {
+        if (state.labs.length) showLabPicker(session.role, session.register, session.name);
+        else toast('Your lab was removed. Ask your teacher to assign a new one.', 'warn', 5000);
+      }, 300);
+    }
+  }
 }
 
 function connectStation() {
@@ -1499,6 +1631,7 @@ function connectStation() {
 
 function updateAuthScreen() {
   if (session && session.role) return;
+  if (pendingSession) return; // lab picker is open
   const hasAdmin = getAdmins().length > 0;
   const setupEl = $('setupScreen'); const loginEl = $('loginScreen');
   if (hasAdmin) {
@@ -1587,7 +1720,7 @@ function checkOverdueForCurrentUser() {
     if (myOverdue.length) {
       banner.classList.remove('hidden');
       $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · please hand them back at the lab`;
-    } else { banner.classList.add('hidden'); }
+    } else banner.classList.add('hidden');
   }
   let notified = {};
   try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
@@ -1644,10 +1777,14 @@ function renderOverview() {
         const units = items.reduce((s,i) => s + i.totalStock, 0);
         const out = state.loans.filter(x => x.labId === l.id).reduce((s,x) => s + x.quantity, 0);
         const teachers = getAdmins().filter(a => a.isSuper || (a.labIds||[]).includes(l.id)).length;
-        return `<div class="rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40 p-3.5">
+        const isActive = session.role === 'user' && session.activeLabId === l.id;
+        return `<div class="rounded-xl border ${isActive ? 'border-brand-500/60 bg-gradient-to-br from-brand-500/10 to-ink-900/60 ring-1 ring-brand-500/30' : 'border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40'} p-3.5">
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">${labChip(l.id)}</div>
+              <div class="flex items-center gap-2 flex-wrap">
+                ${labChip(l.id)}
+                ${isActive ? '<span class="rounded-full border border-brand-500/50 bg-brand-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase text-brand-200">Your lab</span>' : ''}
+              </div>
               <div class="mt-2 text-sm font-bold text-white">${esc(l.name)}</div>
               <div class="mt-0.5 text-[11px] text-slate-500 line-clamp-2">${esc(l.description || '')}</div>
             </div>
@@ -1658,6 +1795,7 @@ function renderOverview() {
             <div class="rounded-lg bg-ink-950/50 py-1.5"><div class="mono text-xs font-bold text-amber-300">${out}</div><div class="text-[9px] uppercase text-slate-600">Out</div></div>
           </div>
           <div class="mt-2 text-[10px] text-slate-500"><i class="fa-solid fa-user-shield mr-1"></i>${teachers} teacher${teachers===1?'':'s'}</div>
+          ${session.role === 'user' && !isActive ? `<button onclick="setCatalogLab('${esc(l.id)}'); go('catalog')" class="mt-2 w-full rounded-lg border border-ink-600/70 bg-ink-800/60 py-1.5 text-[10px] font-semibold text-slate-300 hover:border-brand-500/60 hover:text-white transition">Browse this lab</button>` : ''}
         </div>`;
       }).join('');
     }
@@ -1670,9 +1808,10 @@ function renderCatalogLabTabs() {
   if (!state.labs.length) { wrap.innerHTML = `<span class="text-xs text-slate-500">No labs available.</span>`; return; }
   const btn = (id, label, icon) => {
     const active = catalogLabFilter === id;
+    const isMine = session.role === 'user' && session.activeLabId === id;
     return `<button onclick="setCatalogLab('${id}')" class="focus-ring inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
       active ? 'border-brand-500/60 bg-gradient-to-br from-brand-500/25 to-brand-500/10 text-brand-200 shadow-lg shadow-brand-600/20' : 'border-ink-600/70 bg-ink-900/70 text-slate-400 hover:border-brand-500/40 hover:text-slate-200'
-    }"><i class="fa-solid ${icon} text-[10px]"></i>${esc(label)}</button>`;
+    }"><i class="fa-solid ${icon} text-[10px]"></i>${esc(label)}${isMine ? ' · yours' : ''}</button>`;
   };
   wrap.innerHTML = btn('ALL', 'All labs', 'fa-layer-group') + state.labs.map(l => btn(l.id, l.name, 'fa-building-columns')).join('');
 }
@@ -1819,6 +1958,13 @@ function checkoutCart() {
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
   if (!name) { toast('Borrower name required.', 'warn'); return; }
   if (!idRef) { toast('Student ID required.', 'warn'); return; }
+  // Warn if any cart item belongs to a lab other than the student's active lab
+  if (session.role === 'user' && session.activeLabId) {
+    const foreign = entries.filter(([itemId]) => (findItem(itemId)||{}).labId !== session.activeLabId);
+    if (foreign.length) {
+      toast(`Items from other labs are in your cart. You are browsing ${labName(session.activeLabId)}.`, 'warn', 4500);
+    }
+  }
   for (const [itemId, qty] of entries) {
     const item = findItem(itemId);
     if (!item) { toast('A component no longer exists.', 'error'); return; }
@@ -1853,7 +1999,10 @@ function visibleLoans() {
     const mine = myLabIds();
     return state.loans.filter(l => mine.includes(l.labId));
   }
-  return state.loans.filter(l => l.borrowerId === session.register);
+  // Students: loans for their register, scoped to their currently selected lab
+  let list = state.loans.filter(l => l.borrowerId === session.register);
+  if (session.activeLabId) list = list.filter(l => l.labId === session.activeLabId);
+  return list;
 }
 
 function renderLoans() {
@@ -1861,7 +2010,8 @@ function renderLoans() {
   const t = now();
   const isAdminUser = session.role === 'admin';
 
-  $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
+  const activeLab = session.role === 'user' && session.activeLabId ? labName(session.activeLabId) : null;
+  $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : (activeLab ? `My Loans · ${activeLab}` : 'My Borrowed Items');
   $('loansSubheading').textContent = isAdminUser
     ? 'Verify the count and close the loan once the items are physically back.'
     : 'Hand your items to a lab teacher — they will verify and close the loan.';
@@ -1869,13 +2019,16 @@ function renderLoans() {
   const bulkBtn = $('loansBulkBtn');
   if (bulkBtn) {
     if (isAdminUser) { bulkBtn.classList.remove('hidden'); $('loansBulkBtnText').textContent = 'Force-return all'; }
-    else { bulkBtn.classList.add('hidden'); }
+    else bulkBtn.classList.add('hidden');
   }
 
   const loans = visibleLoans().slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
 
   if (!loans.length) {
-    box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-2 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition">Browse catalog</button></div>`;
+    const msg = session.role === 'user' && session.activeLabId
+      ? `No active loans in ${esc(activeLab)}.`
+      : 'No active loans';
+    box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">${msg}</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-2 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition">Browse catalog</button></div>`;
     return;
   }
 
@@ -1884,7 +2037,6 @@ function renderLoans() {
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     const pct = Math.min(100, (elapsed / loanMs()) * 100);
     const rem = loan.dueTimeMs - t;
-
     let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/40 bg-emerald-500/15 text-emerald-300', pTxt='Active', bCls='from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
     if (overdue) { cCls='border-rose-500/50 bg-gradient-to-br from-rose-950/40 to-ink-850/50 overdue-pulse'; pCls='bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; pTxt='Overdue'; bCls='from-rose-500 to-rose-600'; tCls='text-rose-400'; tLbl='Overdue by'; }
     else if (dueSoon) { cCls='border-amber-500/50 bg-gradient-to-br from-amber-950/20 to-ink-850/50'; pCls='border-amber-500/40 bg-amber-500/15 text-amber-300'; pTxt='Due soon'; bCls='from-amber-500 to-amber-600'; tCls='text-amber-400'; }
@@ -1960,8 +2112,7 @@ async function confirmReturnVerify() {
   if (received === 0) {
     const ok = await confirmDialog('Nothing received', `You entered 0 — no components were physically returned. The loan will stay open.`, 'Keep open', false, 'fa-circle-info');
     if (!ok) return;
-    closeModal('mReturnVerify');
-    pendingReturnLoanId = null;
+    closeModal('mReturnVerify'); pendingReturnLoanId = null;
     toast('No items received. Loan remains open.', 'info');
     return;
   }
@@ -1970,8 +2121,7 @@ async function confirmReturnVerify() {
     const ok = await confirmDialog('Confirm full return', `Confirm you received all ${received} × "${loan.itemName}" from ${loan.borrowerName}.`, 'Confirm & close', false, 'fa-check');
     if (!ok) return;
     finalizeFullReturn(loan);
-    closeModal('mReturnVerify');
-    pendingReturnLoanId = null;
+    closeModal('mReturnVerify'); pendingReturnLoanId = null;
     return;
   }
 
@@ -1979,8 +2129,7 @@ async function confirmReturnVerify() {
   const ok = await confirmDialog('Partial return', `You received ${received} of ${loan.quantity}. ${remaining} unit(s) will remain on loan for ${loan.borrowerName}. Continue?`, 'Record partial', false, 'fa-clipboard-check');
   if (!ok) return;
   finalizePartialReturn(loan, received, remaining);
-  closeModal('mReturnVerify');
-  pendingReturnLoanId = null;
+  closeModal('mReturnVerify'); pendingReturnLoanId = null;
 }
 
 function finalizeFullReturn(loan) {
@@ -1989,13 +2138,10 @@ function finalizeFullReturn(loan) {
   if (idx === -1) return;
   const h = state.history.find(x => x.loanId === loan.loanId);
   if (h) {
-    h.status = 'RETURNED';
-    h.returnTimeMs = t;
-    h.returnTimeFormatted = fmtDateTime(t);
+    h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t);
     h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
     h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
-    h.verifiedBy = session.register;
-    h.receivedCount = loan.quantity;
+    h.verifiedBy = session.register; h.receivedCount = loan.quantity;
   }
   state.loans.splice(idx, 1);
   logActivity('return', `${loan.borrowerName} returned all ${loan.quantity} × ${loan.itemName} (verified by ${session.register})`);
@@ -2006,7 +2152,6 @@ function finalizeFullReturn(loan) {
 
 function finalizePartialReturn(loan, received, remaining) {
   const t = now();
-  // Log a separate history record for the partial return
   const partialRecord = {
     loanId: loan.loanId + '-P' + Date.now().toString().slice(-4),
     itemId: loan.itemId, itemName: loan.itemName, category: loan.category,
@@ -2018,12 +2163,10 @@ function finalizePartialReturn(loan, received, remaining) {
     returnTimeMs: t, returnTimeFormatted: fmtDateTime(t),
     elapsedMinutes: ((t - loan.borrowTimeMs)/60000).toFixed(1),
     overdueFlag: t > loan.dueTimeMs ? 'YES' : 'NO',
-    verifiedBy: session.register,
-    receivedCount: received,
+    verifiedBy: session.register, receivedCount: received,
     note: `Partial return (${received} of ${received + remaining})`
   };
   state.history.unshift(partialRecord);
-  // Update the active loan to reflect the remaining units
   loan.quantity = remaining;
   logActivity('return', `${loan.borrowerName} returned ${received} × ${loan.itemName} (partial, verified by ${session.register}); ${remaining} still out`);
   saveAndPublish('loans','history','activity');
@@ -2031,7 +2174,7 @@ function finalizePartialReturn(loan, received, remaining) {
   toast(`Partial return recorded: ${received} × ${loan.itemName}. ${remaining} still on loan.`, 'success', 5000);
 }
 
-/* ─── ADMIN BULK FORCE-RETURN (admins only) ─── */
+/* ─── ADMIN BULK FORCE-RETURN ─── */
 async function loansBulkAction() {
   if (session.role !== 'admin') { toast('Only teachers can return items.', 'warn'); return; }
   const t = now();
@@ -2049,8 +2192,7 @@ async function loansBulkAction() {
       h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t);
       h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
       h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
-      h.verifiedBy = session.register;
-      h.receivedCount = loan.quantity;
+      h.verifiedBy = session.register; h.receivedCount = loan.quantity;
     }
     state.loans.splice(idx, 1);
   });
@@ -2062,7 +2204,6 @@ async function loansBulkAction() {
 
 /* ─── DASHBOARD ─── */
 function dashLabOptions() { const mine = myLabIds(); return state.labs.filter(l => mine.includes(l.id)); }
-
 function populateDashLabFilter() {
   const sel = $('dashLabFilter'); if (!sel) return;
   const cur = sel.value || 'ALL';
@@ -2082,28 +2223,19 @@ function renderDashboard() {
   populateDashLabFilter();
   const filter = dashLabFilterValue();
   const scope = filter === 'ALL' ? myLabIds() : [filter];
-
   const scopedInventory = state.inventory.filter(i => scope.includes(i.labId));
   const scopedLoans = state.loans.filter(l => scope.includes(l.labId));
-
   $('admSkus').textContent = scopedInventory.length;
   $('admOnLoan').textContent = scopedLoans.reduce((s,l) => s+l.quantity, 0);
   $('admBorrowers').textContent = new Set(scopedLoans.map(l => l.borrowerId)).size;
   $('admOverdue').textContent = scopedLoans.filter(l => isOverdue(l, t)).length;
   $('dashCurrentUser').textContent = session.register || '—';
-  $('dashScopeLabel').textContent = isSuperAdmin()
-    ? 'Head teacher · full access to every lab'
-    : `${myLabIds().length} lab${myLabIds().length===1?'':'s'} assigned`;
-
+  $('dashScopeLabel').textContent = isSuperAdmin() ? 'Head teacher · full access to every lab' : `${myLabIds().length} lab${myLabIds().length===1?'':'s'} assigned`;
   renderLedger(scopedLoans, t);
   renderInventoryTable(scopedInventory);
-
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
-  renderLabsList();
-  renderTeachersList();
-  renderStudentsList();
-
+  renderLabsList(); renderTeachersList(); renderStudentsList();
   const labsPanel = $('labsPanel');
   if (labsPanel) labsPanel.classList.toggle('hidden', !isSuperAdmin());
 }
@@ -2111,10 +2243,7 @@ function renderDashboard() {
 function renderLedger(loans, t) {
   const tbody = $('ledgerBody'); if (!tbody) return;
   const sorted = loans.slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
-  if (!sorted.length) {
-    tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`;
-    return;
-  }
+  if (!sorted.length) { tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`; return; }
   tbody.innerHTML = sorted.map(loan => {
     const overdue = isOverdue(loan, t);
     const dueSoon = !overdue && isDueSoon(loan, t);
@@ -2122,11 +2251,9 @@ function renderLedger(loans, t) {
     let pill = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300', label = 'Normal';
     if (overdue) { pill = 'bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; label = 'Overdue'; }
     else if (dueSoon) { pill = 'border-amber-500/40 bg-amber-500/15 text-amber-300'; label = 'Due soon'; }
-
     const actions = `<div class="flex justify-end gap-1.5 flex-wrap">
       <button onclick="openReturnVerify('${loan.loanId}')" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition whitespace-nowrap"><i class="fa-solid fa-clipboard-check mr-1 text-[10px]"></i>Verify return</button>
     </div>`;
-
     return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40 transition">
       <td class="mono whitespace-nowrap px-3 py-3 text-[11px] font-semibold text-brand-400">${esc(loan.loanId)}</td>
       <td class="px-3 py-3 whitespace-nowrap">${labChip(loan.labId)}</td>
@@ -2579,6 +2706,12 @@ function updateBadges() {
 }
 
 function renderAll() {
+  // Keep catalog filter in sync with the student's active lab
+  if (session.role === 'user' && session.activeLabId) {
+    if (catalogLabFilter === 'ALL' || !labById(catalogLabFilter)) {
+      catalogLabFilter = session.activeLabId;
+    }
+  }
   renderCatalogLabTabs();
   populateCategories();
   renderOverview();
@@ -2624,13 +2757,26 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
-      session = saved;
-      $('app').classList.remove('hidden');
-      applyRoleUI();
+      // Students must have an active lab; if it's gone, re-prompt
+      if (saved.role === 'user') {
+        if (saved.activeLabId && labById(saved.activeLabId)) {
+          session = saved;
+          $('app').classList.remove('hidden');
+          catalogLabFilter = saved.activeLabId;
+          applyRoleUI();
+        } else if (state.labs.length) {
+          // will ask them to pick a lab
+          setTimeout(() => showLabPicker('user', saved.register, saved.name || saved.register), 100);
+        }
+      } else {
+        session = saved;
+        $('app').classList.remove('hidden');
+        applyRoleUI();
+      }
     }
   } catch {}
   initFirebase();
-  if (!session.role) {
+  if (!session.role && !pendingSession) {
     if (getAdmins().length) {
       $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
     } else {
@@ -2675,6 +2821,9 @@ window.removeTeacher = removeTeacher;
 window.openLabModal = openLabModal;
 window.saveLab = saveLab;
 window.deleteLab = deleteLab;
+window.pickLab = pickLab;
+window.cancelLabPick = cancelLabPick;
+window.switchLab = switchLab;
 </script>
 </body>
 </html>
