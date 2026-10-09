@@ -160,6 +160,12 @@
   .lab-pick-card:active { transform: translateY(0); }
   .lab-pick-icon { width:2.5rem; height:2.5rem; flex-shrink:0; display:grid; place-items:center; border-radius:.75rem; background: linear-gradient(135deg,#3b62f6,#8b5cf6); color:#ffffff; font-size:1rem; }
   body.theme-light .lab-pick-card { background:#ffffff; }
+
+  /* ── Brand logo (uploaded or fallback) ── */
+  .brand-logo { display:block; object-fit:contain; }
+  .logo-slot { background: transparent; }
+  .saved-reg-chip { display:inline-flex; align-items:center; gap:.35rem; border-radius:999px; border:1px solid #d6dfec; background:#f8fafd; padding:.15rem .5rem; font-size:10px; font-weight:700; color:#3d4f6b; cursor:pointer; }
+  .saved-reg-chip:hover { border-color:#3b62f6; color:#1d33d8; background:#eef4ff; }
 </style>
 </head>
 
@@ -173,15 +179,7 @@
 <div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
-      <svg viewBox="0 0 500 130" class="h-20 sm:h-24 w-auto" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
-        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
-        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
-        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
-        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
-      </svg>
+      <img class="brand-logo h-20 sm:h-24 w-auto" alt="BAJAJ BEST" />
     </div>
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
@@ -216,15 +214,7 @@
 <div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
-      <svg viewBox="0 0 500 130" class="h-20 sm:h-24 w-auto" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
-        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
-        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
-        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
-        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
-      </svg>
+      <img class="brand-logo h-20 sm:h-24 w-auto" alt="BAJAJ BEST" />
     </div>
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="flex border-b border-slate-200 bg-slate-50">
@@ -244,7 +234,11 @@
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Register No</label>
-          <input id="loginRegister" type="text" autocomplete="username" placeholder="e.g. STU001" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
+          <div class="w-full sm:flex-1">
+            <input id="loginRegister" type="text" list="registerList" autocomplete="username" placeholder="e.g. STU001" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16)" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()" class="w-full border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.15em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-bajaj-500 focus:outline-none" />
+            <datalist id="registerList"></datalist>
+            <div id="savedRegistersRow" class="mt-2 flex flex-wrap gap-1.5"></div>
+          </div>
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
@@ -265,6 +259,7 @@
         </div>
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
           <p>First login: use your <b class="text-slate-700">Date of Birth</b> (ddmmyyyy).</p>
+          <p class="mt-1">Your register number is remembered in this browser — it will be pre-filled next time.</p>
         </div>
       </div>
       <div id="adminForm" class="hidden p-5 sm:p-7 space-y-4 sm:space-y-5">
@@ -292,15 +287,7 @@
 <div id="labPickerScreen" class="fixed inset-0 z-[205] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-2xl py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
-      <svg viewBox="0 0 500 130" class="h-16 sm:h-20 w-auto" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
-        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
-        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
-        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
-        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
-      </svg>
+      <img class="brand-logo h-16 sm:h-20 w-auto" alt="BAJAJ BEST" />
     </div>
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="bg-gradient-to-r from-bajaj-500 via-bajaj-600 to-bajaj-700 py-3.5 text-center">
@@ -332,15 +319,7 @@
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
   <div class="mx-auto flex max-w-[1400px] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 lg:px-6">
     <button onclick="go('overview')" class="focus-ring flex shrink-0 items-center gap-2 sm:gap-3 rounded-xl p-0.5 sm:p-1">
-      <svg viewBox="0 0 500 130" class="h-8 sm:h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
-        <g transform="translate(60,60)"><path d="M-25 -18 L15 -3 L4 5 L25 5 L15 18 L-25 4 Z" fill="white"/><path d="M-25 15 L-15 22 L-4 15 L25 15 L15 28 L-25 15 Z" fill="white"/></g>
-        <text x="60" y="115" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="white">BAJAJ</text>
-        <text x="140" y="48" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="52" fill="#1e5fa8" letter-spacing="4">BEST</text>
-        <text x="142" y="80" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
-        <text x="142" y="99" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
-        <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
-      </svg>
+      <img class="brand-logo h-8 sm:h-9 w-auto" alt="BAJAJ BEST" />
     </button>
     <nav class="ml-2 hidden items-center gap-0.5 lg:flex">
       <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-gauge-high mr-2 text-xs"></i>Overview</button>
@@ -636,6 +615,38 @@
     </div>
   </div>
 
+  <!-- BRANDING / LOGO -->
+  <div class="rounded-2xl border border-bajaj-500/30 bg-gradient-to-br from-bajaj-500/5 to-ink-850/50 p-4 sm:p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div>
+        <h3 class="flex items-center gap-2 text-sm font-bold text-white">
+          <i class="fa-solid fa-image text-xs text-bajaj-400"></i> Station Logo (Branding)
+        </h3>
+        <p class="mt-1 text-xs leading-relaxed text-slate-400">
+          Upload the official <b class="text-slate-200">BAJAJ BEST</b> logo (PNG / JPG / SVG). It replaces the logo on
+          the login screen, header, setup screen and lab picker — and syncs to every device automatically.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="document.getElementById('logoFileInput').click()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-bajaj-500 to-bajaj-700 px-4 py-2 text-xs font-semibold text-white hover:from-bajaj-600 hover:to-bajaj-800 transition shadow-lg shadow-bajaj-600/20">
+          <i class="fa-solid fa-upload text-[11px]"></i> Upload exact logo
+        </button>
+        <button onclick="resetLogo()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-brand-500/60 hover:text-white transition">
+          <i class="fa-solid fa-rotate-left text-[11px]"></i> Restore default
+        </button>
+      </div>
+    </div>
+    <input type="file" id="logoFileInput" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" class="hidden" onchange="handleLogoUpload(event)" />
+    <div class="flex flex-wrap items-center gap-4 rounded-xl border border-ink-700/60 bg-white p-3">
+      <img id="brandLogoPreview" class="h-14 w-auto max-w-[320px] object-contain" alt="Logo preview" />
+      <div class="min-w-[180px] flex-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Current logo source</div>
+        <div id="logoStatusText" class="mt-1 text-[11px] font-semibold text-slate-700">Default built-in logo</div>
+        <div class="mt-0.5 text-[10px] text-slate-500">Recommended: wide PNG with transparent or white background, 600–1200 px wide.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -724,7 +735,8 @@
     <div class="flex items-start justify-center overflow-auto rounded-2xl border border-ink-700/60 bg-ink-900/40 p-4 sm:p-6 lg:col-span-3 lg:p-10">
       <div id="posterCanvas" class="w-full max-w-sm space-y-6 rounded-2xl border-[5px] border-brand-600 bg-white p-6 sm:p-8 text-center shadow-2xl">
         <div class="space-y-2 border-b border-slate-200 pb-5">
-          <span class="inline-block rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-brand-700">Self-Service Lending</span>
+          <img class="brand-logo mx-auto h-16 w-auto max-w-[240px]" alt="BAJAJ BEST" />
+          <span class="mt-2 inline-block rounded-full bg-brand-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-brand-700">Self-Service Lending</span>
           <h2 id="posterTitlePreview" class="pt-1 text-lg sm:text-xl font-extrabold leading-tight text-slate-900">—</h2>
           <p id="posterSubtitlePreview" class="text-[11px] font-medium text-slate-500">—</p>
         </div>
@@ -1018,12 +1030,28 @@ const STATION_NODE = 'LAB-MAIN';
 const STORAGE_KEY = 'bajaj.lending.v9';
 const SESSION_KEY = 'bajaj.session.v9';
 const THEME_KEY = 'bajaj.theme.v2';
+const REGISTERS_KEY = 'bajaj.registers.v1';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MAX_ACTIVITY = 40;
-const SYNC_KEYS = ['labs','inventory','loans','history','settings','activity','students','adminConfig'];
+const SYNC_KEYS = ['labs','inventory','loans','history','settings','activity','students','adminConfig','branding'];
 const MIN_ADMIN_USER_LEN = 4;
 const MAX_ADMIN_USER_LEN = 12;
 const MIN_ADMIN_PASS_LEN = 6;
+
+/* ─── FALLBACK LOGO (used only until an exact logo is uploaded) ─── */
+const FALLBACK_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 130" width="500" height="130">
+<rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
+<g transform="translate(60,50)" fill="#ffffff">
+<path d="M-30,-18 L8,-18 L30,-4 L-4,-4 L-11,-9 L-25,-9 Z"/>
+<path d="M-8,4 L30,4 L10,18 L-30,18 L-16,10 Z"/>
+</g>
+<text x="60" y="116" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="25" fill="#ffffff" letter-spacing="1">BAJAJ</text>
+<text x="140" y="50" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="54" fill="#1e5fa8" letter-spacing="4">BEST</text>
+<text x="142" y="82" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">BAJAJ</text>
+<text x="142" y="101" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">ENGINEERING</text>
+<text x="142" y="120" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
+</svg>`;
+const FALLBACK_LOGO = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(FALLBACK_LOGO_SVG);
 
 const SEED_LABS = [
   { id:'LAB-ELEC', name:'Electronics Lab',     description:'Microcontrollers, sensors, soldering & bench tools.' },
@@ -1063,7 +1091,8 @@ function defaultState() {
     settings: { ...DEFAULT_SETTINGS },
     activity: [], simOffsetMs: 0,
     students: {},
-    adminConfig: null
+    adminConfig: null,
+    branding: null
   };
 }
 let state = defaultState();
@@ -1083,6 +1112,112 @@ let pendingReturnLoanId = null;
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ─── BRAND LOGO ─── */
+function currentLogoSrc() {
+  return (state.branding && state.branding.logo) ? state.branding.logo : FALLBACK_LOGO;
+}
+function renderLogos() {
+  const src = currentLogoSrc();
+  document.querySelectorAll('img.brand-logo').forEach(img => {
+    if (img.src !== src) img.src = src;
+  });
+  const prev = $('brandLogoPreview');
+  if (prev) prev.src = src;
+  const st = $('logoStatusText');
+  if (st) st.textContent = (state.branding && state.branding.logo)
+    ? `Custom logo uploaded${state.branding.updatedBy ? ' by ' + state.branding.updatedBy : ''}${state.branding.updatedAt ? ' · ' + relTime(state.branding.updatedAt) : ''}`
+    : 'Default built-in logo';
+}
+function setLogo(dataUrl) {
+  state.branding = { logo: dataUrl, updatedAt: Date.now(), updatedBy: session.register || '' };
+  saveLocal(); publishKey('branding');
+  renderLogos();
+  toast('Logo updated everywhere.', 'success');
+}
+function handleLogoUpload(ev) {
+  if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { toast('Please choose an image file.', 'error'); return; }
+  if (file.size > 4 * 1024 * 1024) { toast('Image too large (max 4 MB).', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const raw = e.target.result;
+    // SVG: use directly (vector, tiny)
+    if (file.type === 'image/svg+xml') { setLogo(raw); return; }
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const MAXW = 900;
+        const scale = Math.min(1, MAXW / (img.naturalWidth || MAXW));
+        const w = Math.max(1, Math.round((img.naturalWidth || MAXW) * scale));
+        const h = Math.max(1, Math.round((img.naturalHeight || 200) * scale));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        setLogo(c.toDataURL('image/png'));
+      } catch (err) { console.error(err); setLogo(raw); }
+    };
+    img.onerror = () => toast('Could not read that image.', 'error');
+    img.src = raw;
+  };
+  reader.onerror = () => toast('Could not read that file.', 'error');
+  reader.readAsDataURL(file);
+}
+async function resetLogo() {
+  if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
+  const ok = await confirmDialog('Restore default logo', 'Remove the uploaded logo and go back to the built-in BAJAJ BEST logo on all devices?', 'Restore', true, 'fa-rotate-left');
+  if (!ok) return;
+  state.branding = null;
+  saveLocal(); publishKey('branding');
+  renderLogos();
+  toast('Default logo restored.', 'success');
+}
+
+/* ─── SAVED REGISTER NUMBERS (browser catalog) ─── */
+function getSavedRegisters() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(REGISTERS_KEY) || '[]');
+    return Array.isArray(raw) ? raw.filter(x => typeof x === 'string' && x) : [];
+  } catch { return []; }
+}
+function saveRegister(reg) {
+  const r = String(reg || '').trim().toUpperCase();
+  if (!r) return;
+  const list = getSavedRegisters().filter(x => x !== r);
+  list.unshift(r);
+  try { localStorage.setItem(REGISTERS_KEY, JSON.stringify(list.slice(0, 15))); } catch {}
+  renderSavedRegisters();
+}
+function removeSavedRegister(reg) {
+  const list = getSavedRegisters().filter(x => x !== reg);
+  try { localStorage.setItem(REGISTERS_KEY, JSON.stringify(list)); } catch {}
+  renderSavedRegisters();
+  toast(`Removed "${reg}" from saved register numbers.`, 'info', 2200);
+}
+function renderSavedRegisters() {
+  const list = getSavedRegisters();
+  const dl = $('registerList');
+  if (dl) dl.innerHTML = list.map(r => `<option value="${esc(r)}"></option>`).join('');
+  const row = $('savedRegistersRow');
+  if (row) {
+    row.innerHTML = list.length
+      ? `<span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Saved:</span>` +
+        list.slice(0, 6).map(r => `<button type="button" class="saved-reg-chip" onclick="useSavedRegister('${esc(r)}')" title="Click to fill · right-click to remove" oncontextmenu="event.preventDefault();removeSavedRegister('${esc(r)}')"><i class="fa-solid fa-id-badge"></i>${esc(r)}<span class="opacity-50" onclick="event.stopPropagation();removeSavedRegister('${esc(r)}')">×</span></button>`).join('')
+      : '';
+  }
+}
+function useSavedRegister(reg) {
+  const inp = $('loginRegister');
+  if (inp) { inp.value = reg; inp.focus(); }
+  const pw = $('loginPassword');
+  if (pw) pw.focus();
+}
 
 /* ─── THEME ─── */
 function applyTheme(theme) {
@@ -1188,9 +1323,7 @@ function logActivity(type, message) {
   state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() });
   if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY;
 }
-/* Normalize an identifier for case-insensitive comparison */
 function idKey(s) { return String(s || '').trim().toUpperCase(); }
-/* Does this loan belong to the signed-in student? */
 function isMyLoan(l) {
   if (session.role !== 'user' || !session.register) return false;
   const myKey = idKey(session.register);
@@ -1260,7 +1393,13 @@ function switchLoginTab(tab) {
     sh.classList.remove('hidden'); ah.classList.add('hidden');
     ts.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
     ta.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
-    setTimeout(() => $('loginRegister').focus(), 100);
+    setTimeout(() => {
+      const inp = $('loginRegister');
+      inp.focus();
+      // auto-fill the last register number saved in this browser
+      if (!inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
+      inp.select && inp.select();
+    }, 100);
   } else {
     sf.classList.add('hidden'); af.classList.remove('hidden');
     sh.classList.add('hidden'); ah.classList.remove('hidden');
@@ -1349,7 +1488,9 @@ function cancelLabPick() {
   pendingSession = null;
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  const inp = $('loginRegister');
+  if (!inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
   clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
 }
 
@@ -1376,6 +1517,7 @@ async function attemptStudentLogin() {
     const existing = students[reg];
     if (existing) {
       if (hash === existing.passwordHash) {
+        saveRegister(reg);                 // ← remember this register no. in the browser
         showLabPicker('user', reg, existing.name || reg);
       } else {
         showLoginError('Incorrect password.'); $('loginPassword').select();
@@ -1384,9 +1526,10 @@ async function attemptStudentLogin() {
     }
     if (!/^\d{8}$/.test(pw)) { showLoginError('First-time login: use your Date of Birth (ddmmyyyy).'); return; }
     state.students = state.students || {};
-    state.students[reg] = { register: reg, name: 'Student ' + reg, passwordHash: hash, createdAt: Date.now() };
+    state.students[reg] = { register: reg, name: reg, passwordHash: hash, createdAt: Date.now() };
     publishKey('students');
-    showLabPicker('user', reg, state.students[reg].name);
+    saveRegister(reg);                     // ← remember this register no. in the browser
+    showLabPicker('user', reg, reg);
     toast('Welcome! Your password is now your DOB.', 'success', 5000);
   } catch (e) { console.error(e); showLoginError('Login error. Please try again.'); }
   finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
@@ -1419,6 +1562,11 @@ async function attemptAdminLogin() {
 function enterApp(role, register, name, activeLabId) {
   session = { role, register, name, activeLabId: activeLabId || null };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
+  if (role === 'user') {
+    saveRegister(register);                // keep register no. in browser catalog
+    const inp = $('loginRegister');
+    if (inp) inp.value = register;         // printed/shown value always matches the signed-in student
+  }
   $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
   $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
@@ -1429,7 +1577,6 @@ function enterApp(role, register, name, activeLabId) {
   }
   applyRoleUI(); renderAll(); tick();
   checkOverdueForCurrentUser(true);
-  // Force an immediate re-render of loans so the timer elements exist right away
   renderLoans();
 }
 
@@ -1485,8 +1632,11 @@ function logout() {
   $('app').classList.add('hidden');
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  $('loginRegister').value = ''; $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
   $('adminUserInput').value = ''; $('adminPassInput').value = '';
+  // keep the saved register number visible (browser catalog)
+  const saved = getSavedRegisters();
+  $('loginRegister').value = saved.length ? saved[0] : '';
   clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
 }
 
@@ -1593,6 +1743,7 @@ function applyRemoteKey(key, val) {
   else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
   else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
   else if (key === 'adminConfig') state.adminConfig = (val && typeof val === 'object') ? val : null;
+  else if (key === 'branding') { state.branding = (val && typeof val === 'object' && val.logo) ? val : null; renderLogos(); }
   if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs') {
     migrateInventoryLabs();
     if (session.role === 'user' && session.activeLabId && !labById(session.activeLabId)) {
@@ -1660,6 +1811,7 @@ async function pullLatest() {
     SYNC_KEYS.forEach(key => applyRemoteKey(key, data[key]));
     lastRecvAt = Date.now();
     updateAuthScreen(); renderAll(); checkOverdueForCurrentUser(false);
+    renderLogos();
   } catch (e) {}
 }
 
@@ -1684,7 +1836,8 @@ function saveLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
     labs: state.labs, inventory: state.inventory, loans: state.loans, history: state.history,
     cart: state.cart, borrower: state.borrower, settings: state.settings,
-    activity: state.activity, students: state.students, adminConfig: state.adminConfig
+    activity: state.activity, students: state.students, adminConfig: state.adminConfig,
+    branding: state.branding
   })); } catch {}
 }
 function loadLocal() {
@@ -1702,7 +1855,8 @@ function loadLocal() {
       activity: Array.isArray(s.activity) ? s.activity : [],
       simOffsetMs: 0,
       students: (s.students && typeof s.students === 'object') ? s.students : {},
-      adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : null
+      adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : null,
+      branding: (s.branding && typeof s.branding === 'object' && s.branding.logo) ? s.branding : null
     };
     migrateInventoryLabs();
     sanitizeCart();
@@ -1716,7 +1870,6 @@ function checkOverdueForCurrentUser() {
     const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden');
     return;
   }
-  // Use isMyLoan so the check matches regardless of ID case
   const myOverdue = state.loans.filter(l => isMyLoan(l) && isOverdue(l, now()));
   const banner = $('overdueAlertBanner');
   if (banner) {
@@ -1911,7 +2064,6 @@ function openCart() {
   const idField = $('borrowerId');
   const isStudent = session.role === 'user';
   idField.value = isStudent ? (session.register || '') : (state.borrower.id || (session.register || ''));
-  // Lock the ID for students so their loans always match
   idField.readOnly = isStudent;
   idField.classList.toggle('opacity-60', isStudent);
   idField.classList.toggle('cursor-not-allowed', isStudent);
@@ -1963,7 +2115,6 @@ function renderCart() {
 function checkoutCart() {
   const name = $('borrowerName').value.trim();
   let idRef = $('borrowerId').value.trim();
-  // Students: force borrowerId = register so loans always match their session
   if (session.role === 'user' && session.register) idRef = session.register;
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
@@ -2004,7 +2155,6 @@ function visibleLoans() {
     const mine = myLabIds();
     return state.loans.filter(l => mine.includes(l.labId));
   }
-  // Students: show ALL their own loans, across every lab.
   return state.loans.filter(l => isMyLoan(l));
 }
 
@@ -2016,7 +2166,7 @@ function renderLoans() {
   $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
   $('loansSubheading').textContent = isAdminUser
     ? 'Verify the count and close the loan once the items are physically back.'
-    : 'All your loans across every lab · hand items back to the teacher shown on each card.';
+    : `All loans for register ${session.register || '—'} across every lab · hand items back to the teacher shown on each card.`;
 
   const bulkBtn = $('loansBulkBtn');
   if (bulkBtn) {
@@ -2238,6 +2388,7 @@ function renderDashboard() {
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
   renderLabsList(); renderTeachersList(); renderStudentsList();
+  renderLogos();
   const labsPanel = $('labsPanel');
   if (labsPanel) labsPanel.classList.toggle('hidden', !isSuperAdmin());
 }
@@ -2469,7 +2620,7 @@ function renderStudentsList() {
   else list.innerHTML = students.map(s => `<div class="flex items-center justify-between gap-2 rounded-lg border border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40 px-3 py-2">
     <div class="min-w-0">
       <div class="mono text-xs font-bold text-slate-200">${esc(s.register)}</div>
-      <div class="text-[10px] text-slate-500">${esc(s.name || 'Student')} · joined ${relTime(s.createdAt)}</div>
+      <div class="text-[10px] text-slate-500">${esc(s.name || s.register)} · joined ${relTime(s.createdAt)}</div>
     </div>
     <button onclick="resetStudentPassword('${esc(s.register)}')" class="shrink-0 text-[10px] font-semibold text-amber-400 hover:text-amber-300 transition">Reset password</button>
   </div>`).join('');
@@ -2614,6 +2765,7 @@ function renderPoster() {
   const url = getJoinUrl();
   $('posterUrlPreview').textContent = url;
   $('posterQrTarget').innerHTML = `<img crossorigin="anonymous" width="176" height="176" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=176x176&margin=6&data=${encodeURIComponent(url)}" class="rounded" />`;
+  renderLogos();
 }
 function onPosterInput() {
   state.settings.posterTitle = $('posterTitle').value;
@@ -2627,6 +2779,7 @@ async function downloadPoster() {
   const node = $('posterCanvas');
   const img = node.querySelector('#posterQrTarget img');
   if (img && !img.complete) await new Promise(r => { img.onload = r; img.onerror = r; });
+  renderLogos();
   html2canvas(node, { scale: 3, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
     const a = document.createElement('a'); a.download = 'bajaj-lending-poster.png'; a.href = canvas.toDataURL('image/png'); a.click();
     toast('Poster downloaded.', 'success');
@@ -2720,6 +2873,7 @@ function renderAll() {
   renderLoans();
   renderCart();
   updateBadges();
+  renderLogos();
   if (session.role === 'admin') {
     if (activeView === 'dashboard') renderDashboard();
     if (activeView === 'poster') renderPoster();
@@ -2734,7 +2888,6 @@ function tick() {
   const ct = $('clockTime'); if (ct) ct.textContent = fmtTime(t);
   const cd = $('clockDate'); if (cd) cd.textContent = fmtDate(t);
 
-  // Always update any visible timer elements (per-loan text nodes)
   state.loans.forEach(loan => {
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     const rem = Math.abs(loan.dueTimeMs - t);
@@ -2744,7 +2897,6 @@ function tick() {
     const e4 = document.querySelector(`[data-admin-elapsed="${loan.loanId}"]`); if (e4) e4.textContent = fmtDuration(elapsed);
   });
 
-  // Re-render the loans view when any status flips (active → due-soon → overdue)
   const visible = visibleLoans();
   const key = visible.map(l => (isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N')).join('') + '|' + (visible.length);
   if (key !== lastStatusKey) {
@@ -2760,6 +2912,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadLocal(); loadTheme();
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
   generateCaptcha();
+  renderLogos();
+  renderSavedRegisters();
+
+  // Pre-fill the last register number used on this browser
+  const savedRegs = getSavedRegisters();
+  if (savedRegs.length) $('loginRegister').value = savedRegs[0];
+
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.role && saved.register) {
@@ -2828,6 +2987,10 @@ window.deleteLab = deleteLab;
 window.pickLab = pickLab;
 window.cancelLabPick = cancelLabPick;
 window.switchLab = switchLab;
+window.handleLogoUpload = handleLogoUpload;
+window.resetLogo = resetLogo;
+window.useSavedRegister = useSavedRegister;
+window.removeSavedRegister = removeSavedRegister;
 </script>
 </body>
 </html>
