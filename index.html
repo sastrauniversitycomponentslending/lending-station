@@ -288,7 +288,7 @@
   </div>
 </div>
 
-<!-- LAB PICKER SCREEN (students only) -->
+<!-- LAB PICKER SCREEN -->
 <div id="labPickerScreen" class="fixed inset-0 z-[205] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-2xl py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
@@ -312,7 +312,7 @@
             <i class="fa-solid fa-user-graduate"></i> Signed in as <span id="labPickerUser" class="mono font-bold">—</span>
           </div>
           <p class="mt-3 text-xs leading-relaxed text-slate-500">
-            Which lab do you want to work in? Your catalog and loans will be filtered to this lab. You can switch any time later.
+            Which lab do you want to work in? Your catalog will be filtered to this lab. You can switch any time later.
           </p>
         </div>
         <div id="labPickerList" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
@@ -1015,8 +1015,8 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const STATION_NODE = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v8';
-const SESSION_KEY = 'bajaj.session.v8';
+const STORAGE_KEY = 'bajaj.lending.v9';
+const SESSION_KEY = 'bajaj.session.v9';
 const THEME_KEY = 'bajaj.theme.v2';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MAX_ACTIVITY = 40;
@@ -1188,6 +1188,16 @@ function logActivity(type, message) {
   state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() });
   if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY;
 }
+/* Normalize an identifier for case-insensitive comparison */
+function idKey(s) { return String(s || '').trim().toUpperCase(); }
+/* Does this loan belong to the signed-in student? */
+function isMyLoan(l) {
+  if (session.role !== 'user' || !session.register) return false;
+  const myKey = idKey(session.register);
+  if (idKey(l.borrowerId) === myKey) return true;
+  if (idKey(l.borrowerName) === myKey) return true;
+  return false;
+}
 
 /* ─── TOASTS / MODALS ─── */
 function toast(message, type='info', ttl=3500) {
@@ -1301,8 +1311,8 @@ function showLabPicker(role, register, name) {
     emptyEl.classList.add('hidden');
     listEl.innerHTML = state.labs.map(l => {
       const items = state.inventory.filter(i => i.labId === l.id).length;
-      const myLoans = state.loans.filter(x => x.labId === l.id && x.borrowerId === register).length;
-      const overdue = state.loans.filter(x => x.labId === l.id && x.borrowerId === register && isOverdue(x)).length;
+      const myLoans = state.loans.filter(x => x.labId === l.id && idKey(x.borrowerId) === idKey(register)).length;
+      const overdue = state.loans.filter(x => x.labId === l.id && idKey(x.borrowerId) === idKey(register) && isOverdue(x)).length;
       return `<button type="button" onclick="pickLab('${esc(l.id)}')" class="lab-pick-card">
         <div class="lab-pick-icon"><i class="fa-solid fa-building-columns"></i></div>
         <div class="min-w-0 flex-1">
@@ -1419,6 +1429,8 @@ function enterApp(role, register, name, activeLabId) {
   }
   applyRoleUI(); renderAll(); tick();
   checkOverdueForCurrentUser(true);
+  // Force an immediate re-render of loans so the timer elements exist right away
+  renderLoans();
 }
 
 function applyRoleUI() {
@@ -1537,6 +1549,7 @@ function go(view) {
   if (view === 'sync') renderSyncPage();
   if (view === 'dashboard') renderDashboard();
   if (view === 'catalog') renderCatalogLabTabs();
+  if (view === 'loans') renderLoans();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1703,7 +1716,8 @@ function checkOverdueForCurrentUser() {
     const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden');
     return;
   }
-  const myOverdue = state.loans.filter(l => l.borrowerId === session.register && isOverdue(l, now()));
+  // Use isMyLoan so the check matches regardless of ID case
+  const myOverdue = state.loans.filter(l => isMyLoan(l) && isOverdue(l, now()));
   const banner = $('overdueAlertBanner');
   if (banner) {
     if (myOverdue.length) {
@@ -1894,7 +1908,13 @@ function quickAdd() {
 /* ─── CART ─── */
 function openCart() {
   $('borrowerName').value = state.borrower.name || (session.name || '');
-  $('borrowerId').value = state.borrower.id || (session.register || '');
+  const idField = $('borrowerId');
+  const isStudent = session.role === 'user';
+  idField.value = isStudent ? (session.register || '') : (state.borrower.id || (session.register || ''));
+  // Lock the ID for students so their loans always match
+  idField.readOnly = isStudent;
+  idField.classList.toggle('opacity-60', isStudent);
+  idField.classList.toggle('cursor-not-allowed', isStudent);
   $('cartDrawer').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   renderCart();
@@ -1942,17 +1962,13 @@ function renderCart() {
 
 function checkoutCart() {
   const name = $('borrowerName').value.trim();
-  const idRef = $('borrowerId').value.trim();
+  let idRef = $('borrowerId').value.trim();
+  // Students: force borrowerId = register so loans always match their session
+  if (session.role === 'user' && session.register) idRef = session.register;
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
   if (!name) { toast('Borrower name required.', 'warn'); return; }
   if (!idRef) { toast('Student ID required.', 'warn'); return; }
-  if (session.role === 'user' && session.activeLabId) {
-    const foreign = entries.filter(([itemId]) => (findItem(itemId)||{}).labId !== session.activeLabId);
-    if (foreign.length) {
-      toast(`Items from other labs are in your cart. You are browsing ${labName(session.activeLabId)}.`, 'warn', 4500);
-    }
-  }
   for (const [itemId, qty] of entries) {
     const item = findItem(itemId);
     if (!item) { toast('A component no longer exists.', 'error'); return; }
@@ -1979,6 +1995,7 @@ function checkoutCart() {
   renderAll(); closeCart();
   toast(`Checkout complete — due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
   go('loans');
+  renderLoans();
 }
 
 /* ─── LOANS ─── */
@@ -1987,9 +2004,8 @@ function visibleLoans() {
     const mine = myLabIds();
     return state.loans.filter(l => mine.includes(l.labId));
   }
-  let list = state.loans.filter(l => l.borrowerId === session.register);
-  if (session.activeLabId) list = list.filter(l => l.labId === session.activeLabId);
-  return list;
+  // Students: show ALL their own loans, across every lab.
+  return state.loans.filter(l => isMyLoan(l));
 }
 
 function renderLoans() {
@@ -1997,11 +2013,10 @@ function renderLoans() {
   const t = now();
   const isAdminUser = session.role === 'admin';
 
-  const activeLab = session.role === 'user' && session.activeLabId ? labName(session.activeLabId) : null;
-  $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : (activeLab ? `My Loans · ${activeLab}` : 'My Borrowed Items');
+  $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
   $('loansSubheading').textContent = isAdminUser
     ? 'Verify the count and close the loan once the items are physically back.'
-    : 'Hand your items to a lab teacher — they will verify and close the loan.';
+    : 'All your loans across every lab · hand items back to the teacher shown on each card.';
 
   const bulkBtn = $('loansBulkBtn');
   if (bulkBtn) {
@@ -2012,9 +2027,7 @@ function renderLoans() {
   const loans = visibleLoans().slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
 
   if (!loans.length) {
-    const msg = session.role === 'user' && session.activeLabId
-      ? `No active loans in ${esc(activeLab)}.`
-      : 'No active loans';
+    const msg = isAdminUser ? 'No active loans in your labs.' : 'You have no active loans right now.';
     box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">${msg}</p><button onclick="go('catalog')" class="mt-5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-2 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 transition">Browse catalog</button></div>`;
     return;
   }
@@ -2084,11 +2097,6 @@ function openReturnVerify(loanId) {
   setTimeout(() => { const inp = $('returnVerifyCount'); inp.focus(); inp.select(); }, 120);
 }
 
-/* ─────────────────────────────────────────────────────────────
-   FIX: close the verify modal FIRST, then open the confirm dialog.
-   This eliminates any stacking-context / overlay conflict so the
-   confirm dialog is guaranteed to be visible and clickable.
-   ───────────────────────────────────────────────────────────── */
 async function confirmReturnVerify() {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   const loan = state.loans.find(l => l.loanId === pendingReturnLoanId);
@@ -2101,44 +2109,27 @@ async function confirmReturnVerify() {
   if (received < 0) { toast('Count cannot be negative.', 'warn'); return; }
   if (received > loan.quantity) { toast(`Cannot exceed ${loan.quantity} (expected on loan).`, 'warn'); return; }
 
-  // Capture everything we need, then close the verify modal and clear the pending id
   const loanRef = loan;
   const remaining = loan.quantity - received;
   pendingReturnLoanId = null;
-
-  // Close the verify modal FIRST so the confirm dialog opens by itself
   closeModal('mReturnVerify');
-
-  // Small delay to let the DOM settle before showing the confirm dialog
   await new Promise(r => setTimeout(r, 80));
 
   if (received === 0) {
-    const ok = await confirmDialog(
-      'Nothing received',
-      `You entered 0 — no components were physically returned. The loan will stay open.`,
-      'Keep open', false, 'fa-circle-info'
-    );
+    const ok = await confirmDialog('Nothing received', `You entered 0 — no components were physically returned. The loan will stay open.`, 'Keep open', false, 'fa-circle-info');
     if (!ok) return;
     toast('No items received. Loan remains open.', 'info');
     return;
   }
 
   if (received === loanRef.quantity) {
-    const ok = await confirmDialog(
-      'Confirm full return',
-      `Confirm you received all ${received} × "${loanRef.itemName}" from ${loanRef.borrowerName}.`,
-      'Confirm & close', false, 'fa-check'
-    );
+    const ok = await confirmDialog('Confirm full return', `Confirm you received all ${received} × "${loanRef.itemName}" from ${loanRef.borrowerName}.`, 'Confirm & close', false, 'fa-check');
     if (!ok) return;
     finalizeFullReturn(loanRef);
     return;
   }
 
-  const ok = await confirmDialog(
-    'Partial return',
-    `You received ${received} of ${loanRef.quantity}. ${remaining} unit(s) will remain on loan for ${loanRef.borrowerName}. Continue?`,
-    'Record partial', false, 'fa-clipboard-check'
-  );
+  const ok = await confirmDialog('Partial return', `You received ${received} of ${loanRef.quantity}. ${remaining} unit(s) will remain on loan for ${loanRef.borrowerName}. Continue?`, 'Record partial', false, 'fa-clipboard-check');
   if (!ok) return;
   finalizePartialReturn(loanRef, received, remaining);
 }
@@ -2742,6 +2733,8 @@ function tick() {
   const t = now();
   const ct = $('clockTime'); if (ct) ct.textContent = fmtTime(t);
   const cd = $('clockDate'); if (cd) cd.textContent = fmtDate(t);
+
+  // Always update any visible timer elements (per-loan text nodes)
   state.loans.forEach(loan => {
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     const rem = Math.abs(loan.dueTimeMs - t);
@@ -2750,7 +2743,10 @@ function tick() {
     const e3 = document.querySelector(`[data-bar="${loan.loanId}"]`); if (e3) e3.style.width = Math.min(100, (elapsed/loanMs())*100) + '%';
     const e4 = document.querySelector(`[data-admin-elapsed="${loan.loanId}"]`); if (e4) e4.textContent = fmtDuration(elapsed);
   });
-  const key = state.loans.map(l => isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N').join('');
+
+  // Re-render the loans view when any status flips (active → due-soon → overdue)
+  const visible = visibleLoans();
+  const key = visible.map(l => (isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N')).join('') + '|' + (visible.length);
   if (key !== lastStatusKey) {
     lastStatusKey = key;
     renderLoans(); renderOverview();
