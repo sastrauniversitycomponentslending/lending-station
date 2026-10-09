@@ -13,10 +13,7 @@
 <script>
   tailwind.config = {
     theme: { extend: {
-      fontFamily: {
-        sans: ['Inter','system-ui','sans-serif'],
-        mono: ['JetBrains Mono','ui-monospace','monospace']
-      },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'], mono: ['JetBrains Mono','ui-monospace','monospace'] },
       colors: {
         ink: { 950:'#05080f',900:'#0a0f1a',850:'#0e1421',800:'#131b2a',750:'#182233',700:'#1e2a3d',600:'#2b3a52',500:'#3d4f6b' },
         brand: { 50:'#eef4ff',100:'#dde7ff',200:'#bcd0ff',300:'#90aeff',400:'#5b83fc',500:'#3b62f6',600:'#2544eb',700:'#1d33d8',800:'#1e2caf',900:'#1e2b8a' },
@@ -24,12 +21,9 @@
         neon: { pink:'#ff3d9a', violet:'#8b5cf6', cyan:'#22d3ee', lime:'#a3e635', amber:'#fbbf24' }
       },
       boxShadow: {
-        'glow-sm': '0 0 12px -2px rgba(59,98,246,.45)',
-        'glow': '0 0 24px -4px rgba(59,98,246,.55)',
-        'glow-pink': '0 0 24px -4px rgba(255,61,154,.55)',
-        'glow-cyan': '0 0 24px -4px rgba(34,211,238,.55)',
-        'glow-lime': '0 0 24px -4px rgba(163,230,53,.5)',
-        'card': '0 8px 32px -12px rgba(0,0,0,.5)',
+        'glow-sm': '0 0 12px -2px rgba(59,98,246,.45)', 'glow': '0 0 24px -4px rgba(59,98,246,.55)',
+        'glow-pink': '0 0 24px -4px rgba(255,61,154,.55)', 'glow-cyan': '0 0 24px -4px rgba(34,211,238,.55)',
+        'glow-lime': '0 0 24px -4px rgba(163,230,53,.5)', 'card': '0 8px 32px -12px rgba(0,0,0,.5)',
         'lift': '0 12px 40px -12px rgba(0,0,0,.7)'
       },
       keyframes: {
@@ -38,8 +32,7 @@
         'gradientShift': { '0%,100%': { backgroundPosition:'0% 50%' }, '50%': { backgroundPosition:'100% 50%' } }
       },
       animation: {
-        'float': 'float 4s ease-in-out infinite',
-        'glowPulse': 'glowPulse 3s ease-in-out infinite',
+        'float': 'float 4s ease-in-out infinite', 'glowPulse': 'glowPulse 3s ease-in-out infinite',
         'gradient': 'gradientShift 8s ease infinite'
       }
     }}
@@ -54,19 +47,10 @@
 <style>
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body {
-    transition: background-color .3s ease, color .3s ease;
-    overflow-x: hidden;
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
+  body { transition: background-color .3s ease, color .3s ease; overflow-x: hidden; padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
   .mono { font-family:'JetBrains Mono',monospace; font-variant-numeric: tabular-nums; }
   .glass { background: linear-gradient(180deg, rgba(19,27,42,.85), rgba(14,20,33,.85)); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
-
-  /* ─── Animated background orbs ─── */
   .orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: .22; pointer-events: none; z-index: 0; }
-
-  /* ─── Animations ─── */
   .fade-up { animation: fadeUp .3s cubic-bezier(.16,1,.3,1); }
   @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
   .scale-in { animation: scaleIn .2s cubic-bezier(.16,1,.3,1); }
@@ -75,95 +59,45 @@
   .overdue-pulse { animation: pulseRing 2s infinite; }
   @keyframes shakeAlert { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
   .shake-alert { animation: shakeAlert .4s ease-in-out 3; }
-  @keyframes shimmer { 100% { transform: translateX(100%); } }
-  .shimmer { position: relative; overflow: hidden; }
-  .shimmer::after { content:''; position:absolute; inset:0; transform:translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); animation: shimmer 2s infinite; }
   @keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.85); } }
   .pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
-
-  /* ─── Navigation ─── */
   .nav-btn { position: relative; }
   .nav-btn::after { content:''; position:absolute; left:12px; right:12px; bottom:-1px; height:3px; background: linear-gradient(90deg,#3b62f6,#22d3ee); border-radius:2px; transform: scaleX(0); transition: transform .25s; }
   .nav-btn.active::after { transform: scaleX(1); }
-
   .line-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
   .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
   input[type=number] { -moz-appearance:textfield; }
   .focus-ring:focus-visible { outline:none; box-shadow: 0 0 0 2px currentColor, 0 0 0 4px rgba(59,98,246,.5); }
   .tab-pill { transition: all .2s ease; }
-
-  /* ─── Gradient text ─── */
   .gradient-text { background: linear-gradient(135deg, #5b83fc 0%, #8b5cf6 50%, #22d3ee 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradientShift 6s ease infinite; }
   .gradient-text-warm { background: linear-gradient(135deg, #fbbf24 0%, #ff3d9a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-
-  /* ─── Cards with gradient borders ─── */
   .card-gradient { position: relative; }
   .card-gradient::before { content:''; position:absolute; inset:0; padding:1px; border-radius: inherit; background: linear-gradient(135deg, rgba(91,131,252,.5), rgba(139,92,246,.3), rgba(34,211,238,.4)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
-
-  /* ─── Mobile: better tap targets, stack fixes ─── */
   @media (max-width: 640px) {
     .grid-mobile-1 { grid-template-columns: 1fr !important; }
     button, a { min-height: 40px; }
     .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .mobile-scroll-x::-webkit-scrollbar { height: 4px; }
   }
-
-  /* ─── Theme toggle switch styling ─── */
-  .theme-switch {
-    width: 56px; height: 32px; border-radius: 999px;
-    position: relative;
-    transition: background .3s ease;
-    cursor: pointer;
-    border: 1px solid rgba(148,163,184,.25);
-  }
-  .theme-switch .knob {
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    box-shadow: 0 2px 8px rgba(251,191,36,.5);
-    transition: all .3s cubic-bezier(.4,.2,.2,1);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: #422006;
-  }
-  .theme-switch.light .knob {
-    left: calc(100% - 27px);
-    background: linear-gradient(135deg, #3b62f6, #8b5cf6);
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(59,98,246,.5);
-  }
-
+  .theme-switch { width: 56px; height: 32px; border-radius: 999px; position: relative; transition: background .3s ease; cursor: pointer; border: 1px solid rgba(148,163,184,.25); }
+  .theme-switch .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #f59e0b); box-shadow: 0 2px 8px rgba(251,191,36,.5); transition: all .3s cubic-bezier(.4,.2,.2,1); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #422006; }
+  .theme-switch.light .knob { left: calc(100% - 27px); background: linear-gradient(135deg, #3b62f6, #8b5cf6); color: #ffffff; box-shadow: 0 2px 8px rgba(59,98,246,.5); }
   @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
 
-  /* ══════════════════════════════════════════════════════════
-     LIGHT THEME — vibrant, colorful, high-contrast
-     ══════════════════════════════════════════════════════════ */
-  body.theme-light {
-    background-color: #f5f7fc !important;
-    background-image:
-      radial-gradient(circle at 10% 0%, rgba(91,131,252,.10), transparent 45%),
-      radial-gradient(circle at 90% 5%, rgba(139,92,246,.10), transparent 45%),
-      radial-gradient(circle at 50% 100%, rgba(34,211,238,.08), transparent 50%) !important;
-    color: #0f172a !important;
-  }
+  body.theme-light { background-color: #f5f7fc !important; background-image: radial-gradient(circle at 10% 0%, rgba(91,131,252,.10), transparent 45%), radial-gradient(circle at 90% 5%, rgba(139,92,246,.10), transparent 45%), radial-gradient(circle at 50% 100%, rgba(34,211,238,.08), transparent 50%) !important; color: #0f172a !important; }
   body.theme-light .orb { display: none; }
-
   body.theme-light .bg-ink-950 { background-color: #f5f7fc !important; }
   body.theme-light .bg-ink-900 { background-color: #ffffff !important; }
   body.theme-light .bg-ink-850 { background-color: #ffffff !important; }
   body.theme-light .bg-ink-800 { background-color: #f1f5fb !important; }
   body.theme-light .bg-ink-750 { background-color: #e5ebf5 !important; }
   body.theme-light .bg-ink-700 { background-color: #d6dfec !important; }
-
   body.theme-light [class*="bg-ink-950\/"] { background-color: rgba(255,255,255,.92) !important; }
   body.theme-light [class*="bg-ink-900\/"] { background-color: #ffffff !important; }
   body.theme-light [class*="bg-ink-850\/"] { background-color: #ffffff !important; }
   body.theme-light [class*="bg-ink-800\/"] { background-color: #f8fafd !important; }
   body.theme-light [class*="bg-ink-750\/"] { background-color: #eef3fa !important; }
-
   body.theme-light .text-white { color: #0a1120 !important; }
   body.theme-light .text-slate-100 { color: #1a2332 !important; }
   body.theme-light .text-slate-200 { color: #1f2a3d !important; }
@@ -171,171 +105,56 @@
   body.theme-light .text-slate-400 { color: #566a86 !important; }
   body.theme-light .text-slate-500 { color: #7084a1 !important; }
   body.theme-light .text-slate-600 { color: #8a9bb6 !important; }
-
   body.theme-light [class*="border-ink-"] { border-color: #e0e7f1 !important; }
-  body.theme-light [class*="border-slate-6"],
-  body.theme-light [class*="border-slate-7"] { border-color: #e0e7f1 !important; }
+  body.theme-light [class*="border-slate-6"], body.theme-light [class*="border-slate-7"] { border-color: #e0e7f1 !important; }
   body.theme-light [class*="divide-ink-"] { border-color: #e8eef6 !important; }
-
-  body.theme-light .glass {
-    background: rgba(255,255,255,.9) !important;
-    border-bottom: 1px solid #e0e7f1 !important;
-    box-shadow: 0 1px 3px rgba(15,23,42,.04) !important;
-  }
-
-  body.theme-light .grid-bg {
-    background-image:
-      linear-gradient(rgba(15,23,42,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(15,23,42,.05) 1px, transparent 1px) !important;
-  }
-  body.theme-light [class*="from-ink-850"][class*="via-ink-900"] {
-    background: linear-gradient(135deg,
-      #eef4ff 0%,
-      #ffffff 35%,
-      #f5f0ff 70%,
-      #eefaff 100%) !important;
-    border-color: #d8e3f3 !important;
-  }
-
-  body.theme-light [class*="border-bajaj-500\/30"][class*="bg-bajaj-500\/10"] {
-    background: linear-gradient(135deg, rgba(10,146,235,.12), rgba(139,92,246,.10)) !important;
-    border-color: rgba(10,146,235,.35) !important;
-    color: #0369a1 !important;
-  }
-
-  /* ── VIBRANT COLOR SYSTEM ── */
-
+  body.theme-light .glass { background: rgba(255,255,255,.9) !important; border-bottom: 1px solid #e0e7f1 !important; box-shadow: 0 1px 3px rgba(15,23,42,.04) !important; }
+  body.theme-light [class*="from-ink-850"][class*="via-ink-900"] { background: linear-gradient(135deg, #eef4ff 0%, #ffffff 35%, #f5f0ff 70%, #eefaff 100%) !important; border-color: #d8e3f3 !important; }
+  body.theme-light [class*="border-bajaj-500\/30"][class*="bg-bajaj-500\/10"] { background: linear-gradient(135deg, rgba(10,146,235,.12), rgba(139,92,246,.10)) !important; border-color: rgba(10,146,235,.35) !important; color: #0369a1 !important; }
   body.theme-light [class*="bg-brand-600"] { background: linear-gradient(135deg,#2544eb,#3b62f6) !important; color:#ffffff !important; }
-  body.theme-light [class*="bg-brand-600"]:hover,
   body.theme-light [class*="hover:bg-brand-500"]:hover { background: linear-gradient(135deg,#3b62f6,#5b83fc) !important; }
   body.theme-light [class*="bg-brand-500\/"] { background-color: rgba(59,98,246,.13) !important; }
-  body.theme-light [class*="bg-brand-500\/10"] { background-color: rgba(59,98,246,.10) !important; }
-  body.theme-light [class*="bg-brand-500\/15"] { background-color: rgba(59,98,246,.14) !important; }
-  body.theme-light [class*="bg-brand-500\/20"] { background-color: rgba(59,98,246,.18) !important; }
-  body.theme-light [class*="bg-brand-500\/25"] { background-color: rgba(59,98,246,.22) !important; }
-  body.theme-light [class*="bg-brand-500\/30"] { background-color: rgba(59,98,246,.26) !important; }
-  body.theme-light .text-brand-300,
-  body.theme-light .text-brand-400 { color: #1d33d8 !important; }
+  body.theme-light .text-brand-300, body.theme-light .text-brand-400 { color: #1d33d8 !important; }
   body.theme-light [class*="border-brand-500\/"] { border-color: rgba(59,98,246,.4) !important; }
-  body.theme-light [class*="from-brand-600"] { --tw-gradient-from: #2544eb !important; }
-  body.theme-light [class*="from-brand-500"] { --tw-gradient-from: #3b62f6 !important; }
-  body.theme-light [class*="to-brand-700"] { --tw-gradient-to: #1d33d8 !important; }
-  body.theme-light [class*="to-brand-400"] { --tw-gradient-to: #5b83fc !important; }
-
   body.theme-light [class*="bg-emerald-600"] { background: linear-gradient(135deg,#059669,#10b981) !important; color:#ffffff !important; }
-  body.theme-light [class*="bg-emerald-600"]:hover,
   body.theme-light [class*="hover:bg-emerald-500"]:hover { background: linear-gradient(135deg,#10b981,#34d399) !important; }
   body.theme-light [class*="bg-emerald-500\/"] { background-color: rgba(5,150,105,.12) !important; }
-  body.theme-light [class*="bg-emerald-500\/10"] { background-color: rgba(5,150,105,.10) !important; }
-  body.theme-light [class*="bg-emerald-500\/20"] { background-color: rgba(5,150,105,.16) !important; }
-  body.theme-light [class*="bg-emerald-500\/25"] { background-color: rgba(5,150,105,.20) !important; }
-  body.theme-light .text-emerald-300,
-  body.theme-light .text-emerald-400 { color: #047857 !important; }
+  body.theme-light .text-emerald-300, body.theme-light .text-emerald-400 { color: #047857 !important; }
   body.theme-light [class*="border-emerald-500\/"] { border-color: rgba(5,150,105,.4) !important; }
-  body.theme-light [class*="from-emerald-500"] { --tw-gradient-from: #059669 !important; }
-
   body.theme-light [class*="bg-amber-600"] { background: linear-gradient(135deg,#d97706,#f59e0b) !important; color:#ffffff !important; }
   body.theme-light [class*="bg-amber-500\/"] { background-color: rgba(217,119,6,.12) !important; }
-  body.theme-light [class*="bg-amber-500\/10"] { background-color: rgba(217,119,6,.10) !important; }
-  body.theme-light [class*="bg-amber-500\/20"] { background-color: rgba(217,119,6,.16) !important; }
-  body.theme-light [class*="bg-amber-500\/25"] { background-color: rgba(217,119,6,.20) !important; }
-  body.theme-light .text-amber-300,
-  body.theme-light .text-amber-400 { color: #b45309 !important; }
+  body.theme-light .text-amber-300, body.theme-light .text-amber-400 { color: #b45309 !important; }
   body.theme-light [class*="border-amber-500\/"] { border-color: rgba(217,119,6,.4) !important; }
-
   body.theme-light [class*="bg-rose-600"] { background: linear-gradient(135deg,#e11d48,#f43f5e) !important; color:#ffffff !important; }
-  body.theme-light [class*="bg-rose-600"]:hover,
   body.theme-light [class*="hover:bg-rose-500"]:hover { background: linear-gradient(135deg,#f43f5e,#fb7185) !important; }
   body.theme-light [class*="bg-rose-500\/"] { background-color: rgba(225,29,72,.12) !important; }
-  body.theme-light [class*="bg-rose-500\/10"] { background-color: rgba(225,29,72,.10) !important; }
-  body.theme-light [class*="bg-rose-500\/20"] { background-color: rgba(225,29,72,.16) !important; }
-  body.theme-light [class*="bg-rose-500\/25"] { background-color: rgba(225,29,72,.20) !important; }
-  body.theme-light [class*="bg-rose-500\/30"] { background-color: rgba(225,29,72,.24) !important; }
-  body.theme-light .text-rose-300,
-  body.theme-light .text-rose-400 { color: #be123c !important; }
+  body.theme-light .text-rose-300, body.theme-light .text-rose-400 { color: #be123c !important; }
   body.theme-light [class*="border-rose-500\/"] { border-color: rgba(225,29,72,.4) !important; }
   body.theme-light [class*="bg-rose-950"] { background-color: #fef2f2 !important; }
   body.theme-light [class*="bg-rose-900"] { background-color: #fee2e2 !important; }
-
   body.theme-light [class*="bg-slate-500\/10"] { background-color: #f1f5f9 !important; }
   body.theme-light [class*="border-slate-500\/30"] { border-color: #e0e7f1 !important; }
-
-  body.theme-light [class*="from-brand-950\/40"] {
-    background: linear-gradient(90deg, #eef3ff 0%, #f5f7fc 100%) !important;
-    border-color: rgba(59,98,246,.3) !important;
-  }
-  body.theme-light [class*="from-emerald-950\/30"] {
-    background: linear-gradient(135deg, #ecfdf5 0%, #f5f7fc 50%, #f0fdff 100%) !important;
-    border-color: rgba(5,150,105,.3) !important;
-  }
-
-  body.theme-light .overdue-pulse {
-    animation: pulseRingLight 2s infinite !important;
-    background: #fef2f2 !important;
-    border-color: #f43f5e !important;
-  }
-  @keyframes pulseRingLight {
-    0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.4); }
-    50% { box-shadow: 0 0 0 14px rgba(244,63,94,0); }
-  }
-
-  body.theme-light input,
-  body.theme-light textarea,
-  body.theme-light select {
-    background-color: #ffffff !important;
-    color: #0a1120 !important;
-    border-color: #d6dfec !important;
-  }
-  body.theme-light input::placeholder,
-  body.theme-light textarea::placeholder { color: #9aabc5 !important; }
-  body.theme-light input:focus,
-  body.theme-light textarea:focus,
-  body.theme-light select:focus {
-    border-color: #3b62f6 !important;
-    box-shadow: 0 0 0 3px rgba(59,98,246,.15) !important;
-  }
-
+  body.theme-light [class*="from-brand-950\/40"] { background: linear-gradient(90deg, #eef3ff 0%, #f5f7fc 100%) !important; border-color: rgba(59,98,246,.3) !important; }
+  body.theme-light .overdue-pulse { animation: pulseRingLight 2s infinite !important; background: #fef2f2 !important; border-color: #f43f5e !important; }
+  @keyframes pulseRingLight { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.4); } 50% { box-shadow: 0 0 0 14px rgba(244,63,94,0); } }
+  body.theme-light input, body.theme-light textarea, body.theme-light select { background-color: #ffffff !important; color: #0a1120 !important; border-color: #d6dfec !important; }
+  body.theme-light input::placeholder, body.theme-light textarea::placeholder { color: #9aabc5 !important; }
+  body.theme-light input:focus, body.theme-light textarea:focus, body.theme-light select:focus { border-color: #3b62f6 !important; box-shadow: 0 0 0 3px rgba(59,98,246,.15) !important; }
   body.theme-light .theme-switch { background: #ffffff; border-color: #d6dfec; }
-
   body.theme-light ::-webkit-scrollbar-thumb { background: #c8d3e3 !important; }
-  body.theme-light ::-webkit-scrollbar-thumb:hover { background: #a8b6cd !important; }
-
-  body.theme-light .kbd {
-    background: #f1f5f9 !important;
-    border-color: #d6dfec !important;
-    color: #475569 !important;
-  }
-
   body.theme-light [class*="hover:bg-ink-800"]:hover { background-color: #eef3fa !important; }
   body.theme-light [class*="hover:bg-ink-700"]:hover { background-color: #e0e7f1 !important; }
-  body.theme-light [class*="hover:bg-ink-800\/"]:hover { background-color: #f5f7fc !important; }
   body.theme-light [class*="hover:text-white"]:hover { color: #0a1120 !important; }
   body.theme-light [class*="hover:text-slate-200"]:hover { color: #1f2a3d !important; }
   body.theme-light [class*="hover:border-ink-500"]:hover { border-color: #c8d3e3 !important; }
   body.theme-light [class*="hover:border-ink-600"]:hover { border-color: #c8d3e3 !important; }
-
-  body.theme-light #toasts > div {
-    background: #ffffff !important;
-    border-color: #e0e7f1 !important;
-    box-shadow: 0 12px 40px -12px rgba(15,23,42,.2) !important;
-  }
+  body.theme-light #toasts > div { background: #ffffff !important; border-color: #e0e7f1 !important; box-shadow: 0 12px 40px -12px rgba(15,23,42,.2) !important; }
   body.theme-light #toasts > div p { color: #1f2a3d !important; }
-
   body.theme-light thead[class*="bg-ink-900\/60"] { background-color: #f5f7fc !important; }
-
   body.theme-light [class*="bg-ink-950\/8"] { background-color: rgba(15,23,42,.5) !important; }
   body.theme-light [class*="bg-ink-950\/7"] { background-color: rgba(15,23,42,.5) !important; }
+  body.theme-light #overdueAlertBanner > div { background: linear-gradient(135deg, #fef2f2, #fff1f2) !important; border-color: #f43f5e !important; }
 
-  body.theme-light #overdueAlertBanner > div {
-    background: linear-gradient(135deg, #fef2f2, #fff1f2) !important;
-    border-color: #f43f5e !important;
-  }
-
-  @media (max-width: 640px) {
-    body.theme-light .grid-bg { background-size: 24px 24px !important; }
-  }
-
-  /* Lab chip */
   .lab-chip { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.1rem .5rem; font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
   .lab-chip-0 { background: rgba(59,98,246,.15); color:#90aeff; border:1px solid rgba(59,98,246,.4); }
   .lab-chip-1 { background: rgba(34,211,238,.15); color:#67e8f9; border:1px solid rgba(34,211,238,.4); }
@@ -354,14 +173,11 @@
 
 <body class="min-h-screen bg-ink-950 font-sans text-slate-200 antialiased">
 
-<!-- Decorative animated orbs (dark mode only) -->
 <div class="orb" style="width:400px;height:400px;background:#3b62f6;top:-100px;left:-100px;"></div>
 <div class="orb" style="width:350px;height:350px;background:#8b5cf6;top:40%;right:-150px;"></div>
 <div class="orb" style="width:300px;height:300px;background:#22d3ee;bottom:-100px;left:20%;"></div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SETUP SCREEN
-     ═══════════════════════════════════════════════════════ -->
+<!-- SETUP SCREEN -->
 <div id="setupScreen" class="fixed inset-0 z-[210] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
@@ -375,7 +191,6 @@
         <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
       </svg>
     </div>
-
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">First-Time Setup · Create Head Teacher</h1>
@@ -386,27 +201,18 @@
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Teacher No</label>
-          <input id="setupTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
-                 onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()"
-                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
+          <input id="setupTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)" onkeydown="if(event.key==='Enter')document.getElementById('setupPassword').focus()" class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Password</label>
-          <input id="setupPassword" type="password" autocomplete="new-password" placeholder="min 6 characters"
-                 onkeydown="if(event.key==='Enter')document.getElementById('setupConfirm').focus()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+          <input id="setupPassword" type="password" autocomplete="new-password" placeholder="min 6 characters" onkeydown="if(event.key==='Enter')document.getElementById('setupConfirm').focus()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-36 shrink-0">Confirm Password</label>
-          <input id="setupConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
-                 onkeydown="if(event.key==='Enter')completeSetup()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+          <input id="setupConfirm" type="password" autocomplete="new-password" placeholder="repeat password" onkeydown="if(event.key==='Enter')completeSetup()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
-        <button id="setupBtn" onclick="completeSetup()"
-                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
-          <i class="fa-solid fa-user-plus text-xs"></i>
-          <span id="setupBtnText">Create Head Teacher</span>
+        <button id="setupBtn" onclick="completeSetup()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-plus text-xs"></i><span id="setupBtnText">Create Head Teacher</span>
         </button>
         <p id="setupError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
       </div>
@@ -414,9 +220,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     LOGIN SCREEN
-     ═══════════════════════════════════════════════════════ -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="fixed inset-0 z-[200] hidden items-center justify-center bg-gradient-to-br from-slate-100 via-white to-bajaj-50 p-3 sm:p-4 overflow-y-auto">
   <div class="w-full max-w-lg py-6 sm:py-8">
     <div class="mb-5 sm:mb-6 flex justify-center">
@@ -430,7 +234,6 @@
         <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
       </svg>
     </div>
-
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
       <div class="flex border-b border-slate-200 bg-slate-50">
         <button id="tabStudent" onclick="switchLoginTab('student')" class="tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500">
@@ -440,40 +243,30 @@
           <i class="fa-solid fa-user-shield mr-1.5"></i> Teacher
         </button>
       </div>
-
       <div id="studentHeader" class="bg-gradient-to-r from-bajaj-500 via-bajaj-600 to-bajaj-700 py-3.5 text-center">
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Student Web Interface</h1>
       </div>
       <div id="adminHeader" class="hidden bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Teacher Login</h1>
       </div>
-
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Register No</label>
-          <input id="loginRegister" type="text" autocomplete="username" placeholder="e.g. STU001"
-                 onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
+          <input id="loginRegister" type="text" autocomplete="username" placeholder="e.g. STU001" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy"
-                 onkeydown="if(event.key==='Enter')document.getElementById('loginCaptchaInput').focus()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy" onkeydown="if(event.key==='Enter')document.getElementById('loginCaptchaInput').focus()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Enter captcha</label>
           <div class="flex items-center gap-3 w-full sm:flex-1">
-            <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off"
-                   onkeydown="if(event.key==='Enter')attemptStudentLogin()"
-                   class="w-24 sm:w-28 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
+            <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')attemptStudentLogin()" class="w-24 sm:w-28 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
             <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()"></canvas>
           </div>
         </div>
-        <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
-                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
-          <i class="fa-solid fa-right-to-bracket text-xs"></i>
-          <span id="loginSubmitText">Submit</span>
+        <button id="loginSubmitBtn" onclick="attemptStudentLogin()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
+          <i class="fa-solid fa-right-to-bracket text-xs"></i><span id="loginSubmitText">Submit</span>
         </button>
         <div class="text-right">
           <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-700 underline decoration-dotted hover:text-bajaj-900">Forgot password?</button>
@@ -482,28 +275,19 @@
           <p>First login: use your <b class="text-slate-700">Date of Birth</b> (ddmmyyyy).</p>
         </div>
       </div>
-
       <div id="adminForm" class="hidden p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Teacher No</label>
-          <input id="adminUserInput" type="text" maxlength="12" autocomplete="username" placeholder="min 4 characters"
-                 oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
-                 onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()"
-                 class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
+          <input id="adminUserInput" type="text" maxlength="12" autocomplete="username" placeholder="min 4 characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)" onkeydown="if(event.key==='Enter')document.getElementById('adminPassInput').focus()" class="mono w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.2em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-rose-500 focus:outline-none" />
         </div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
-          <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="••••••••"
-                 onkeydown="if(event.key==='Enter')attemptAdminLogin()"
-                 class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
+          <input id="adminPassInput" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')attemptAdminLogin()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none" />
         </div>
-        <button id="adminLoginBtn" onclick="attemptAdminLogin()"
-                class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
-          <i class="fa-solid fa-user-shield text-xs"></i>
-          <span id="adminLoginBtnText">Sign in as Teacher</span>
+        <button id="adminLoginBtn" onclick="attemptAdminLogin()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-600 hover:to-rose-800 disabled:opacity-60">
+          <i class="fa-solid fa-user-shield text-xs"></i><span id="adminLoginBtnText">Sign in as Teacher</span>
         </button>
       </div>
-
       <div class="px-5 sm:px-7 pb-5 sm:pb-6 space-y-3">
         <p id="loginError" class="hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-center text-xs font-semibold text-rose-700"></p>
         <p id="loginInfo" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-center text-xs font-semibold text-emerald-700"></p>
@@ -512,15 +296,10 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIN APP
-     ═══════════════════════════════════════════════════════ -->
+<!-- MAIN APP -->
 <div id="app" class="hidden min-h-screen flex flex-col relative z-10">
-
-<!-- HEADER -->
 <header class="glass sticky top-0 z-50 border-b border-ink-700/60">
   <div class="mx-auto flex max-w-[1400px] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 lg:px-6">
-
     <button onclick="go('overview')" class="focus-ring flex shrink-0 items-center gap-2 sm:gap-3 rounded-xl p-0.5 sm:p-1">
       <svg viewBox="0 0 500 130" class="h-8 sm:h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="5" width="120" height="120" fill="#1e5fa8"/>
@@ -532,7 +311,6 @@
         <text x="142" y="118" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#1e5fa8">SKILLS TRAINING</text>
       </svg>
     </button>
-
     <nav class="ml-2 hidden items-center gap-0.5 lg:flex">
       <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-gauge-high mr-2 text-xs"></i>Overview</button>
       <button data-nav="catalog" onclick="go('catalog')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-boxes-stacked mr-2 text-xs"></i>Catalog</button>
@@ -541,13 +319,10 @@
       <button id="navPoster" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
       <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
     </nav>
-
     <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
       <div id="syncPill" class="hidden md:flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-2.5 py-1.5 text-[11px] font-medium text-slate-400">
-        <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span>
-        <span id="syncPillText">Offline</span>
+        <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span><span id="syncPillText">Offline</span>
       </div>
-
       <div class="hidden xl:flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3 py-1.5">
         <i class="fa-regular fa-clock text-[11px] text-amber-400"></i>
         <div class="leading-none">
@@ -555,17 +330,13 @@
           <div id="clockDate" class="mt-0.5 text-[9px] text-slate-500">--</div>
         </div>
       </div>
-
       <button id="themeSwitch" onclick="toggleTheme()" title="Toggle theme" class="theme-switch focus-ring" aria-label="Toggle theme">
         <span class="knob"><i id="themeIcon" class="fa-solid fa-sun"></i></span>
       </button>
-
       <button onclick="openCart()" class="focus-ring relative flex items-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3 sm:px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 active:scale-[.97] transition">
-        <i class="fa-solid fa-cart-shopping text-[11px]"></i>
-        <span class="hidden sm:inline">Cart</span>
+        <i class="fa-solid fa-cart-shopping text-[11px]"></i><span class="hidden sm:inline">Cart</span>
         <span id="cartCount" class="hidden min-w-[18px] rounded-full bg-white/30 px-1.5 py-0.5 text-[10px] font-extrabold">0</span>
       </button>
-
       <div class="relative">
         <button onclick="toggleUserMenu()" class="focus-ring flex items-center gap-1.5 sm:gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-medium text-slate-300 hover:border-brand-500/50 hover:text-white transition">
           <div class="grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-bajaj-500 to-brand-600 text-[10px] font-bold text-white" id="userAvatar">?</div>
@@ -589,7 +360,6 @@
       </div>
     </div>
   </div>
-
   <nav class="flex gap-1 overflow-x-auto border-t border-ink-700/60 px-2 sm:px-3 py-2 lg:hidden mobile-scroll-x">
     <button data-nav="overview" onclick="go('overview')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Overview</button>
     <button data-nav="catalog" onclick="go('catalog')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Catalog</button>
@@ -600,7 +370,6 @@
   </nav>
 </header>
 
-<!-- Overdue banner -->
 <div id="overdueAlertBanner" class="hidden mx-auto w-full max-w-[1400px] px-3 sm:px-4 pt-3 sm:pt-4 lg:px-6">
   <div class="overdue-pulse flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-2xl border-2 border-rose-500 bg-rose-950/40 p-3.5 sm:p-4">
     <div class="grid h-10 w-10 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 text-white shadow-lg shadow-rose-500/40">
@@ -616,20 +385,18 @@
 
 <main class="mx-auto w-full max-w-[1400px] flex-1 px-3 sm:px-4 py-4 sm:py-6 lg:px-6 lg:py-8">
 
-<!-- ══════════════ OVERVIEW ══════════════ -->
+<!-- OVERVIEW -->
 <section id="view-overview" class="space-y-4 sm:space-y-6">
   <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-ink-700/60 bg-gradient-to-br from-ink-850 via-ink-900 to-ink-950 p-5 sm:p-8 lg:p-9">
     <div class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 sm:h-72 sm:w-72 rounded-full bg-bajaj-500/20 blur-3xl animate-glowPulse"></div>
     <div class="pointer-events-none absolute -left-24 -bottom-24 h-56 w-56 sm:h-72 sm:w-72 rounded-full bg-neon-violet/15 blur-3xl animate-glowPulse" style="animation-delay: 1.5s;"></div>
-
     <div class="relative flex flex-col gap-6 lg:gap-8 lg:flex-row lg:items-center lg:justify-between">
       <div class="max-w-2xl">
         <div class="mb-3 sm:mb-4 inline-flex items-center gap-2 rounded-full border border-bajaj-500/40 bg-gradient-to-r from-bajaj-500/15 to-neon-violet/15 px-3 py-1 text-[10px] sm:text-[11px] font-semibold text-bajaj-300">
           <i class="fa-solid fa-graduation-cap"></i> Bajaj Engineering Skills Training
         </div>
         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-[1.15] text-white tracking-tight">
-          Borrow lab hardware<br/>
-          <span class="gradient-text">in under a minute.</span>
+          Borrow lab hardware<br/><span class="gradient-text">in under a minute.</span>
         </h1>
         <p class="mt-3 sm:mt-4 max-w-xl text-xs sm:text-sm leading-relaxed text-slate-400">
           Multi-lab inventory · teacher-verified returns · live sync across every device.
@@ -671,7 +438,6 @@
       </div>
     </div>
   </div>
-
   <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
     <div class="card-gradient rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-4 sm:p-5 relative overflow-hidden">
       <div class="absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-lg bg-brand-500/15 text-brand-400"><i class="fa-solid fa-microchip text-[11px]"></i></div>
@@ -694,15 +460,13 @@
       <div class="mt-1 text-[10px] sm:text-xs text-slate-500">Overdue</div>
     </div>
   </div>
-
-  <!-- Lab directory -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-building-columns text-xs text-neon-cyan"></i> Labs on this station</h3>
     <div id="overviewLabGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
   </div>
 </section>
 
-<!-- ══════════════ CATALOG ══════════════ -->
+<!-- CATALOG -->
 <section id="view-catalog" class="hidden space-y-4 sm:space-y-5">
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
     <div class="flex flex-col gap-3 sm:gap-4">
@@ -713,22 +477,17 @@
         </div>
         <div class="relative w-full sm:w-56">
           <i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
-          <input id="skuInput" type="text" onkeydown="if(event.key==='Enter'){quickAdd();}" placeholder="Scan or type SKU"
-                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
+          <input id="skuInput" type="text" onkeydown="if(event.key==='Enter'){quickAdd();}" placeholder="Scan or type SKU" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
         </div>
       </div>
-
-      <!-- Lab chooser -->
       <div>
         <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-building-columns mr-1"></i> Which lab is the component from?</div>
         <div id="catalogLabTabs" class="flex flex-wrap gap-2"></div>
       </div>
-
       <div class="flex flex-wrap items-center gap-2">
         <div class="relative flex-1 min-w-[180px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
-          <input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search…"
-                 class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
+          <input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search…" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
         </div>
         <select id="catalogCategory" onchange="renderCatalog()" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200"><option value="ALL">All categories</option></select>
         <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400">
@@ -740,21 +499,21 @@
   <div id="catalogGrid" class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
 </section>
 
-<!-- ══════════════ LOANS ══════════════ -->
+<!-- LOANS -->
 <section id="view-loans" class="hidden space-y-4 sm:space-y-5">
   <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
     <div>
       <h1 id="loansHeading" class="text-base sm:text-lg font-bold text-white">Active Borrowed Items</h1>
-      <p id="loansSubheading" class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · returns require teacher verification</p>
+      <p id="loansSubheading" class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · returns verified by lab teachers</p>
     </div>
-    <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto">
-      <i class="fa-solid fa-paper-plane text-[11px]"></i> <span id="loansBulkBtnText">Request all returns</span>
+    <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden">
+      <i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span>
     </button>
   </div>
   <div id="loanList" class="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2"></div>
 </section>
 
-<!-- ══════════════ DASHBOARD ══════════════ -->
+<!-- DASHBOARD -->
 <section id="view-dashboard" class="hidden space-y-4 sm:space-y-5">
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-brand-500/30 bg-gradient-to-r from-brand-950/50 via-ink-850/70 to-neon-violet/10 p-3.5 sm:p-5">
     <div class="flex items-center gap-3">
@@ -791,29 +550,12 @@
     </div>
   </div>
 
-  <!-- RETURN REQUESTS -->
-  <div id="returnRequestsPanel" class="hidden rounded-2xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-950/30 to-ink-850/50 overflow-hidden">
-    <div class="flex items-center justify-between gap-3 border-b border-amber-500/30 px-4 sm:px-5 py-4">
-      <div class="flex items-center gap-2.5">
-        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-500/30"><i class="fa-solid fa-clipboard-check text-sm"></i></div>
-        <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            Return requests — verify before approving
-            <span id="returnReqCount" class="rounded-full border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">0</span>
-          </h3>
-          <p class="mt-0.5 text-[10px] text-amber-300/70">Physically check the component is back before approving.</p>
-        </div>
-      </div>
-    </div>
-    <div id="returnRequestsList" class="divide-y divide-amber-500/20"></div>
-  </div>
-
   <!-- Ledger -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
       <div>
         <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-list text-brand-400 text-xs"></i> Live Borrowed Items</h3>
-        <p class="mt-0.5 text-[10px] text-slate-500">Scroll horizontally on mobile</p>
+        <p class="mt-0.5 text-[10px] text-slate-500">Verify the count before closing a loan. Scroll horizontally on mobile.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <button onclick="exportExcel()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white hover:from-emerald-600 hover:to-emerald-800 transition"><i class="fa-solid fa-file-excel text-[11px]"></i> Export</button>
@@ -914,7 +656,7 @@
   </div>
 </section>
 
-<!-- ══════════════ POSTER ══════════════ -->
+<!-- POSTER -->
 <section id="view-poster" class="hidden space-y-4 sm:space-y-5">
   <div class="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-5">
     <div class="space-y-3 sm:space-y-4 rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5 lg:col-span-2">
@@ -931,8 +673,7 @@
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Portal URL</label>
-        <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.com/"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
+        <input id="posterUrl" type="text" oninput="onPosterInput()" placeholder="https://your-site.com/" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 font-mono text-[11px] text-white placeholder:text-slate-600" />
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Instructions</label>
@@ -947,7 +688,6 @@
         </button>
       </div>
     </div>
-
     <div class="flex items-start justify-center overflow-auto rounded-2xl border border-ink-700/60 bg-ink-900/40 p-4 sm:p-6 lg:col-span-3 lg:p-10">
       <div id="posterCanvas" class="w-full max-w-sm space-y-6 rounded-2xl border-[5px] border-brand-600 bg-white p-6 sm:p-8 text-center shadow-2xl">
         <div class="space-y-2 border-b border-slate-200 pb-5">
@@ -970,7 +710,7 @@
   </div>
 </section>
 
-<!-- ══════════════ SYNC ══════════════ -->
+<!-- SYNC -->
 <section id="view-sync" class="hidden space-y-4 sm:space-y-5">
   <div class="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-ink-850/50 to-neon-cyan/10 p-5 sm:p-8">
     <div class="flex items-start gap-3 sm:gap-4">
@@ -1027,9 +767,7 @@
 </footer>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     CART DRAWER
-     ═══════════════════════════════════════════════════════ -->
+<!-- CART DRAWER -->
 <div id="cartDrawer" class="fixed inset-0 z-[80] hidden bg-ink-950/70 backdrop-blur-sm">
   <div class="ml-auto flex h-full w-full max-w-md flex-col border-l border-ink-700/70 bg-ink-900 shadow-2xl">
     <div class="flex items-center justify-between border-b border-ink-700/60 px-4 sm:px-5 py-4">
@@ -1055,9 +793,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODALS
-     ═══════════════════════════════════════════════════════ -->
+<!-- MODALS -->
 <div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -1089,29 +825,23 @@
     <div class="space-y-4">
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Teacher No</label>
-        <input id="newTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters"
-               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)"
-               class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs tracking-[.2em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
+        <input id="newTeacherNo" type="text" maxlength="12" autocomplete="off" placeholder="min 4 characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)" class="mono focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs tracking-[.2em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Password</label>
-        <input id="newTeacherPass" type="password" autocomplete="new-password" placeholder="min 6 characters"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+        <input id="newTeacherPass" type="password" autocomplete="new-password" placeholder="min 6 characters" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
       </div>
       <div>
         <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Confirm Password</label>
-        <input id="newTeacherPassConfirm" type="password" autocomplete="new-password" placeholder="repeat password"
-               class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+        <input id="newTeacherPassConfirm" type="password" autocomplete="new-password" placeholder="repeat password" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
       </div>
       <div>
         <label class="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Labs this teacher manages</label>
         <div id="newTeacherLabs" class="space-y-1.5"></div>
       </div>
-      <label id="newTeacherSuperWrap" class="flex items-start gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/5 p-3 cursor-pointer">
+      <label class="flex items-start gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/5 p-3 cursor-pointer">
         <input id="newTeacherSuper" type="checkbox" class="mt-0.5 h-3.5 w-3.5 accent-amber-500" />
-        <span class="text-[11px] leading-relaxed text-amber-300">
-          <b>Head teacher (super admin)</b> — full access to every lab, can create labs and manage all teachers.
-        </span>
+        <span class="text-[11px] leading-relaxed text-amber-300"><b>Head teacher (super admin)</b> — full access to every lab, can create labs and manage all teachers.</span>
       </label>
     </div>
     <p id="addTeacherError" class="hidden text-xs font-medium text-rose-400"></p>
@@ -1147,22 +877,30 @@
   </div>
 </div>
 
-<div id="mRejectReturn" class="fixed inset-0 z-[96] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
-  <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-rose-600/50 bg-ink-850 p-5 sm:p-6">
+<!-- RETURN VERIFY MODAL (admin only) -->
+<div id="mReturnVerify" class="fixed inset-0 z-[96] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
+  <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border-2 border-emerald-500/60 bg-ink-850 p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
     <div class="flex items-start gap-3">
-      <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/15 text-rose-400"><i class="fa-solid fa-circle-xmark"></i></div>
-      <div class="min-w-0">
-        <h3 class="text-sm font-bold text-white">Reject return request</h3>
-        <p id="rejectReturnInfo" class="mt-1 text-xs leading-relaxed text-slate-400"></p>
+      <div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/30">
+        <i class="fa-solid fa-clipboard-check"></i>
       </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-base font-bold text-white">Verify return</h3>
+        <p class="mt-0.5 text-[11px] text-emerald-300/80">Check the count before closing this loan.</p>
+      </div>
+      <button onclick="closeModal('mReturnVerify')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div>
-      <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Reason (student will see this)</label>
-      <textarea id="rejectReason" rows="3" placeholder="e.g. Component not physically received at the lab desk." class="focus-ring w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
+    <div id="returnVerifyInfo" class="rounded-xl border border-ink-700/60 bg-ink-950/50 p-3 text-xs leading-relaxed text-slate-300"></div>
+    <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
+      <label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-emerald-300">Number of units physically received</label>
+      <input id="returnVerifyCount" type="number" min="0" step="1" class="focus-ring mono w-full rounded-xl border border-emerald-500/40 bg-ink-950/80 p-3 text-base font-bold text-white" />
+      <div id="returnVerifyHint" class="mt-2 text-[11px] leading-relaxed text-slate-400"></div>
     </div>
     <div class="flex gap-2">
-      <button onclick="closeModal('mRejectReturn')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
-      <button onclick="confirmRejectReturn()" class="w-1/2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white hover:from-rose-600 hover:to-rose-800 transition">Reject request</button>
+      <button onclick="closeModal('mReturnVerify')" class="w-1/3 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="confirmReturnVerify()" class="flex-1 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-bold text-white hover:from-emerald-600 hover:to-emerald-800 transition shadow-lg shadow-emerald-600/20">
+        <i class="fa-solid fa-check mr-1 text-[11px]"></i> Confirm return
+      </button>
     </div>
   </div>
 </div>
@@ -1222,7 +960,7 @@
     </div>
     <div id="overdueItemsList" class="max-h-60 space-y-2 overflow-y-auto"></div>
     <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-center text-xs leading-relaxed text-rose-200">
-      <i class="fa-solid fa-circle-info mr-1"></i> Request the return in the app and hand the items to the lab teacher.
+      <i class="fa-solid fa-circle-info mr-1"></i> Hand the items to a lab teacher to complete the return.
     </div>
     <div class="flex gap-2">
       <button onclick="closeModal('mOverdue')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Dismiss</button>
@@ -1234,9 +972,6 @@
 <div id="toasts" class="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[110] flex w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   CONFIG
-   ═══════════════════════════════════════════════════════ */
 const BUILTIN_FIREBASE = {
   apiKey: "AIzaSyCmg42q2ZN_GNH65pCSprXHyu7ZZ1RKZTE",
   authDomain: "components-8893a.firebaseapp.com",
@@ -1247,9 +982,9 @@ const BUILTIN_FIREBASE = {
   appId: "1:13293708546:web:b1344c74fc5e8483a6ce1b",
   measurementId: "G-DP20GNZX7X"
 };
-const STATION_NODE = 'LAB-MAIN';           // firebase node name (kept for compatibility)
-const STORAGE_KEY = 'bajaj.lending.v6';
-const SESSION_KEY = 'bajaj.session.v6';
+const STATION_NODE = 'LAB-MAIN';
+const STORAGE_KEY = 'bajaj.lending.v7';
+const SESSION_KEY = 'bajaj.session.v7';
 const THEME_KEY = 'bajaj.theme.v2';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MAX_ACTIVITY = 40;
@@ -1258,13 +993,11 @@ const MIN_ADMIN_USER_LEN = 4;
 const MAX_ADMIN_USER_LEN = 12;
 const MIN_ADMIN_PASS_LEN = 6;
 
-/* ── Labs (seeded on first run) ── */
 const SEED_LABS = [
-  { id:'LAB-ELEC', name:'Electronics Lab',       description:'Microcontrollers, sensors, soldering & bench tools.' },
-  { id:'LAB-MECH', name:'Mechanical Workshop',   description:'Motors, actuators, measuring & fabrication tools.' }
+  { id:'LAB-ELEC', name:'Electronics Lab',     description:'Microcontrollers, sensors, soldering & bench tools.' },
+  { id:'LAB-MECH', name:'Mechanical Workshop', description:'Motors, actuators, measuring & fabrication tools.' }
 ];
 
-/* ── Inventory (each item belongs to a lab) ── */
 const SEED_INVENTORY = [
   { id:'SKU-1001', labId:'LAB-ELEC', name:'Arduino Uno R3 Board',                 category:'Microcontrollers',   totalStock:12, description:'ATmega328P microcontroller board with USB cable.' },
   { id:'SKU-1002', labId:'LAB-ELEC', name:'Raspberry Pi 4 Model B (4GB)',         category:'Microcontrollers',   totalStock:6,  description:'Quad-core 64-bit SBC with dual 4K output.' },
@@ -1312,17 +1045,16 @@ let captchaCode = '';
 let loginTab = 'student';
 let currentTheme = 'dark';
 let catalogLabFilter = 'ALL';
-let pendingRejectLoanId = null;
+let pendingReturnLoanId = null;
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ─────────── Theme ─────────── */
+/* ─── THEME ─── */
 function applyTheme(theme) {
   currentTheme = theme === 'light' ? 'light' : 'dark';
-  const icon = $('themeIcon');
-  const sw = $('themeSwitch');
+  const icon = $('themeIcon'); const sw = $('themeSwitch');
   const meta = document.querySelector('meta[name="theme-color"]');
   if (currentTheme === 'light') {
     document.body.classList.add('theme-light');
@@ -1337,28 +1069,15 @@ function applyTheme(theme) {
   }
   try { localStorage.setItem(THEME_KEY, currentTheme); } catch {}
 }
-function toggleTheme() {
-  applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-  toast(`Switched to ${currentTheme} mode.`, 'info', 1500);
-}
-function loadTheme() {
-  let saved = 'dark';
-  try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch {}
-  applyTheme(saved);
-}
+function toggleTheme() { applyTheme(currentTheme === 'light' ? 'dark' : 'light'); toast(`Switched to ${currentTheme} mode.`, 'info', 1500); }
+function loadTheme() { let saved = 'dark'; try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch {} applyTheme(saved); }
 
-/* ─────────── Hashing ─────────── */
+/* ─── HASHING ─── */
 function stableHash(text) {
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
-  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
-  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  for (let i = 0; i < text.length; i++) { const ch = text.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return ('00000000' + (h2 >>> 0).toString(16)).slice(-8) + ('00000000' + (h1 >>> 0).toString(16)).slice(-8);
 }
 async function hashPassword(pw) {
@@ -1372,7 +1091,7 @@ async function hashPassword(pw) {
   return stableHash('best::' + pw);
 }
 
-/* ─────────── Time / format helpers ─────────── */
+/* ─── TIME / FORMAT ─── */
 function now() { return Date.now() + serverClockOffsetMs + state.simOffsetMs; }
 function findItem(id) { return state.inventory.find(i => i.id === id); }
 function fmtTime(ms) { return new Date(ms).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
@@ -1382,52 +1101,45 @@ function fmtDuration(ms) { const t = Math.max(0, Math.floor(ms/1000)); const h =
 function fmtDurShort(ms) { const m = Math.max(0, Math.round(ms/60000)); const h = Math.floor(m/60); return h > 0 ? `${h}h ${pad2(m%60)}m` : `${m}m`; }
 function relTime(ms) { const d = now() - ms; if (d < 45000) return 'just now'; if (d < 3600000) return `${Math.floor(d/60000)}m ago`; if (d < 86400000) return `${Math.floor(d/3600000)}h ago`; return `${Math.floor(d/86400000)}d ago`; }
 
-/* ─────────── Labs ─────────── */
+/* ─── LABS ─── */
 function labById(id) { return state.labs.find(l => l.id === id) || null; }
 function labName(id) { const l = labById(id); return l ? l.name : 'Unknown lab'; }
-function labChipClass(labId) {
-  const idx = Math.max(0, state.labs.findIndex(l => l.id === labId));
-  return 'lab-chip lab-chip-' + (idx % 6);
-}
-function labChip(labId) {
-  return `<span class="${labChipClass(labId)}"><i class="fa-solid fa-building-columns"></i>${esc(labName(labId))}</span>`;
-}
+function labChipClass(labId) { const idx = Math.max(0, state.labs.findIndex(l => l.id === labId)); return 'lab-chip lab-chip-' + (idx % 6); }
+function labChip(labId) { return `<span class="${labChipClass(labId)}"><i class="fa-solid fa-building-columns"></i>${esc(labName(labId))}</span>`; }
+function allLabIds() { return state.labs.map(l => l.id); }
+function defaultLabId() { return state.labs.length ? state.labs[0].id : null; }
 
-/* ─────────── Admin / role helpers ─────────── */
+/* ─── ADMINS / ROLES ─── */
 function getAdmins() {
+  let admins = [];
   if (!state.adminConfig) return [];
-  if (Array.isArray(state.adminConfig.admins)) return state.adminConfig.admins;
-  if (state.adminConfig.username && state.adminConfig.passwordHash) {
-    return [{ username: state.adminConfig.username, passwordHash: state.adminConfig.passwordHash, isSuper: true, labIds: [], createdAt: state.adminConfig.createdAt || Date.now() }];
+  if (Array.isArray(state.adminConfig.admins)) {
+    admins = state.adminConfig.admins.map(a => ({ ...a }));
+  } else if (state.adminConfig.username && state.adminConfig.passwordHash) {
+    admins = [{ username: state.adminConfig.username, passwordHash: state.adminConfig.passwordHash, isSuper: true, labIds: [], createdAt: state.adminConfig.createdAt || Date.now() }];
   }
-  return [];
+  // MIGRATION: if no admin has isSuper set, promote the earliest-created admin to head teacher
+  if (admins.length && !admins.some(a => a.isSuper === true)) {
+    let earliestIdx = 0;
+    admins.forEach((a, i) => { if ((a.createdAt || 0) < (admins[earliestIdx].createdAt || Infinity)) earliestIdx = i; });
+    admins[earliestIdx].isSuper = true;
+  }
+  // MIGRATION: ensure labIds is always an array
+  admins.forEach(a => { if (!Array.isArray(a.labIds)) a.labIds = []; });
+  return admins;
 }
-function findAdminByUsername(name) {
-  return getAdmins().find(a => (a.username || '').toUpperCase() === (name || '').toUpperCase());
-}
-function myAdminRecord() {
-  if (session.role !== 'admin' || !session.register) return null;
-  return findAdminByUsername(session.register);
-}
-function isSuperAdmin() {
-  const a = myAdminRecord();
-  return !!(a && a.isSuper);
-}
-/** Labs the signed-in teacher may manage. */
+function findAdminByUsername(name) { return getAdmins().find(a => (a.username || '').toUpperCase() === (name || '').toUpperCase()); }
+function myAdminRecord() { if (session.role !== 'admin' || !session.register) return null; return findAdminByUsername(session.register); }
+function isSuperAdmin() { const a = myAdminRecord(); return !!(a && a.isSuper); }
 function myLabIds() {
   const a = myAdminRecord();
   if (!a) return [];
   if (a.isSuper) return state.labs.map(l => l.id);
-  const ids = Array.isArray(a.labIds) ? a.labIds : [];
-  return ids.filter(id => state.labs.some(l => l.id === id));
+  return (a.labIds || []).filter(id => state.labs.some(l => l.id === id));
 }
-function canManageLab(labId) {
-  return session.role === 'admin' && myLabIds().includes(labId);
-}
-/** Labs a student can browse (all of them). */
-function allLabIds() { return state.labs.map(l => l.id); }
+function canManageLab(labId) { return session.role === 'admin' && myLabIds().includes(labId); }
 
-/* ─────────── Loan helpers ─────────── */
+/* ─── LOAN HELPERS ─── */
 function borrowedQty(id) { return state.loans.reduce((s,l) => l.itemId === id ? s + l.quantity : s, 0); }
 function availableQty(id) { const it = findItem(id); return it ? Math.max(0, it.totalStock - borrowedQty(id)) : 0; }
 function selectableQty(id) { return Math.max(0, availableQty(id) - (state.cart[id]||0)); }
@@ -1449,7 +1161,7 @@ function logActivity(type, message) {
   if (state.activity.length > MAX_ACTIVITY) state.activity.length = MAX_ACTIVITY;
 }
 
-/* ─────────── Toasts / modals ─────────── */
+/* ─── TOASTS / MODALS ─── */
 function toast(message, type='info', ttl=3500) {
   const cfg = {
     info:    { icon:'fa-circle-info',          color:'text-brand-400',   border:'border-brand-500/40',   bg:'bg-gradient-to-br from-brand-500/15 to-brand-500/5' },
@@ -1480,10 +1192,9 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
   });
 }
 
-/* ─────────── Captcha ─────────── */
+/* ─── CAPTCHA ─── */
 function generateCaptcha() {
-  const canvas = $('captchaCanvas');
-  if (!canvas) return;
+  const canvas = $('captchaCanvas'); if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   captchaCode = '';
@@ -1492,62 +1203,41 @@ function generateCaptcha() {
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   grad.addColorStop(0, '#f1f5f9'); grad.addColorStop(1, '#e2e8f0');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < 5; i++) {
-    ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
-    ctx.lineWidth = 1 + Math.random();
-    ctx.beginPath(); ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.stroke();
-  }
-  for (let i = 0; i < 40; i++) {
-    ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`;
-    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 1.5);
-  }
-  for (let i = 0; i < captchaCode.length; i++) {
-    ctx.save();
-    ctx.translate(16 + i * 26, 32); ctx.rotate((Math.random() - 0.5) * 0.6);
-    ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`;
-    ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`;
-    ctx.fillText(captchaCode[i], 0, 0); ctx.restore();
-  }
+  for (let i = 0; i < 5; i++) { ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`; ctx.lineWidth = 1 + Math.random(); ctx.beginPath(); ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.stroke(); }
+  for (let i = 0; i < 40; i++) { ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`; ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 1.5); }
+  for (let i = 0; i < captchaCode.length; i++) { ctx.save(); ctx.translate(16 + i * 26, 32); ctx.rotate((Math.random() - 0.5) * 0.6); ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`; ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`; ctx.fillText(captchaCode[i], 0, 0); ctx.restore(); }
 }
 
-/* ─────────── Login screen glue ─────────── */
+/* ─── LOGIN SCREEN GLUE ─── */
 function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
 function showLoginInfo(msg) { const i = $('loginInfo'); i.textContent = msg; i.classList.remove('hidden'); $('loginError').classList.add('hidden'); }
 function clearLoginMessages() { $('loginError').classList.add('hidden'); $('loginInfo').classList.add('hidden'); }
 function showSetupError(msg) { const e = $('setupError'); e.textContent = msg; e.classList.remove('hidden'); }
 
 function switchLoginTab(tab) {
-  loginTab = tab;
-  clearLoginMessages();
-  const studentForm = $('studentForm');
-  const adminForm = $('adminForm');
-  const tabStudent = $('tabStudent');
-  const tabAdmin = $('tabAdmin');
-  const studentHeader = $('studentHeader');
-  const adminHeader = $('adminHeader');
-
+  loginTab = tab; clearLoginMessages();
+  const sf = $('studentForm'), af = $('adminForm'), ts = $('tabStudent'), ta = $('tabAdmin'), sh = $('studentHeader'), ah = $('adminHeader');
   if (tab === 'student') {
-    studentForm.classList.remove('hidden'); adminForm.classList.add('hidden');
-    studentHeader.classList.remove('hidden'); adminHeader.classList.add('hidden');
-    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
-    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    sf.classList.remove('hidden'); af.classList.add('hidden');
+    sh.classList.remove('hidden'); ah.classList.add('hidden');
+    ts.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
+    ta.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
     setTimeout(() => $('loginRegister').focus(), 100);
   } else {
-    studentForm.classList.add('hidden'); adminForm.classList.remove('hidden');
-    studentHeader.classList.add('hidden'); adminHeader.classList.remove('hidden');
-    tabAdmin.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
-    tabStudent.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
+    sf.classList.add('hidden'); af.classList.remove('hidden');
+    sh.classList.add('hidden'); ah.classList.remove('hidden');
+    ta.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-rose-700 bg-white border-b-2 border-rose-500';
+    ts.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
     setTimeout(() => $('adminUserInput').focus(), 100);
   }
 }
 
-/* ─────────── Setup ─────────── */
+/* ─── SETUP ─── */
 async function completeSetup() {
   const teacherNo = $('setupTeacherNo').value.trim().toUpperCase();
   const pw = $('setupPassword').value;
   const cf = $('setupConfirm').value;
-  const btn = $('setupBtn');
-  const btnTxt = $('setupBtnText');
+  const btn = $('setupBtn'); const btnTxt = $('setupBtnText');
   $('setupError').classList.add('hidden');
   if (teacherNo.length < MIN_ADMIN_USER_LEN) { showSetupError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
   if (teacherNo.length > MAX_ADMIN_USER_LEN) { showSetupError(`Teacher No cannot exceed ${MAX_ADMIN_USER_LEN} characters.`); return; }
@@ -1557,10 +1247,7 @@ async function completeSetup() {
   btn.disabled = true; btnTxt.textContent = 'Creating…';
   try {
     const hash = await hashPassword(pw);
-    state.adminConfig = {
-      admins: [{ username: teacherNo, passwordHash: hash, isSuper: true, labIds: [], createdAt: Date.now() }],
-      createdAt: Date.now()
-    };
+    state.adminConfig = { admins: [{ username: teacherNo, passwordHash: hash, isSuper: true, labIds: [], createdAt: Date.now() }], createdAt: Date.now() };
     if (!Array.isArray(state.labs) || !state.labs.length) state.labs = SEED_LABS.map(l => ({ ...l }));
     saveLocal(); publishKey('adminConfig'); publishKey('labs');
     $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
@@ -1573,13 +1260,12 @@ async function completeSetup() {
   finally { btn.disabled = false; btnTxt.textContent = 'Create Head Teacher'; }
 }
 
-/* ─────────── Student login ─────────── */
+/* ─── STUDENT LOGIN ─── */
 async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
   const pw = $('loginPassword').value;
   const captchaInput = $('loginCaptchaInput').value.trim().toUpperCase();
-  const btn = $('loginSubmitBtn');
-  const btnTxt = $('loginSubmitText');
+  const btn = $('loginSubmitBtn'); const btnTxt = $('loginSubmitText');
   clearLoginMessages();
   if (!reg) { showLoginError('Please enter your Register No.'); return; }
   if (!pw) { showLoginError('Please enter your Password.'); return; }
@@ -1605,12 +1291,11 @@ async function attemptStudentLogin() {
   finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
 }
 
-/* ─────────── Teacher login ─────────── */
+/* ─── ADMIN LOGIN ─── */
 async function attemptAdminLogin() {
   const teacherNo = $('adminUserInput').value.trim().toUpperCase();
   const password = $('adminPassInput').value;
-  const btn = $('adminLoginBtn');
-  const btnTxt = $('adminLoginBtnText');
+  const btn = $('adminLoginBtn'); const btnTxt = $('adminLoginBtnText');
   clearLoginMessages();
   if (!teacherNo) { showLoginError('Please enter your Teacher No.'); return; }
   if (teacherNo.length < MIN_ADMIN_USER_LEN) { showLoginError(`Teacher No must be at least ${MIN_ADMIN_USER_LEN} characters.`); return; }
@@ -1629,7 +1314,7 @@ async function attemptAdminLogin() {
   finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Teacher'; }
 }
 
-/* ─────────── Enter app ─────────── */
+/* ─── ENTER APP ─── */
 function enterApp(role, register, name) {
   session = { role, register, name };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
@@ -1644,8 +1329,7 @@ function applyRoleUI() {
   const isAdminUser = session.role === 'admin';
   ['navDashboard','navPoster','navSync','navDashboardMobile','navPosterMobile','navSyncMobile'].forEach(id => {
     const el = $(id); if (!el) return;
-    if (isAdminUser) el.classList.remove('hidden');
-    else el.classList.add('hidden');
+    if (isAdminUser) el.classList.remove('hidden'); else el.classList.add('hidden');
   });
   if (session.register) {
     $('userAvatar').textContent = session.register.slice(0, 1).toUpperCase();
@@ -1663,9 +1347,7 @@ function applyRoleUI() {
     const labList = $('menuLabList');
     if (labList) {
       const ids = isAdminUser ? myLabIds() : [];
-      labList.innerHTML = ids.length
-        ? ids.map(id => labChip(id)).join('')
-        : (isAdminUser ? '<span class="text-[10px] text-slate-500">No labs assigned</span>' : '');
+      labList.innerHTML = ids.length ? ids.map(id => labChip(id)).join('') : (isAdminUser ? '<span class="text-[10px] text-slate-500">No labs assigned</span>' : '');
     }
   }
   go('overview');
@@ -1696,9 +1378,7 @@ function openChangePassword() {
 }
 
 async function saveNewPassword() {
-  const cur = $('cpCurrent').value;
-  const nw = $('cpNew').value;
-  const cf = $('cpConfirm').value;
+  const cur = $('cpCurrent').value, nw = $('cpNew').value, cf = $('cpConfirm').value;
   const msg = $('cpMessage');
   const show = (t, ok) => { msg.textContent = t; msg.className = `text-xs font-medium ${ok ? 'text-emerald-400' : 'text-rose-400'}`; msg.classList.remove('hidden'); };
   if (!cur || !nw || !cf) { show('Please fill all fields.', false); return; }
@@ -1710,29 +1390,21 @@ async function saveNewPassword() {
     const admins = getAdmins();
     const idx = admins.findIndex(a => a.username === session.register);
     if (idx === -1 || curHash !== admins[idx].passwordHash) { show('Current password is incorrect.', false); return; }
-    admins[idx].passwordHash = newHash;
-    admins[idx].updatedAt = Date.now();
+    admins[idx].passwordHash = newHash; admins[idx].updatedAt = Date.now();
     state.adminConfig = { ...(state.adminConfig || {}), admins };
-    publishKey('adminConfig');
-    show('Password updated.', true);
-    toast('Password changed.', 'success');
+    publishKey('adminConfig'); show('Password updated.', true); toast('Password changed.', 'success');
   } else {
     const s = (state.students || {})[session.register];
     if (!s || curHash !== s.passwordHash) { show('Current password is incorrect.', false); return; }
-    s.passwordHash = newHash;
-    s.passwordUpdatedAt = Date.now();
-    publishKey('students');
-    show('Password updated.', true);
-    toast('Password changed.', 'success');
+    s.passwordHash = newHash; s.passwordUpdatedAt = Date.now();
+    publishKey('students'); show('Password updated.', true); toast('Password changed.', 'success');
   }
   setTimeout(() => closeModal('mChangePassword'), 1200);
 }
 
-function showForgotHelp() {
-  showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask a lab teacher to reset.');
-}
+function showForgotHelp() { showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask a lab teacher to reset.'); }
 
-/* ─────────── Navigation ─────────── */
+/* ─── NAVIGATION ─── */
 function go(view) {
   const isAdminUser = session.role === 'admin';
   if (!isAdminUser && ['dashboard','poster','sync'].includes(view)) { toast('Teacher access required.', 'warn'); return; }
@@ -1753,7 +1425,7 @@ function go(view) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ─────────── Firebase ─────────── */
+/* ─── FIREBASE ─── */
 function initFirebase() {
   try {
     if (!firebase.apps.length) fbApp = firebase.initializeApp(BUILTIN_FIREBASE);
@@ -1765,6 +1437,28 @@ function initFirebase() {
   } catch (e) { console.error('[firebase]', e); return false; }
 }
 
+function migrateInventoryLabs() {
+  // Ensure every inventory item has a valid labId
+  if (!state.labs.length) return;
+  const validIds = new Set(state.labs.map(l => l.id));
+  const fallback = state.labs[0].id;
+  state.inventory.forEach(i => { if (!i.labId || !validIds.has(i.labId)) i.labId = fallback; });
+  // Ensure every loan has a valid labId
+  state.loans.forEach(l => {
+    if (!l.labId || !validIds.has(l.labId)) {
+      const it = state.inventory.find(i => i.id === l.itemId);
+      l.labId = it ? it.labId : fallback;
+    }
+  });
+  // Ensure every history record has a valid labId
+  state.history.forEach(h => {
+    if (!h.labId || !validIds.has(h.labId)) {
+      const it = state.inventory.find(i => i.id === h.itemId);
+      h.labId = it ? it.labId : fallback;
+    }
+  });
+}
+
 function applyRemoteKey(key, val) {
   if (key === 'labs') { if (Array.isArray(val) && val.length) state.labs = val; }
   else if (key === 'settings') { if (val) state.settings = { ...DEFAULT_SETTINGS, ...val }; }
@@ -1774,6 +1468,7 @@ function applyRemoteKey(key, val) {
   else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
   else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
   else if (key === 'adminConfig') state.adminConfig = (val && typeof val === 'object') ? val : null;
+  if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs') migrateInventoryLabs();
 }
 
 function connectStation() {
@@ -1805,8 +1500,7 @@ function connectStation() {
 function updateAuthScreen() {
   if (session && session.role) return;
   const hasAdmin = getAdmins().length > 0;
-  const setupEl = $('setupScreen');
-  const loginEl = $('loginScreen');
+  const setupEl = $('setupScreen'); const loginEl = $('loginScreen');
   if (hasAdmin) {
     setupEl.classList.add('hidden'); setupEl.classList.remove('flex');
     loginEl.classList.remove('hidden'); loginEl.classList.add('flex');
@@ -1819,8 +1513,7 @@ function updateAuthScreen() {
 
 function publishKey(key) {
   if (!stationRef) return;
-  const val = state[key];
-  if (val === undefined) return;
+  const val = state[key]; if (val === undefined) return;
   stationRef.child(key).set(val).then(() => { lastSentAt = Date.now(); }).catch(e => console.warn('[publish]', key, e));
 }
 
@@ -1836,8 +1529,7 @@ async function pullLatest() {
 }
 
 function updateSyncPill() {
-  const pill = $('syncPill'), txt = $('syncPillText');
-  if (!pill || !txt) return;
+  const pill = $('syncPill'), txt = $('syncPillText'); if (!pill || !txt) return;
   const dot = pill.querySelector('span');
   if (connected) {
     pill.className = 'hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 px-2.5 py-1.5 text-[11px] font-medium text-emerald-300';
@@ -1850,16 +1542,12 @@ function updateSyncPill() {
   }
 }
 
-function forceSync() {
-  if (!stationRef) { toast('Not connected.', 'warn'); return; }
-  pullLatest().then(() => toast('Pulled latest from server.', 'success'));
-}
+function forceSync() { if (!stationRef) { toast('Not connected.', 'warn'); return; } pullLatest().then(() => toast('Pulled latest from server.', 'success')); }
 
-/* ─────────── Local persistence ─────────── */
+/* ─── LOCAL PERSISTENCE ─── */
 function saveLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    labs: state.labs,
-    inventory: state.inventory, loans: state.loans, history: state.history,
+    labs: state.labs, inventory: state.inventory, loans: state.loans, history: state.history,
     cart: state.cart, borrower: state.borrower, settings: state.settings,
     activity: state.activity, students: state.students, adminConfig: state.adminConfig
   })); } catch {}
@@ -1881,16 +1569,16 @@ function loadLocal() {
       students: (s.students && typeof s.students === 'object') ? s.students : {},
       adminConfig: (s.adminConfig && typeof s.adminConfig === 'object') ? s.adminConfig : null
     };
+    migrateInventoryLabs();
     sanitizeCart();
   } catch {}
 }
 function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
 
-/* ─────────── Overdue notifications ─────────── */
+/* ─── OVERDUE ─── */
 function checkOverdueForCurrentUser() {
   if (!session || !session.register || session.role === 'admin') {
-    const banner = $('overdueAlertBanner');
-    if (banner) banner.classList.add('hidden');
+    const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden');
     return;
   }
   const myOverdue = state.loans.filter(l => l.borrowerId === session.register && isOverdue(l, now()));
@@ -1898,10 +1586,8 @@ function checkOverdueForCurrentUser() {
   if (banner) {
     if (myOverdue.length) {
       banner.classList.remove('hidden');
-      $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · please return immediately`;
-    } else {
-      banner.classList.add('hidden');
-    }
+      $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · please hand them back at the lab`;
+    } else { banner.classList.add('hidden'); }
   }
   let notified = {};
   try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
@@ -1925,19 +1611,17 @@ function checkOverdueForCurrentUser() {
   }
 }
 
-/* ─────────── Overview ─────────── */
+/* ─── OVERVIEW ─── */
 function renderOverview() {
   const t = now();
   const scope = session.role === 'admin' ? myLabIds() : allLabIds();
   const inv = state.inventory.filter(i => scope.includes(i.labId));
   const loans = state.loans.filter(l => scope.includes(l.labId));
-
   const total = inv.reduce((s,i) => s + i.totalStock, 0);
   const onLoan = loans.reduce((s,l) => s + l.quantity, 0);
   const avail = Math.max(0, total - onLoan);
   const util = total ? Math.round((onLoan/total)*100) : 0;
   const overdue = loans.filter(l => isOverdue(l, t)).length;
-
   $('heroAvailable').textContent = avail;
   $('heroOnLoan').textContent = onLoan;
   $('heroUtil').textContent = util + '%';
@@ -1947,13 +1631,9 @@ function renderOverview() {
   $('kpiLoans').textContent = loans.length;
   $('kpiBorrowers').textContent = new Set(loans.map(l => l.borrowerId)).size;
   $('kpiOverdue').textContent = overdue;
-  $('loanPeriodLabel').textContent = state.settings.loanDurationMinutes >= 60
-    ? `${(state.settings.loanDurationMinutes / 60).toFixed(1)} hours`
-    : `${state.settings.loanDurationMinutes} minutes`;
-
+  $('loanPeriodLabel').textContent = state.settings.loanDurationMinutes >= 60 ? `${(state.settings.loanDurationMinutes / 60).toFixed(1)} hours` : `${state.settings.loanDurationMinutes} minutes`;
   const chips = $('heroLabChips');
   if (chips) chips.innerHTML = state.labs.map(l => labChip(l.id)).join('');
-
   const grid = $('overviewLabGrid');
   if (grid) {
     if (!state.labs.length) {
@@ -1984,27 +1664,19 @@ function renderOverview() {
   }
 }
 
-/* ─────────── Catalog ─────────── */
+/* ─── CATALOG ─── */
 function renderCatalogLabTabs() {
-  const wrap = $('catalogLabTabs');
-  if (!wrap) return;
+  const wrap = $('catalogLabTabs'); if (!wrap) return;
   if (!state.labs.length) { wrap.innerHTML = `<span class="text-xs text-slate-500">No labs available.</span>`; return; }
   const btn = (id, label, icon) => {
     const active = catalogLabFilter === id;
     return `<button onclick="setCatalogLab('${id}')" class="focus-ring inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-      active
-        ? 'border-brand-500/60 bg-gradient-to-br from-brand-500/25 to-brand-500/10 text-brand-200 shadow-lg shadow-brand-600/20'
-        : 'border-ink-600/70 bg-ink-900/70 text-slate-400 hover:border-brand-500/40 hover:text-slate-200'
+      active ? 'border-brand-500/60 bg-gradient-to-br from-brand-500/25 to-brand-500/10 text-brand-200 shadow-lg shadow-brand-600/20' : 'border-ink-600/70 bg-ink-900/70 text-slate-400 hover:border-brand-500/40 hover:text-slate-200'
     }"><i class="fa-solid ${icon} text-[10px]"></i>${esc(label)}</button>`;
   };
-  wrap.innerHTML = btn('ALL', 'All labs', 'fa-layer-group') +
-    state.labs.map(l => btn(l.id, l.name, 'fa-building-columns')).join('');
+  wrap.innerHTML = btn('ALL', 'All labs', 'fa-layer-group') + state.labs.map(l => btn(l.id, l.name, 'fa-building-columns')).join('');
 }
-function setCatalogLab(id) {
-  catalogLabFilter = id;
-  renderCatalogLabTabs();
-  renderCatalog();
-}
+function setCatalogLab(id) { catalogLabFilter = id; renderCatalogLabTabs(); populateCategories(); renderCatalog(); }
 
 function populateCategories() {
   const sel = $('catalogCategory'); if (!sel) return;
@@ -2028,7 +1700,6 @@ function renderCatalog() {
     if (inStockOnly && availableQty(it.id) <= 0) return false;
     return true;
   }).sort((a,b) => (a.labId + a.name).localeCompare(b.labId + b.name));
-
   $('catalogResultCount').textContent = `${list.length} item${list.length===1?'':'s'}`;
   if (!list.length) {
     grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 sm:py-20 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`;
@@ -2049,9 +1720,7 @@ function renderCatalog() {
       : `<button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-semibold text-white hover:from-brand-600 hover:to-brand-800 shadow-lg shadow-brand-600/20 disabled:cursor-not-allowed disabled:bg-ink-750 disabled:bg-none disabled:text-slate-500 disabled:shadow-none active:scale-[.98] transition"><i class="fa-solid fa-cart-plus text-[11px]"></i> Add</button>`;
     return `<article class="fade-up flex flex-col rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/70 to-ink-900/70 p-4 hover:border-brand-500/40 transition">
       <div class="flex items-start justify-between gap-3">
-        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500/20 to-neon-violet/20 text-brand-300">
-          <i class="fa-solid fa-microchip text-sm"></i>
-        </div>
+        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500/20 to-neon-violet/20 text-brand-300"><i class="fa-solid fa-microchip text-sm"></i></div>
         <span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sCls}">${sTxt}</span>
       </div>
       <div class="mt-3">${labChip(item.labId)}</div>
@@ -2065,9 +1734,7 @@ function renderCatalog() {
           <span class="text-slate-500">${esc(item.category)}</span>
           <span class="mono text-slate-600">${avail} / ${item.totalStock}</span>
         </div>
-        <div class="h-1 overflow-hidden rounded-full bg-ink-800">
-          <div class="h-full rounded-full bg-gradient-to-r ${bCls} transition-all" style="width:${pct}%"></div>
-        </div>
+        <div class="h-1 overflow-hidden rounded-full bg-ink-800"><div class="h-full rounded-full bg-gradient-to-r ${bCls} transition-all" style="width:${pct}%"></div></div>
       </div>
       <div class="mt-4">${action}</div>
     </article>`;
@@ -2096,7 +1763,7 @@ function quickAdd() {
   input.value = ''; input.focus();
 }
 
-/* ─────────── Cart ─────────── */
+/* ─── CART ─── */
 function openCart() {
   $('borrowerName').value = state.borrower.name || (session.name || '');
   $('borrowerId').value = state.borrower.id || (session.register || '');
@@ -2111,20 +1778,18 @@ function renderCart() {
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   const total = entries.reduce((s,[,q]) => s + q, 0);
   $('cartSummary').textContent = entries.length ? `${entries.length} item${entries.length===1?'':'s'} · ${total} unit${total===1?'':'s'}` : 'Empty';
-
   const labSummary = $('cartLabSummary');
   if (labSummary) {
     if (!entries.length) labSummary.innerHTML = '';
     else {
       const labsInCart = [...new Set(entries.map(([id]) => (findItem(id)||{}).labId).filter(Boolean))];
-      labSummary.innerHTML = `<span class="font-semibold uppercase tracking-wider text-slate-500">Return approval by:</span><br/>` +
+      labSummary.innerHTML = `<span class="font-semibold uppercase tracking-wider text-slate-500">Return verified by:</span><br/>` +
         labsInCart.map(lid => {
           const teachers = getAdmins().filter(a => a.isSuper || (a.labIds||[]).includes(lid)).map(a => a.username);
           return `<span class="mt-1 inline-flex items-center gap-1">${labChip(lid)}<span class="text-slate-500">→ ${teachers.length ? teachers.map(esc).join(', ') : 'no teacher assigned'}</span></span>`;
         }).join('<br/>');
     }
   }
-
   if (!entries.length) {
     box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`;
     return;
@@ -2168,8 +1833,7 @@ function checkoutCart() {
       borrowerName: name, borrowerId: idRef,
       borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
       dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
-      status: 'ACTIVE',
-      returnStatus: 'NONE', returnRequestedAt: 0, returnRequestedBy: '', returnRejectReason: '', returnRejectedAt: 0
+      status: 'ACTIVE'
     };
     state.loans.unshift(record);
     state.history.unshift({ ...record });
@@ -2183,7 +1847,7 @@ function checkoutCart() {
   go('loans');
 }
 
-/* ─────────── Loans ─────────── */
+/* ─── LOANS ─── */
 function visibleLoans() {
   if (session.role === 'admin') {
     const mine = myLabIds();
@@ -2199,9 +1863,14 @@ function renderLoans() {
 
   $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
   $('loansSubheading').textContent = isAdminUser
-    ? 'Approve a return only after physically receiving the component.'
-    : 'Returns must be requested here and approved by a lab teacher.';
-  $('loansBulkBtnText').textContent = isAdminUser ? 'Force-return all' : 'Request all returns';
+    ? 'Verify the count and close the loan once the items are physically back.'
+    : 'Hand your items to a lab teacher — they will verify and close the loan.';
+
+  const bulkBtn = $('loansBulkBtn');
+  if (bulkBtn) {
+    if (isAdminUser) { bulkBtn.classList.remove('hidden'); $('loansBulkBtnText').textContent = 'Force-return all'; }
+    else { bulkBtn.classList.add('hidden'); }
+  }
 
   const loans = visibleLoans().slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
 
@@ -2215,36 +1884,18 @@ function renderLoans() {
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     const pct = Math.min(100, (elapsed / loanMs()) * 100);
     const rem = loan.dueTimeMs - t;
-    const pending = loan.returnStatus === 'PENDING';
-    const rejected = loan.returnStatus === 'REJECTED';
 
     let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/40 bg-emerald-500/15 text-emerald-300', pTxt='Active', bCls='from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
     if (overdue) { cCls='border-rose-500/50 bg-gradient-to-br from-rose-950/40 to-ink-850/50 overdue-pulse'; pCls='bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; pTxt='Overdue'; bCls='from-rose-500 to-rose-600'; tCls='text-rose-400'; tLbl='Overdue by'; }
     else if (dueSoon) { cCls='border-amber-500/50 bg-gradient-to-br from-amber-950/20 to-ink-850/50'; pCls='border-amber-500/40 bg-amber-500/15 text-amber-300'; pTxt='Due soon'; bCls='from-amber-500 to-amber-600'; tCls='text-amber-400'; }
-    if (pending) { cCls='border-brand-500/50 bg-gradient-to-br from-brand-950/30 to-ink-850/50'; pCls='border-brand-500/50 bg-brand-500/20 text-brand-200'; pTxt='Return pending'; }
 
     let actionHtml = '';
     if (isAdminUser) {
-      actionHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <button onclick="approveReturn('${loan.loanId}')" class="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-semibold text-white hover:from-emerald-600 hover:to-emerald-800 transition"><i class="fa-solid fa-check text-[11px]"></i> Approve & close</button>
-        <button onclick="openRejectReturn('${loan.loanId}')" class="flex items-center justify-center gap-2 rounded-xl border border-rose-500/50 bg-rose-500/10 py-2.5 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition"><i class="fa-solid fa-xmark text-[11px]"></i> Reject</button>
-      </div>`;
-    } else if (pending) {
-      actionHtml = `<div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-3 text-center">
-          <div class="text-[11px] font-bold text-brand-200"><i class="fa-solid fa-hourglass-half mr-1"></i> Waiting for teacher approval</div>
-          <div class="mt-1 text-[10px] text-slate-400">Hand the item to a teacher in <b>${esc(labName(loan.labId))}</b> to be verified.</div>
-          <button onclick="cancelReturnRequest('${loan.loanId}')" class="mt-2 text-[10px] font-semibold text-slate-400 underline decoration-dotted hover:text-slate-200">Cancel request</button>
-        </div>`;
-    } else if (rejected) {
-      actionHtml = `<div class="space-y-2">
-          <div class="rounded-xl border border-rose-500/40 bg-rose-500/10 p-3">
-            <div class="text-[11px] font-bold text-rose-300"><i class="fa-solid fa-circle-xmark mr-1"></i> Return rejected</div>
-            <div class="mt-1 text-[10px] leading-relaxed text-rose-200/90">${esc(loan.returnRejectReason || 'No reason given.')}</div>
-          </div>
-          <button onclick="requestReturn('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300 hover:border-amber-500/60 hover:text-amber-200 transition"><i class="fa-solid fa-paper-plane text-[11px]"></i> Request return again</button>
-        </div>`;
+      actionHtml = `<button onclick="openReturnVerify('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-semibold text-white hover:from-emerald-600 hover:to-emerald-800 transition shadow-lg shadow-emerald-600/20"><i class="fa-solid fa-clipboard-check text-[11px]"></i> Verify count &amp; close loan</button>`;
     } else {
-      actionHtml = `<button onclick="requestReturn('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300 hover:border-emerald-500/60 hover:bg-gradient-to-br hover:from-emerald-500 hover:to-emerald-700 hover:text-white hover:border-transparent transition"><i class="fa-solid fa-paper-plane text-[11px]"></i> Request return</button>`;
+      actionHtml = `<div class="rounded-xl border border-ink-700/60 bg-ink-950/40 p-3 text-center">
+          <div class="text-[11px] font-semibold text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Hand the item(s) to a teacher in <b class="text-slate-200">${esc(labName(loan.labId))}</b> to complete the return.</div>
+        </div>`;
     }
 
     return `<article class="fade-up flex flex-col gap-4 rounded-2xl border p-4 sm:p-5 ${cCls}">
@@ -2270,57 +1921,69 @@ function renderLoans() {
   }).join('');
 }
 
-/* ── Student: request a return ── */
-async function requestReturn(loanId) {
-  const loan = state.loans.find(l => l.loanId === loanId);
-  if (!loan) return;
-  if (session.role !== 'admin' && loan.borrowerId !== session.register) { toast('This is not your loan.', 'error'); return; }
-  const ok = await confirmDialog(
-    'Request return',
-    `Request the return of ${loan.quantity} × "${loan.itemName}" from ${labName(loan.labId)}? A teacher must verify the component is back before it is cleared.`,
-    'Send request', false, 'fa-paper-plane'
-  );
-  if (!ok) return;
-  loan.returnStatus = 'PENDING';
-  loan.returnRequestedAt = now();
-  loan.returnRequestedBy = session.register;
-  loan.returnRejectReason = '';
-  loan.returnRejectedAt = 0;
-  logActivity('return-request', `${loan.borrowerName} requested return of ${loan.quantity} × ${loan.itemName}`);
-  saveAndPublish('loans','activity');
-  renderAll(); checkOverdueForCurrentUser(false);
-  toast('Return requested — waiting for teacher approval.', 'success', 4500);
-}
-
-async function cancelReturnRequest(loanId) {
-  const loan = state.loans.find(l => l.loanId === loanId);
-  if (!loan) return;
-  const ok = await confirmDialog('Cancel return request', `Withdraw the return request for "${loan.itemName}"?`, 'Withdraw', false, 'fa-rotate-left');
-  if (!ok) return;
-  loan.returnStatus = 'NONE';
-  loan.returnRequestedAt = 0;
-  loan.returnRequestedBy = '';
-  saveAndPublish('loans');
-  renderAll();
-  toast('Return request withdrawn.', 'info');
-}
-
-/* ── Admin: approve / reject ── */
-async function approveReturn(loanId) {
+/* ─── ADMIN RETURN VERIFICATION (with count) ─── */
+function openReturnVerify(loanId) {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   const loan = state.loans.find(l => l.loanId === loanId);
   if (!loan) return;
   if (!canManageLab(loan.labId)) { toast(`You do not manage ${labName(loan.labId)}.`, 'error'); return; }
-  const ok = await confirmDialog(
-    'Approve return',
-    `Confirm you have physically received ${loan.quantity} × "${loan.itemName}" from ${loan.borrowerName} in ${labName(loan.labId)}.`,
-    'Approve & close', false, 'fa-check'
-  );
-  if (!ok) return;
-  finalizeReturn(loan);
+  pendingReturnLoanId = loanId;
+  const overdue = isOverdue(loan, now());
+  $('returnVerifyInfo').innerHTML = `
+    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+      ${labChip(loan.labId)}
+      ${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}
+    </div>
+    <div><b class="text-white">${esc(loan.itemName)}</b> · TXN <span class="mono">${esc(loan.loanId)}</span></div>
+    <div class="mt-1">Borrower: <b class="text-slate-200">${esc(loan.borrowerName)}</b> (<span class="mono">${esc(loan.borrowerId)}</span>)</div>
+    <div class="mt-1">Expected on loan: <b class="text-amber-300 mono">${loan.quantity}</b> unit${loan.quantity===1?'':'s'} · Due ${esc(loan.dueTimeFormatted)}</div>
+  `;
+  $('returnVerifyCount').value = loan.quantity;
+  $('returnVerifyCount').max = loan.quantity;
+  $('returnVerifyHint').innerHTML = `Enter the number of <b>${esc(loan.itemName)}</b> units you actually received. Must be between 0 and ${loan.quantity}. Partial counts will keep the remaining units on loan.`;
+  openModal('mReturnVerify');
+  setTimeout(() => { const inp = $('returnVerifyCount'); inp.focus(); inp.select(); }, 120);
 }
 
-function finalizeReturn(loan) {
+async function confirmReturnVerify() {
+  if (session.role !== 'admin') return;
+  const loan = state.loans.find(l => l.loanId === pendingReturnLoanId);
+  if (!loan) { closeModal('mReturnVerify'); return; }
+  if (!canManageLab(loan.labId)) { toast(`You do not manage ${labName(loan.labId)}.`, 'error'); closeModal('mReturnVerify'); return; }
+
+  const raw = $('returnVerifyCount').value;
+  const received = parseInt(raw, 10);
+  if (raw === '' || isNaN(received)) { toast('Enter a valid number.', 'warn'); return; }
+  if (received < 0) { toast('Count cannot be negative.', 'warn'); return; }
+  if (received > loan.quantity) { toast(`Cannot exceed ${loan.quantity} (expected on loan).`, 'warn'); return; }
+
+  if (received === 0) {
+    const ok = await confirmDialog('Nothing received', `You entered 0 — no components were physically returned. The loan will stay open.`, 'Keep open', false, 'fa-circle-info');
+    if (!ok) return;
+    closeModal('mReturnVerify');
+    pendingReturnLoanId = null;
+    toast('No items received. Loan remains open.', 'info');
+    return;
+  }
+
+  if (received === loan.quantity) {
+    const ok = await confirmDialog('Confirm full return', `Confirm you received all ${received} × "${loan.itemName}" from ${loan.borrowerName}.`, 'Confirm & close', false, 'fa-check');
+    if (!ok) return;
+    finalizeFullReturn(loan);
+    closeModal('mReturnVerify');
+    pendingReturnLoanId = null;
+    return;
+  }
+
+  const remaining = loan.quantity - received;
+  const ok = await confirmDialog('Partial return', `You received ${received} of ${loan.quantity}. ${remaining} unit(s) will remain on loan for ${loan.borrowerName}. Continue?`, 'Record partial', false, 'fa-clipboard-check');
+  if (!ok) return;
+  finalizePartialReturn(loan, received, remaining);
+  closeModal('mReturnVerify');
+  pendingReturnLoanId = null;
+}
+
+function finalizeFullReturn(loan) {
   const t = now();
   const idx = state.loans.findIndex(l => l.loanId === loan.loanId);
   if (idx === -1) return;
@@ -2332,108 +1995,83 @@ function finalizeReturn(loan) {
     h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
     h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
     h.verifiedBy = session.register;
-    h.returnStatus = 'APPROVED';
-    h.returnApprovedAt = t;
+    h.receivedCount = loan.quantity;
   }
   state.loans.splice(idx, 1);
-  logActivity('return', `${loan.borrowerName} returned ${loan.quantity} × ${loan.itemName} (verified by ${session.register})`);
+  logActivity('return', `${loan.borrowerName} returned all ${loan.quantity} × ${loan.itemName} (verified by ${session.register})`);
   saveAndPublish('loans','history','activity');
   renderAll(); checkOverdueForCurrentUser(false);
-  toast(`Return approved for ${loan.itemName}.`, 'success');
+  toast(`Return completed for ${loan.itemName}.`, 'success');
 }
 
-function openRejectReturn(loanId) {
-  if (session.role !== 'admin') return;
-  const loan = state.loans.find(l => l.loanId === loanId);
-  if (!loan) return;
-  if (!canManageLab(loan.labId)) { toast(`You do not manage ${labName(loan.labId)}.`, 'error'); return; }
-  pendingRejectLoanId = loanId;
-  $('rejectReturnInfo').textContent = `${loan.borrowerName} asked to return ${loan.quantity} × "${loan.itemName}" (${labName(loan.labId)}). Tell them what is wrong so they can fix it.`;
-  $('rejectReason').value = '';
-  openModal('mRejectReturn');
-  setTimeout(() => $('rejectReason').focus(), 120);
-}
-
-function confirmRejectReturn() {
-  const reason = $('rejectReason').value.trim();
-  if (!reason) { toast('Please give a reason for the rejection.', 'warn'); return; }
-  const loan = state.loans.find(l => l.loanId === pendingRejectLoanId);
-  if (!loan) { closeModal('mRejectReturn'); return; }
-  loan.returnStatus = 'REJECTED';
-  loan.returnRejectReason = reason;
-  loan.returnRejectedAt = now();
-  loan.returnRejectedBy = session.register;
-  logActivity('return-rejected', `Return of ${loan.itemName} rejected by ${session.register}: ${reason}`);
-  saveAndPublish('loans','activity');
-  closeModal('mRejectReturn');
-  pendingRejectLoanId = null;
-  renderAll();
-  toast('Return request rejected. The student has been notified in the app.', 'warn', 4500);
-}
-
-/* ── Bulk action (role dependent) ── */
-async function loansBulkAction() {
+function finalizePartialReturn(loan, received, remaining) {
   const t = now();
-  if (session.role === 'admin') {
-    const mine = myLabIds();
-    const list = state.loans.filter(l => mine.includes(l.labId));
-    if (!list.length) { toast('No active loans in your labs.', 'warn'); return; }
-    const ok = await confirmDialog('Force-return all', `Force-close all ${list.length} active loan(s) in your labs? Only do this after verifying the components are back.`, 'Force-return all');
-    if (!ok) return;
-    const count = list.length;
-    list.forEach(loan => {
-      const idx = state.loans.findIndex(l => l.loanId === loan.loanId);
-      if (idx === -1) return;
-      const h = state.history.find(x => x.loanId === loan.loanId);
-      if (h) {
-        h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t);
-        h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
-        h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
-        h.verifiedBy = session.register; h.returnStatus = 'APPROVED'; h.returnApprovedAt = t;
-      }
-      state.loans.splice(idx, 1);
-    });
-    logActivity('return', `All ${count} loan(s) force-returned by ${session.register}`);
-    saveAndPublish('loans','history','activity');
-    renderAll();
-    toast(`Force-returned ${count}.`, 'success');
-    return;
-  }
-
-  const mine = state.loans.filter(l => l.borrowerId === session.register && l.returnStatus !== 'PENDING');
-  if (!mine.length) { toast('Nothing to request.', 'warn'); return; }
-  const ok = await confirmDialog('Request all returns', `Send return requests for ${mine.length} item(s)? A teacher must verify each one.`, 'Send requests', false, 'fa-paper-plane');
-  if (!ok) return;
-  mine.forEach(loan => {
-    loan.returnStatus = 'PENDING';
-    loan.returnRequestedAt = t;
-    loan.returnRequestedBy = session.register;
-    loan.returnRejectReason = '';
-  });
-  logActivity('return-request', `${session.register} requested return of ${mine.length} item(s)`);
-  saveAndPublish('loans','activity');
-  renderAll();
-  toast(`${mine.length} return request(s) sent.`, 'success');
+  // Log a separate history record for the partial return
+  const partialRecord = {
+    loanId: loan.loanId + '-P' + Date.now().toString().slice(-4),
+    itemId: loan.itemId, itemName: loan.itemName, category: loan.category,
+    labId: loan.labId, quantity: received,
+    borrowerName: loan.borrowerName, borrowerId: loan.borrowerId,
+    borrowTimeMs: loan.borrowTimeMs, borrowTimeFormatted: loan.borrowTimeFormatted,
+    dueTimeMs: loan.dueTimeMs, dueTimeFormatted: loan.dueTimeFormatted,
+    status: 'RETURNED',
+    returnTimeMs: t, returnTimeFormatted: fmtDateTime(t),
+    elapsedMinutes: ((t - loan.borrowTimeMs)/60000).toFixed(1),
+    overdueFlag: t > loan.dueTimeMs ? 'YES' : 'NO',
+    verifiedBy: session.register,
+    receivedCount: received,
+    note: `Partial return (${received} of ${received + remaining})`
+  };
+  state.history.unshift(partialRecord);
+  // Update the active loan to reflect the remaining units
+  loan.quantity = remaining;
+  logActivity('return', `${loan.borrowerName} returned ${received} × ${loan.itemName} (partial, verified by ${session.register}); ${remaining} still out`);
+  saveAndPublish('loans','history','activity');
+  renderAll(); checkOverdueForCurrentUser(false);
+  toast(`Partial return recorded: ${received} × ${loan.itemName}. ${remaining} still on loan.`, 'success', 5000);
 }
 
-/* ─────────── Dashboard ─────────── */
-function dashLabOptions() {
+/* ─── ADMIN BULK FORCE-RETURN (admins only) ─── */
+async function loansBulkAction() {
+  if (session.role !== 'admin') { toast('Only teachers can return items.', 'warn'); return; }
+  const t = now();
   const mine = myLabIds();
-  return state.labs.filter(l => mine.includes(l.id));
+  const list = state.loans.filter(l => mine.includes(l.labId));
+  if (!list.length) { toast('No active loans in your labs.', 'warn'); return; }
+  const ok = await confirmDialog('Force-return all', `Force-close all ${list.length} active loan(s) in your labs WITHOUT verifying each count? Only do this after confirming the components are back.`, 'Force-return all');
+  if (!ok) return;
+  const count = list.length;
+  list.forEach(loan => {
+    const idx = state.loans.findIndex(l => l.loanId === loan.loanId);
+    if (idx === -1) return;
+    const h = state.history.find(x => x.loanId === loan.loanId);
+    if (h) {
+      h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t);
+      h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
+      h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
+      h.verifiedBy = session.register;
+      h.receivedCount = loan.quantity;
+    }
+    state.loans.splice(idx, 1);
+  });
+  logActivity('return', `All ${count} loan(s) force-returned by ${session.register}`);
+  saveAndPublish('loans','history','activity');
+  renderAll();
+  toast(`Force-returned ${count}.`, 'success');
 }
+
+/* ─── DASHBOARD ─── */
+function dashLabOptions() { const mine = myLabIds(); return state.labs.filter(l => mine.includes(l.id)); }
 
 function populateDashLabFilter() {
   const sel = $('dashLabFilter'); if (!sel) return;
   const cur = sel.value || 'ALL';
   const labs = dashLabOptions();
-  sel.innerHTML = `<option value="ALL">All my labs (${labs.length})</option>` +
-    labs.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
+  sel.innerHTML = `<option value="ALL">All my labs (${labs.length})</option>` + labs.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
   sel.value = labs.some(l => l.id === cur) || cur === 'ALL' ? cur : 'ALL';
 }
-
 function dashLabFilterValue() {
-  const sel = $('dashLabFilter');
-  const v = sel ? sel.value : 'ALL';
+  const sel = $('dashLabFilter'); const v = sel ? sel.value : 'ALL';
   const mine = myLabIds();
   return (v && v !== 'ALL' && mine.includes(v)) ? v : 'ALL';
 }
@@ -2457,7 +2095,6 @@ function renderDashboard() {
     ? 'Head teacher · full access to every lab'
     : `${myLabIds().length} lab${myLabIds().length===1?'':'s'} assigned`;
 
-  renderReturnRequests();
   renderLedger(scopedLoans, t);
   renderInventoryTable(scopedInventory);
 
@@ -2471,54 +2108,8 @@ function renderDashboard() {
   if (labsPanel) labsPanel.classList.toggle('hidden', !isSuperAdmin());
 }
 
-function renderReturnRequests() {
-  const wrap = $('returnRequestsPanel');
-  const list = $('returnRequestsList');
-  if (!wrap || !list) return;
-  if (session.role !== 'admin') { wrap.classList.add('hidden'); return; }
-  const mine = myLabIds();
-  const reqs = state.loans
-    .filter(l => l.returnStatus === 'PENDING' && mine.includes(l.labId))
-    .sort((a,b) => (a.returnRequestedAt||0) - (b.returnRequestedAt||0));
-  const cnt = $('returnReqCount');
-  if (cnt) cnt.textContent = reqs.length;
-  if (!reqs.length) { wrap.classList.add('hidden'); return; }
-  wrap.classList.remove('hidden');
-  const t = now();
-  list.innerHTML = reqs.map(l => {
-    const overdue = isOverdue(l, t);
-    return `<div class="flex flex-col lg:flex-row lg:items-center gap-3 p-4 ${overdue ? 'bg-rose-500/5' : ''}">
-      <div class="flex items-start gap-3 min-w-0 flex-1">
-        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl ${overdue ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'}">
-          <i class="fa-solid fa-clipboard-check text-sm"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm font-bold text-white">${esc(l.itemName)} <span class="text-slate-500">×${l.quantity}</span></span>
-            ${labChip(l.labId)}
-            ${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}
-          </div>
-          <div class="mt-1 text-[11px] text-slate-400">
-            <b class="text-slate-300">${esc(l.borrowerName)}</b> · <span class="mono">${esc(l.borrowerId)}</span> · TXN <span class="mono">${esc(l.loanId)}</span>
-          </div>
-          <div class="mt-1 text-[10px] text-slate-500">Requested ${relTime(l.returnRequestedAt || t)} · due ${esc(l.dueTimeFormatted)}</div>
-        </div>
-      </div>
-      <div class="flex flex-col sm:flex-row gap-2 shrink-0">
-        <button onclick="approveReturn('${l.loanId}')" class="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-4 py-2.5 text-xs font-bold text-white hover:from-emerald-600 hover:to-emerald-800 transition">
-          <i class="fa-solid fa-check text-[11px]"></i> Received — approve
-        </button>
-        <button onclick="openRejectReturn('${l.loanId}')" class="flex items-center justify-center gap-2 rounded-xl border border-rose-500/50 bg-rose-500/10 px-4 py-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition">
-          <i class="fa-solid fa-xmark text-[11px]"></i> Not returned
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 function renderLedger(loans, t) {
-  const tbody = $('ledgerBody');
-  if (!tbody) return;
+  const tbody = $('ledgerBody'); if (!tbody) return;
   const sorted = loans.slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
   if (!sorted.length) {
     tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-12 text-center text-xs text-slate-500">No components borrowed.</td></tr>`;
@@ -2527,17 +2118,13 @@ function renderLedger(loans, t) {
   tbody.innerHTML = sorted.map(loan => {
     const overdue = isOverdue(loan, t);
     const dueSoon = !overdue && isDueSoon(loan, t);
-    const pending = loan.returnStatus === 'PENDING';
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     let pill = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300', label = 'Normal';
     if (overdue) { pill = 'bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; label = 'Overdue'; }
     else if (dueSoon) { pill = 'border-amber-500/40 bg-amber-500/15 text-amber-300'; label = 'Due soon'; }
-    if (pending) { pill = 'border-brand-500/50 bg-brand-500/20 text-brand-200'; label = 'Return pending'; }
 
     const actions = `<div class="flex justify-end gap-1.5 flex-wrap">
-      ${pending ? `<button onclick="approveReturn('${loan.loanId}')" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition">Approve</button>
-      <button onclick="openRejectReturn('${loan.loanId}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20 transition">Reject</button>`
-      : `<button onclick="approveReturn('${loan.loanId}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:border-emerald-500/60 hover:text-emerald-300 transition">Force return</button>`}
+      <button onclick="openReturnVerify('${loan.loanId}')" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/20 transition whitespace-nowrap"><i class="fa-solid fa-clipboard-check mr-1 text-[10px]"></i>Verify return</button>
     </div>`;
 
     return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40 transition">
@@ -2557,12 +2144,8 @@ function renderLedger(loans, t) {
 }
 
 function renderInventoryTable(items) {
-  const inv = $('inventoryBody');
-  if (!inv) return;
-  if (!items.length) {
-    inv.innerHTML = `<tr><td colspan="9" class="px-4 py-12 text-center text-xs text-slate-500">No components in your labs.</td></tr>`;
-    return;
-  }
+  const inv = $('inventoryBody'); if (!inv) return;
+  if (!items.length) { inv.innerHTML = `<tr><td colspan="9" class="px-4 py-12 text-center text-xs text-slate-500">No components in your labs.</td></tr>`; return; }
   inv.innerHTML = items.map(item => {
     const out = borrowedQty(item.id); const avail = availableQty(item.id);
     const low = avail > 0 && avail <= state.settings.lowStockThreshold;
@@ -2581,10 +2164,8 @@ function renderInventoryTable(items) {
   }).join('');
 }
 
-/* ── Labs list (super admin) ── */
 function renderLabsList() {
-  const list = $('labsList');
-  const badge = $('labCountBadge');
+  const list = $('labsList'); const badge = $('labCountBadge');
   if (badge) badge.textContent = state.labs.length;
   if (!list) return;
   if (!state.labs.length) { list.innerHTML = `<p class="text-xs text-slate-500">No labs yet.</p>`; return; }
@@ -2655,17 +2236,15 @@ async function deleteLab(id) {
   const admins = getAdmins().map(a => ({ ...a, labIds: (a.labIds || []).filter(x => x !== id) }));
   state.adminConfig = { ...(state.adminConfig || {}), admins };
   publishKey('labs'); publishKey('adminConfig');
-  renderAll();
-  toast('Lab deleted.', 'success');
+  renderAll(); toast('Lab deleted.', 'success');
 }
 
-/* ── Teachers ── */
+/* ─── TEACHERS ─── */
 function renderTeachersList() {
   const admins = getAdmins();
   const badge = $('teacherCountBadge');
   if (badge) badge.textContent = admins.length;
-  const list = $('teachersList');
-  if (!list) return;
+  const list = $('teachersList'); if (!list) return;
   if (!admins.length) { list.innerHTML = `<p class="text-xs text-slate-500">No teachers configured.</p>`; return; }
   const superAdmin = isSuperAdmin();
   list.innerHTML = admins.map(a => {
@@ -2756,8 +2335,7 @@ async function removeTeacher(username) {
 
 function renderStudentsList() {
   const students = Object.values(state.students || {}).sort((a,b) => b.createdAt - a.createdAt);
-  const list = $('studentsList');
-  if (!list) return;
+  const list = $('studentsList'); if (!list) return;
   if (!students.length) list.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students have logged in yet.</div>`;
   else list.innerHTML = students.map(s => `<div class="flex items-center justify-between gap-2 rounded-lg border border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40 px-3 py-2">
     <div class="min-w-0">
@@ -2786,7 +2364,7 @@ async function resetStudentPassword(reg) {
   toast(`${reg} password reset.`, 'success');
 }
 
-/* ─────────── Component modal ─────────── */
+/* ─── COMPONENT MODAL ─── */
 function fillComponentLabSelect(selectedLabId) {
   const sel = $('cmpLab'); if (!sel) return;
   const mine = myLabIds();
@@ -2812,10 +2390,8 @@ function openComponentModal(id = null) {
   $('cmpDesc').value = item ? item.description : '';
   openModal('mComponent');
 }
-function nextSku() {
-  const nums = state.inventory.map(i => parseInt(String(i.id).replace(/\D/g,''),10)).filter(n => !isNaN(n));
-  return 'SKU-' + ((nums.length ? Math.max(...nums) : 1000) + 1);
-}
+function nextSku() { const nums = state.inventory.map(i => parseInt(String(i.id).replace(/\D/g,''),10)).filter(n => !isNaN(n)); return 'SKU-' + ((nums.length ? Math.max(...nums) : 1000) + 1); }
+
 function saveComponent() {
   if (session.role !== 'admin') return;
   const orig = $('cmpOriginalId').value;
@@ -2847,6 +2423,7 @@ function saveComponent() {
   publishKey('inventory'); populateCategories(); closeModal('mComponent'); renderAll();
   toast('Saved.', 'success');
 }
+
 async function deleteComponent(id) {
   if (session.role !== 'admin') return;
   const item = findItem(id); if (!item) return;
@@ -2871,7 +2448,6 @@ async function resetDemo() {
   const mine = myLabIds();
   const ok = await confirmDialog('Reset', 'Restore sample inventory for your labs and clear all active loans?', 'Reset');
   if (!ok) return;
-  // keep items from labs the admin does not manage
   const keep = state.inventory.filter(i => !mine.includes(i.labId));
   const fresh = SEED_INVENTORY.filter(i => mine.includes(i.labId)).map(x => ({ ...x }));
   state.inventory = [...keep, ...fresh];
@@ -2887,9 +2463,7 @@ async function clearHistory() {
   const mine = myLabIds();
   const scoped = state.history.filter(h => mine.includes(h.labId));
   if (!scoped.length) { toast('History is already empty for your labs.', 'warn'); return; }
-  const ok = await confirmDialog('Clear transaction history',
-    `Permanently delete ${scoped.length} transaction record(s) for your labs? Current inventory and active loans stay intact. Download the Excel backup first.`,
-    'Erase history');
+  const ok = await confirmDialog('Clear transaction history', `Permanently delete ${scoped.length} transaction record(s) for your labs? Current inventory and active loans stay intact. Download the Excel backup first.`, 'Erase history');
   if (!ok) return;
   state.history = state.history.filter(h => !mine.includes(h.labId));
   state.activity = [];
@@ -2897,11 +2471,8 @@ async function clearHistory() {
   toast(`${scoped.length} records erased.`, 'success', 4000);
 }
 
-/* ─────────── Poster ─────────── */
-function getJoinUrl() {
-  const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, '');
-  return base + '/';
-}
+/* ─── POSTER ─── */
+function getJoinUrl() { const base = (deployUrl || '').replace(/\/$/, '') || (location.origin + location.pathname).replace(/\/$/, ''); return base + '/'; }
 function renderPoster() {
   const s = state.settings;
   $('posterTitle').value = s.posterTitle;
@@ -2933,7 +2504,7 @@ async function downloadPoster() {
   }).catch(() => toast('Export failed.', 'error'));
 }
 
-/* ─────────── Sync page ─────────── */
+/* ─── SYNC PAGE ─── */
 function renderSyncPage() {
   const conn = $('syncStatConn');
   if (conn) conn.innerHTML = connected
@@ -2944,12 +2515,9 @@ function renderSyncPage() {
   const url = getJoinUrl();
   $('syncJoinQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(url)}`;
 }
-function copyJoinUrl() {
-  const url = getJoinUrl();
-  navigator.clipboard.writeText(url).then(() => toast('URL copied.', 'success')).catch(() => prompt('Copy:', url));
-}
+function copyJoinUrl() { const url = getJoinUrl(); navigator.clipboard.writeText(url).then(() => toast('URL copied.', 'success')).catch(() => prompt('Copy:', url)); }
 
-/* ─────────── Excel export ─────────── */
+/* ─── EXCEL EXPORT ─── */
 function exportExcel() {
   if (session.role !== 'admin') return;
   const mine = myLabIds();
@@ -2957,7 +2525,6 @@ function exportExcel() {
   const inv = state.inventory.filter(i => mine.includes(i.labId));
   const hist = state.history.filter(h => mine.includes(h.labId));
   if (!hist.length && !inv.length) { toast('Nothing to export.', 'warn'); return; }
-
   const loanRows = hist.map(h => {
     const active = h.status === 'ACTIVE';
     const endMs = active ? t : (h.returnTimeMs || h.borrowTimeMs);
@@ -2969,18 +2536,16 @@ function exportExcel() {
       'Returned At': active ? 'STILL BORROWED' : (h.returnTimeFormatted || ''),
       'Status': h.status, 'Elapsed Minutes': parseFloat(mins),
       'Overdue': active ? (t > h.dueTimeMs ? 'YES' : 'NO') : (h.overdueFlag || 'NO'),
-      'Verified By': h.verifiedBy || ''
+      'Verified By': h.verifiedBy || '', 'Units Received': h.receivedCount != null ? h.receivedCount : ''
     };
   });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(loanRows.length ? loanRows : [{ Info: 'No loans yet' }]), 'Loans');
-
   const invRows = inv.map(i => ({
     'Lab': labName(i.labId), 'SKU': i.id, 'Component Name': i.name, 'Category': i.category, 'Total Stock': i.totalStock,
     'Available': availableQty(i.id), 'On Loan': borrowedQty(i.id), 'Description': i.description
   }));
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invRows), 'Inventory');
-
   const labsRows = state.labs.filter(l => mine.includes(l.id)).map(l => ({
     'Lab': l.name, 'Lab ID': l.id,
     'SKUs': state.inventory.filter(i => i.labId === l.id).length,
@@ -2989,7 +2554,6 @@ function exportExcel() {
     'Teachers': getAdmins().filter(a => a.isSuper || (a.labIds||[]).includes(l.id)).map(a => a.username).join(', ')
   }));
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(labsRows.length ? labsRows : [{ Info: 'No labs' }]), 'Labs');
-
   const scopedLoans = state.loans.filter(l => mine.includes(l.labId));
   const summaryRows = [
     { Metric: 'Total labs', Value: mine.length },
@@ -2998,7 +2562,6 @@ function exportExcel() {
     { Metric: 'Units on loan', Value: scopedLoans.reduce((s,l) => s + l.quantity, 0) },
     { Metric: 'Active borrowers', Value: new Set(scopedLoans.map(l => l.borrowerId)).size },
     { Metric: 'Overdue loans', Value: scopedLoans.filter(l => isOverdue(l, t)).length },
-    { Metric: 'Pending return requests', Value: scopedLoans.filter(l => l.returnStatus === 'PENDING').length },
     { Metric: 'Total transactions', Value: hist.length },
     { Metric: 'Registered students', Value: Object.keys(state.students || {}).length },
     { Metric: 'Report generated', Value: fmtDateTime(t) }
@@ -3008,7 +2571,7 @@ function exportExcel() {
   toast('Excel downloaded.', 'success');
 }
 
-/* ─────────── Render everything ─────────── */
+/* ─── RENDER ALL ─── */
 function updateBadges() {
   const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
   const badge = $('cartCount');
@@ -3030,7 +2593,7 @@ function renderAll() {
   }
 }
 
-/* ─────────── Ticker ─────────── */
+/* ─── TICKER ─── */
 let lastStatusKey = '';
 function tick() {
   const t = now();
@@ -3044,7 +2607,7 @@ function tick() {
     const e3 = document.querySelector(`[data-bar="${loan.loanId}"]`); if (e3) e3.style.width = Math.min(100, (elapsed/loanMs())*100) + '%';
     const e4 = document.querySelector(`[data-admin-elapsed="${loan.loanId}"]`); if (e4) e4.textContent = fmtDuration(elapsed);
   });
-  const key = state.loans.map(l => (isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N') + (l.returnStatus||'N')[0]).join('');
+  const key = state.loans.map(l => isOverdue(l,t)?'O':isDueSoon(l,t)?'S':'N').join('');
   if (key !== lastStatusKey) {
     lastStatusKey = key;
     renderLoans(); renderOverview();
@@ -3053,7 +2616,7 @@ function tick() {
   }
 }
 
-/* ─────────── Boot ─────────── */
+/* ─── BOOT ─── */
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal(); loadTheme();
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
@@ -3080,11 +2643,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(() => checkOverdueForCurrentUser(false), 30000);
 });
 
-/* ─────────── Exports ─────────── */
+/* ─── EXPORTS ─── */
 window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
 window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
-window.requestReturn = requestReturn; window.cancelReturnRequest = cancelReturnRequest;
-window.approveReturn = approveReturn; window.openRejectReturn = openRejectReturn; window.confirmRejectReturn = confirmRejectReturn;
+window.openReturnVerify = openReturnVerify; window.confirmReturnVerify = confirmReturnVerify;
 window.loansBulkAction = loansBulkAction;
 window.renderCatalog = renderCatalog; window.setCatalogLab = setCatalogLab;
 window.onPosterInput = onPosterInput; window.downloadPoster = downloadPoster; window.showQr = showQr;
