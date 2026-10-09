@@ -155,7 +155,6 @@
   body.theme-light .lab-chip-4 { background: rgba(225,29,72,.10); color:#be123c; }
   body.theme-light .lab-chip-5 { background: rgba(139,92,246,.12); color:#6d28d9; }
 
-  /* Lab picker cards */
   .lab-pick-card { position: relative; display:flex; align-items:flex-start; gap:.85rem; text-align:left; padding:1rem 1.1rem; border-radius:1rem; border:2px solid #e0e7f1; background:#ffffff; transition: all .2s cubic-bezier(.16,1,.3,1); cursor:pointer; width:100%; }
   .lab-pick-card:hover { border-color:#3b62f6; box-shadow: 0 12px 28px -12px rgba(59,98,246,.35); transform: translateY(-2px); }
   .lab-pick-card:active { transform: translateY(0); }
@@ -947,7 +946,6 @@
   </div>
 </div>
 
-<!-- FIX: raised z-index from 95 → 120 so it renders above mReturnVerify (z-96) -->
 <div id="mConfirm" class="fixed inset-0 z-[120] hidden items-center justify-center bg-ink-950/80 p-3 sm:p-4 backdrop-blur-md">
   <div class="scale-in w-full max-w-sm space-y-4 sm:space-y-5 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 sm:p-6">
     <div class="flex items-start gap-3.5">
@@ -2086,8 +2084,13 @@ function openReturnVerify(loanId) {
   setTimeout(() => { const inp = $('returnVerifyCount'); inp.focus(); inp.select(); }, 120);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   FIX: close the verify modal FIRST, then open the confirm dialog.
+   This eliminates any stacking-context / overlay conflict so the
+   confirm dialog is guaranteed to be visible and clickable.
+   ───────────────────────────────────────────────────────────── */
 async function confirmReturnVerify() {
-  if (session.role !== 'admin') return;
+  if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   const loan = state.loans.find(l => l.loanId === pendingReturnLoanId);
   if (!loan) { closeModal('mReturnVerify'); return; }
   if (!canManageLab(loan.labId)) { toast(`You do not manage ${labName(loan.labId)}.`, 'error'); closeModal('mReturnVerify'); return; }
@@ -2098,27 +2101,46 @@ async function confirmReturnVerify() {
   if (received < 0) { toast('Count cannot be negative.', 'warn'); return; }
   if (received > loan.quantity) { toast(`Cannot exceed ${loan.quantity} (expected on loan).`, 'warn'); return; }
 
+  // Capture everything we need, then close the verify modal and clear the pending id
+  const loanRef = loan;
+  const remaining = loan.quantity - received;
+  pendingReturnLoanId = null;
+
+  // Close the verify modal FIRST so the confirm dialog opens by itself
+  closeModal('mReturnVerify');
+
+  // Small delay to let the DOM settle before showing the confirm dialog
+  await new Promise(r => setTimeout(r, 80));
+
   if (received === 0) {
-    const ok = await confirmDialog('Nothing received', `You entered 0 — no components were physically returned. The loan will stay open.`, 'Keep open', false, 'fa-circle-info');
+    const ok = await confirmDialog(
+      'Nothing received',
+      `You entered 0 — no components were physically returned. The loan will stay open.`,
+      'Keep open', false, 'fa-circle-info'
+    );
     if (!ok) return;
-    closeModal('mReturnVerify'); pendingReturnLoanId = null;
     toast('No items received. Loan remains open.', 'info');
     return;
   }
 
-  if (received === loan.quantity) {
-    const ok = await confirmDialog('Confirm full return', `Confirm you received all ${received} × "${loan.itemName}" from ${loan.borrowerName}.`, 'Confirm & close', false, 'fa-check');
+  if (received === loanRef.quantity) {
+    const ok = await confirmDialog(
+      'Confirm full return',
+      `Confirm you received all ${received} × "${loanRef.itemName}" from ${loanRef.borrowerName}.`,
+      'Confirm & close', false, 'fa-check'
+    );
     if (!ok) return;
-    finalizeFullReturn(loan);
-    closeModal('mReturnVerify'); pendingReturnLoanId = null;
+    finalizeFullReturn(loanRef);
     return;
   }
 
-  const remaining = loan.quantity - received;
-  const ok = await confirmDialog('Partial return', `You received ${received} of ${loan.quantity}. ${remaining} unit(s) will remain on loan for ${loan.borrowerName}. Continue?`, 'Record partial', false, 'fa-clipboard-check');
+  const ok = await confirmDialog(
+    'Partial return',
+    `You received ${received} of ${loanRef.quantity}. ${remaining} unit(s) will remain on loan for ${loanRef.borrowerName}. Continue?`,
+    'Record partial', false, 'fa-clipboard-check'
+  );
   if (!ok) return;
-  finalizePartialReturn(loan, received, remaining);
-  closeModal('mReturnVerify'); pendingReturnLoanId = null;
+  finalizePartialReturn(loanRef, received, remaining);
 }
 
 function finalizeFullReturn(loan) {
