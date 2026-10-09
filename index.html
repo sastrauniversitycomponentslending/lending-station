@@ -202,13 +202,24 @@
       <div id="adminHeader" class="hidden bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 py-3.5 text-center">
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Teacher Login</h1>
       </div>
+
+      <!-- STUDENT FORM: no password, no captcha -->
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
+        <div class="rounded-lg border border-bajaj-200 bg-bajaj-50/70 p-3 text-center text-[11px] font-medium text-bajaj-800">
+          <i class="fa-solid fa-id-card mr-1"></i> Students: no password needed — just scan your ID card barcode.
+        </div>
+
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Register No</label>
           <div class="w-full sm:flex-1">
             <div class="flex gap-2">
-              <input id="loginRegister" type="text" list="registerList" autocomplete="username" placeholder="Scan ID or type" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16)" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()" class="w-full border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.15em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-bajaj-500 focus:outline-none" />
-              <button type="button" onclick="openScanner('login')" class="shrink-0 rounded-lg bg-gradient-to-br from-bajaj-500 to-bajaj-700 px-3 text-white shadow-lg shadow-bajaj-500/20 hover:from-bajaj-600 hover:to-bajaj-800" title="Scan ID card barcode">
+              <input id="loginRegister" type="text" list="registerList" autocomplete="username" placeholder="Scan ID or type"
+                oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16)"
+                onkeydown="if(event.key==='Enter')attemptStudentLogin()"
+                class="w-full border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm tracking-[.15em] text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:border-bajaj-500 focus:outline-none" />
+              <button type="button" onclick="openScanner('login')"
+                class="shrink-0 rounded-lg bg-gradient-to-br from-bajaj-500 to-bajaj-700 px-3 text-white shadow-lg shadow-bajaj-500/20 hover:from-bajaj-600 hover:to-bajaj-800"
+                title="Scan ID card barcode">
                 <i class="fa-solid fa-barcode"></i>
               </button>
             </div>
@@ -216,28 +227,19 @@
             <div id="savedRegistersRow" class="mt-2 flex flex-wrap gap-1.5"></div>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Password</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="ddmmyyyy" onkeydown="if(event.key==='Enter')document.getElementById('loginCaptchaInput').focus()" class="w-full sm:flex-1 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bajaj-500 focus:outline-none" />
-        </div>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Enter captcha</label>
-          <div class="flex items-center gap-3 w-full sm:flex-1">
-            <input id="loginCaptchaInput" type="text" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter')attemptStudentLogin()" class="w-24 sm:w-28 border-b-2 border-slate-300 bg-transparent px-1 py-2 text-sm text-slate-900 focus:border-bajaj-500 focus:outline-none" />
-            <canvas id="captchaCanvas" width="140" height="46" class="cursor-pointer rounded border border-slate-300 shadow-sm" onclick="generateCaptcha()"></canvas>
-          </div>
-        </div>
-        <button id="loginSubmitBtn" onclick="attemptStudentLogin()" class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
-          <i class="fa-solid fa-right-to-bracket text-xs"></i><span id="loginSubmitText">Submit</span>
+
+        <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
+          class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
+          <i class="fa-solid fa-right-to-bracket text-xs"></i><span id="loginSubmitText">Enter Catalog</span>
         </button>
-        <div class="text-right">
-          <button onclick="showForgotHelp()" class="text-xs font-semibold text-bajaj-700 underline decoration-dotted hover:text-bajaj-900">Forgot password?</button>
-        </div>
+
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
-          <p>First login: use your <b class="text-slate-700">Date of Birth</b> (ddmmyyyy).</p>
-          <p class="mt-1"><i class="fa-solid fa-barcode mr-1"></i> Scan the barcode on your ID card to fill your register number.</p>
+          <p><i class="fa-solid fa-barcode mr-1"></i> Scan the barcode on your ID card — you'll go straight to the lab catalog.</p>
+          <p class="mt-1">No password. No captcha. Just scan and borrow.</p>
         </div>
       </div>
+
+      <!-- TEACHER FORM: keeps password -->
       <div id="adminForm" class="hidden p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Teacher No</label>
@@ -1259,14 +1261,13 @@ function renderSavedRegisters() {
       list.slice(0, 6).map(r => `<button type="button" class="saved-reg-chip" onclick="useSavedRegister('${esc(r)}')" oncontextmenu="event.preventDefault();removeSavedRegister('${esc(r)}')"><i class="fa-solid fa-id-badge"></i>${esc(r)}<span class="opacity-50" onclick="event.stopPropagation();removeSavedRegister('${esc(r)}')">×</span></button>`).join('')
     : '';
 }
-function useSavedRegister(reg) { const inp = $('loginRegister'); if (inp) { inp.value = reg; inp.focus(); } $('loginPassword').focus(); }
+function useSavedRegister(reg) { const inp = $('loginRegister'); if (inp) { inp.value = reg; inp.focus(); } attemptStudentLogin(); }
 
 /* ═══════════════════════════════════════════════════════════════════════
    BARCODE SCANNER  (fast: 30 fps + native BarcodeDetector when available)
    ═══════════════════════════════════════════════════════════════════════ */
 function createScannerInstance() {
   const opts = { verbose: false };
-  // Use the browser's native BarcodeDetector when supported (10x faster)
   opts.experimentalFeatures = { useBarCodeDetectorIfSupported: true };
   html5QrScanner = new Html5Qrcode('scannerReader', opts);
 }
@@ -1281,8 +1282,8 @@ function supportedFormats() {
 
 function buildScannerConfig() {
   const cfg = {
-    fps: 30,                       // fast frame rate
-    disableFlip: true,             // 1D barcodes don't need mirroring — saves CPU
+    fps: 30,
+    disableFlip: true,
     qrbox: function(vw, vh) {
       const w = Math.max(120, Math.floor(vw * 0.96));
       const h = Math.max(90, Math.floor(Math.min(vh * 0.6, vw * 0.42)));
@@ -1330,7 +1331,6 @@ function openScanner(target, hintText) {
     showScannerStatus('Camera library not loaded. Use manual entry below.', 'error');
     return;
   }
-  // Give the modal a frame to paint before the camera starts
   setTimeout(startCameraScanner, 120);
 }
 
@@ -1357,7 +1357,6 @@ function startCameraScanner() {
       Html5Qrcode.getCameras().then(cameras => {
         if (!cameras || !cameras.length) throw new Error('no-camera');
         const back = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
-        // rebuild a clean instance for the fallback attempt
         try { html5QrScanner.clear(); } catch {}
         reader.innerHTML = '';
         createScannerInstance();
@@ -1396,15 +1395,21 @@ function onScanSuccess(decodedText) {
   const clean = String(decodedText || '').trim();
   if (!clean) return;
   const ts = Date.now();
-  // debounce identical rapid re-reads so a single scan fires once
   if (clean === lastScanValue && (ts - lastScanTime) < 2000) return;
   lastScanValue = clean; lastScanTime = ts;
 
   if (navigator.vibrate) { try { navigator.vibrate(60); } catch {} }
   showScannerStatus('Scanned: ' + clean, 'success');
 
-  // release the camera immediately — makes the flow feel instant
   destroyScanner();
+
+  // For the student login, skip the intermediate modal entirely — go straight in.
+  if (scannerTarget === 'login') {
+    closeScanner();
+    $('loginRegister').value = clean.toUpperCase();
+    setTimeout(() => attemptStudentLogin(), 60);
+    return;
+  }
 
   handleScannedCode(clean);
 }
@@ -1412,6 +1417,12 @@ function onScanSuccess(decodedText) {
 function scannerManualSubmit() {
   const v = $('scannerManual').value.trim();
   if (!v) return;
+  if (scannerTarget === 'login') {
+    $('loginRegister').value = v.toUpperCase();
+    closeScanner();
+    setTimeout(() => attemptStudentLogin(), 60);
+    return;
+  }
   handleScannedCode(v);
 }
 
@@ -1426,7 +1437,7 @@ function handleScannedCode(code) {
     case 'login':
       $('loginRegister').value = clean.toUpperCase();
       closeScanner();
-      setTimeout(() => { $('loginPassword').focus(); }, 200);
+      setTimeout(() => attemptStudentLogin(), 60);
       break;
     case 'adminLogin':
       $('adminUserInput').value = cleanCode(clean, MAX_ADMIN_USER_LEN);
@@ -1901,19 +1912,19 @@ async function saveNewStudent() {
 
   if (!reg || reg.length < 3) { showErr('Register No must be at least 3 characters.'); return; }
   if (!/^[A-Z0-9-]+$/.test(reg)) { showErr('Register No may only contain A-Z, 0-9 and "-".'); return; }
-  if (!/^\d{8}$/.test(dob)) { showErr('DOB must be ddmmyyyy (8 digits).'); return; }
+  if (dob && !/^\d{8}$/.test(dob)) { showErr('DOB must be ddmmyyyy (8 digits) or leave blank.'); return; }
 
   const students = state.students || {};
-  if (students[reg] && students[reg].passwordHash) {
+  if (students[reg] && !students[reg].autoRegistered) {
     showErr(`Student "${reg}" already exists.`);
     return;
   }
-  const hash = await hashPassword(dob);
+  const hash = dob ? await hashPassword(dob) : '';
   students[reg] = {
     register: reg,
     name: name || ('Student ' + reg),
     passwordHash: hash,
-    dob,
+    dob: dob || '',
     idPhoto: pendingRegPhoto || '',
     createdAt: Date.now(),
     registeredBy: session.register || ''
@@ -1928,7 +1939,7 @@ async function saveNewStudent() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT REMOVAL (new)
+   STUDENT REMOVAL
    ═══════════════════════════════════════════════════════════════════════ */
 async function deleteStudent(reg) {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
@@ -1988,7 +1999,6 @@ function renderStudentsList() {
         </div>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
-        <button onclick="resetStudentPassword('${reg}')" class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold text-amber-300 hover:bg-amber-500/20 transition"><i class="fa-solid fa-key mr-1"></i>Reset</button>
         <button onclick="deleteStudent('${reg}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[10px] font-semibold text-rose-300 hover:bg-rose-500/20 transition"><i class="fa-solid fa-user-minus mr-1"></i>Remove</button>
       </div>
     </div>`;
@@ -2147,7 +2157,7 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CAPTCHA
+   CAPTCHA (kept for compatibility — not used by student login anymore)
    ═══════════════════════════════════════════════════════════════════════ */
 function generateCaptcha() {
   const canvas = $('captchaCanvas'); if (!canvas) return;
@@ -2270,9 +2280,10 @@ function cancelLabPick() {
   pendingSession = null;
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  const pwEl = $('loginPassword'); if (pwEl) pwEl.value = '';
+  const cpEl = $('loginCaptchaInput'); if (cpEl) cpEl.value = '';
   const inp = $('loginRegister');
-  if (!inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
+  if (inp && !inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
   clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
 }
 function switchLab() {
@@ -2281,39 +2292,46 @@ function switchLab() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT LOGIN
+   STUDENT LOGIN — no password, no captcha.
+   Scan barcode → straight to lab picker → catalog.
    ═══════════════════════════════════════════════════════════════════════ */
 async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
-  const pw = $('loginPassword').value;
-  const captchaInput = $('loginCaptchaInput').value.trim().toUpperCase();
   const btn = $('loginSubmitBtn'); const btnTxt = $('loginSubmitText');
   clearLoginMessages();
-  if (!reg) { showLoginError('Please enter or scan your Register No.'); return; }
-  if (!pw) { showLoginError('Please enter your Password.'); return; }
-  if (!captchaInput) { showLoginError('Please enter the captcha.'); return; }
-  if (captchaInput !== captchaCode) { showLoginError('Captcha mismatch.'); generateCaptcha(); $('loginCaptchaInput').value = ''; return; }
-  btn.disabled = true; btnTxt.textContent = 'Verifying…';
+
+  if (!reg || reg.length < 3) { showLoginError('Please scan or enter your Register No.'); return; }
+  if (!/^[A-Z0-9-]+$/.test(reg)) { showLoginError('Register No may only contain A-Z, 0-9 and "-".'); return; }
+
+  btn.disabled = true; btnTxt.textContent = 'Opening catalog…';
   try {
-    const hash = await hashPassword(pw);
     const students = state.students || {};
-    const existing = students[reg];
-    if (existing) {
-      if (hash === existing.passwordHash) {
-        saveRegister(reg);
-        showLabPicker('user', reg, existing.name || reg);
-      } else { showLoginError('Incorrect password.'); $('loginPassword').select(); }
-      return;
+    let existing = students[reg];
+
+    // First-time scan → auto-register so the student can go straight in.
+    if (!existing) {
+      existing = {
+        register: reg,
+        name: reg,
+        createdAt: Date.now(),
+        autoRegistered: true
+      };
+      students[reg] = existing;
+      state.students = students;
+      publishKey('students');
+      logActivity('student-register', `${reg} auto-registered via barcode scan`);
+      publishKey('activity');
     }
-    if (!/^\d{8}$/.test(pw)) { showLoginError('First-time login: use your DOB (ddmmyyyy).'); return; }
-    state.students = state.students || {};
-    state.students[reg] = { register: reg, name: reg, passwordHash: hash, createdAt: Date.now() };
-    publishKey('students');
+
     saveRegister(reg);
-    showLabPicker('user', reg, reg);
-    toast('Welcome!', 'success', 4000);
-  } catch (e) { console.error(e); showLoginError('Login error.'); }
-  finally { btn.disabled = false; btnTxt.textContent = 'Submit'; }
+    showLabPicker('user', reg, existing.name || reg);
+  } catch (e) {
+    console.error(e);
+    showLoginError('Login error.');
+  } finally {
+    btn.disabled = false;
+    btnTxt.textContent = 'Enter Catalog';
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2404,7 +2422,8 @@ function logout() {
   $('app').classList.add('hidden');
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  $('loginPassword').value = ''; $('loginCaptchaInput').value = '';
+  const pwEl = $('loginPassword'); if (pwEl) pwEl.value = '';
+  const cpEl = $('loginCaptchaInput'); if (cpEl) cpEl.value = '';
   $('adminUserInput').value = ''; $('adminPassInput').value = '';
   const saved = getSavedRegisters();
   $('loginRegister').value = saved.length ? saved[0] : '';
@@ -2442,13 +2461,13 @@ async function saveNewPassword() {
     publishKey('adminConfig'); show('Password updated.', true);
   } else {
     const s = (state.students || {})[session.register];
-    if (!s || curHash !== s.passwordHash) { show('Current password incorrect.', false); return; }
+    if (!s || !s.passwordHash || curHash !== s.passwordHash) { show('Current password incorrect.', false); return; }
     s.passwordHash = newHash;
     publishKey('students'); show('Password updated.', true);
   }
   setTimeout(() => closeModal('mChangePassword'), 1200);
 }
-function showForgotHelp() { showLoginInfo('New users: password is your DOB (ddmmyyyy). Existing users: ask a teacher to reset.'); }
+function showForgotHelp() { showLoginInfo('Students: just scan your ID card — no password needed. Teachers: ask the head teacher to reset.'); }
 
 /* ═══════════════════════════════════════════════════════════════════════
    NAV
@@ -2504,10 +2523,6 @@ function migrateInventoryLabs() {
       const it = state.inventory.find(i => i.id === h.itemId);
       h.labId = it ? it.labId : fallback;
     }
-  });
-  state.units.forEach(u => {
-    const it = state.inventory.find(i => i.id === u.skuId);
-    if (it && (!u.skuId || !validIds.has(it.labId))) { /* no-op */ }
   });
 }
 function applyRemoteKey(key, val) {
@@ -3449,6 +3464,15 @@ function exportExcel() {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(studentRows.length ? studentRows : [{Info:'No students'}]), 'Students');
   XLSX.writeFile(wb, `bajaj-lending-${new Date().toISOString().slice(0,10)}.xlsx`);
   toast('Excel downloaded.', 'success');
+}
+function clearHistory() {
+  if (session.role !== 'admin') return;
+  const mine = myLabIds();
+  const before = state.history.length;
+  state.history = state.history.filter(h => !mine.includes(h.labId));
+  saveAndPublish('history');
+  renderAll();
+  toast(`Cleared ${before - state.history.length} history record(s).`, 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
