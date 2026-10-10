@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#05080f" />
 <title>BEST — Component Lending Station</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231e5fa8'/%3E%3Cpath d='M40 30h30v8H40zm0 16h30v8H40zm0 16h20v8H40z' fill='white'/%3E%3C/svg%3E" />
+<link rel="manifest" href='data:application/manifest+json,{"name":"BEST Component Lending Station","short_name":"BEST Lending","start_url":"./","display":"standalone","background_color":"%2305080f","theme_color":"%2305080f","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%231e5fa8%27/%3E%3Cpath d=%27M40 30h30v8H40zm0 16h30v8H40zm0 16h20v8H40z%27 fill=%27white%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}' />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -33,6 +34,7 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -162,6 +164,7 @@
   .sp-inspect { background:#ffedd5; color:#9a3412; border:1px solid #fdba74; }
   .sp-inuse { background:#dbeafe; color:#1e40af; border:1px solid #93c5fd; }
   .sp-oos { background:#f3f4f6; color:#374151; border:1px solid #d1d5db; }
+  .sp-reserved { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
 
   .role-badge-headbajaj { background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; }
   .role-badge-stocks { background:linear-gradient(135deg,#0891b2,#06b6d4); color:#fff; }
@@ -319,11 +322,13 @@
       <button data-nav="loans" onclick="go('loans')" class="nav-btn focus-ring rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-clock-rotate-left mr-2 text-xs"></i>My Loans</button>
       <button id="navDashboard" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-sliders mr-2 text-xs"></i>Dashboard</button>
       <button id="navReports" data-nav="reports" onclick="go('reports')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-file-lines mr-2 text-xs"></i>Reports</button>
+      <button id="navAudit" data-nav="audit" onclick="go('audit')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-clipboard-list mr-2 text-xs"></i>Audit</button>
       <button id="navUnits" data-nav="units" onclick="go('units')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-barcode mr-2 text-xs"></i>Units</button>
       <button id="navPoster" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-qrcode mr-2 text-xs"></i>Poster</button>
       <button id="navSync" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden rounded-lg px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:text-slate-200"><i class="fa-solid fa-tower-broadcast mr-2 text-xs"></i>Sync</button>
     </nav>
     <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+      <button id="installBtn" onclick="installPWA()" class="focus-ring hidden items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1.5 text-[11px] font-medium text-emerald-300"><i class="fa-solid fa-download text-[10px]"></i> Install</button>
       <button id="activeLabChip" onclick="switchLab()" class="focus-ring hidden items-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-2.5 py-1.5 text-[11px] font-semibold text-brand-200 hover:bg-brand-500/20 transition">
         <i class="fa-solid fa-building-columns text-[10px]"></i><span id="activeLabChipText" class="max-w-[120px] truncate">—</span>
       </button>
@@ -364,6 +369,7 @@
     <button data-nav="loans" onclick="go('loans')" class="nav-btn focus-ring whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">My Loans</button>
     <button id="navDashboardMobile" data-nav="dashboard" onclick="go('dashboard')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Dashboard</button>
     <button id="navReportsMobile" data-nav="reports" onclick="go('reports')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Reports</button>
+    <button id="navAuditMobile" data-nav="audit" onclick="go('audit')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Audit</button>
     <button id="navUnitsMobile" data-nav="units" onclick="go('units')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Units</button>
     <button id="navPosterMobile" data-nav="poster" onclick="go('poster')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Poster</button>
     <button id="navSyncMobile" data-nav="sync" onclick="go('sync')" class="nav-btn focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium text-slate-400">Sync</button>
@@ -388,7 +394,7 @@
       <h3 class="text-sm font-extrabold text-orange-200">Monthly machine inspection due</h3>
       <p id="machineInspectionDetail" class="mt-0.5 text-xs text-orange-300/90"></p>
     </div>
-    <button onclick="go('machines')" class="focus-ring w-full sm:w-auto rounded-xl bg-gradient-to-r from-orange-600 to-orange-700 px-4 py-2 text-xs font-bold text-white">Open Machines</button>
+    <button onclick="showMachineInspectionReport()" class="focus-ring w-full sm:w-auto rounded-xl bg-gradient-to-r from-orange-600 to-orange-700 px-4 py-2 text-xs font-bold text-white">View report</button>
   </div>
 </div>
 
@@ -444,7 +450,13 @@
       <div class="flex flex-wrap items-center gap-2">
         <div class="relative flex-1 min-w-[180px]"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i><input id="catalogSearch" type="text" oninput="renderCatalog()" placeholder="Search…" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" /></div>
         <select id="catalogCategory" onchange="renderCatalog()" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200"><option value="ALL">All categories</option></select>
+        <select id="catalogSort" onchange="renderCatalog()" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200">
+          <option value="NAME">Sort: Name</option>
+          <option value="AVAIL">Sort: Availability</option>
+          <option value="POPULAR">Sort: Popularity</option>
+        </select>
         <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400"><input id="catalogInStock" type="checkbox" onchange="renderCatalog()" class="h-3.5 w-3.5 accent-brand-500" /> In stock</label>
+        <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400"><input id="catalogFavOnly" type="checkbox" onchange="renderCatalog()" class="h-3.5 w-3.5 accent-amber-500" /> ★ Favourites</label>
       </div>
     </div>
   </div>
@@ -476,10 +488,12 @@
     <div><h1 id="loansHeading" class="text-base sm:text-lg font-bold text-white">Active Borrowed Items</h1><p id="loansSubheading" class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · each unit tracked by barcode</p></div>
     <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden"><i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span></button>
   </div>
+  <div id="myStatsStrip" class="mb-3"></div>
+  <div id="myReservationsStrip" class="mb-3"></div>
   <div id="loanList" class="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2"></div>
 </section>
 
-<!-- REPORTS (Lab Assistant / Head of BAJAJ / Stocks Handler) -->
+<!-- REPORTS -->
 <section id="view-reports" class="hidden space-y-4 sm:space-y-5">
   <div class="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-ink-850/50 to-neon-cyan/10 p-5 sm:p-8">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -497,6 +511,30 @@
     </div>
   </div>
   <div id="reportContent" class="space-y-4 sm:space-y-5"></div>
+</section>
+
+<!-- AUDIT LOG (new) -->
+<section id="view-audit" class="hidden space-y-4 sm:space-y-5">
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div>
+        <h1 class="text-base sm:text-lg font-bold text-white">Audit Log</h1>
+        <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Immutable trail of stock edits, returns, settings changes, staff actions and machine events.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <input id="auditSearch" type="text" oninput="renderAuditLog()" placeholder="Filter actor / action / target…" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600" />
+        <button onclick="exportAuditCSV()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-file-excel text-[11px]"></i> CSV</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto mobile-scroll-x">
+      <table class="w-full text-left text-xs min-w-[900px]">
+        <thead class="border-b border-ink-700 bg-ink-900/60 text-[10px] uppercase tracking-wider text-slate-500">
+          <tr><th class="px-3 py-3 font-semibold">When</th><th class="px-3 py-3 font-semibold">Actor</th><th class="px-3 py-3 font-semibold">Role</th><th class="px-3 py-3 font-semibold">Action</th><th class="px-3 py-3 font-semibold">Target</th><th class="px-3 py-3 font-semibold">Details</th></tr>
+        </thead>
+        <tbody id="auditBody" class="divide-y divide-ink-700/60"></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
 <!-- UNITS & BARCODES -->
@@ -561,6 +599,18 @@
       <div class="flex-1 min-w-0"><h3 class="text-sm font-extrabold text-orange-200">Inspection due (90-day cycle)</h3><p id="inspectionDueDetail" class="mt-0.5 text-xs text-orange-300/90"></p></div>
       <button onclick="go('units')" class="focus-ring rounded-xl bg-gradient-to-r from-orange-600 to-orange-700 px-4 py-2 text-xs font-bold text-white">Open Units</button>
     </div>
+  </div>
+
+  <!-- Extension queue -->
+  <div class="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 to-ink-850/50 p-4 sm:p-5">
+    <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-hourglass-half text-xs text-amber-400"></i> Extension Requests</h3>
+    <div id="extensionQueue" class="space-y-2"></div>
+  </div>
+
+  <!-- Reservation queue -->
+  <div class="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-950/20 to-ink-850/50 p-4 sm:p-5">
+    <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-bell text-xs text-brand-400"></i> Reservation Queue</h3>
+    <div id="reservationQueue" class="space-y-2"></div>
   </div>
 
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
@@ -641,8 +691,23 @@
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Low-stock threshold</label><input id="setLowStock" type="number" min="0" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Inspection cycle (days)</label><input id="setInspectDays" type="number" min="7" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" value="90" /></div>
       <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Machine inspection (days)</label><input id="setMachineInspectDays" type="number" min="7" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" value="30" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fine / hour overdue (₹)</label><input id="setFinePerHour" type="number" min="0" step="1" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Points / day overdue</label><input id="setPenaltyPoints" type="number" min="0" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Block threshold (points)</label><input id="setBlockThreshold" type="number" min="1" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
+      <div><label class="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Max items / student</label><input id="setMaxItems" type="number" min="1" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 p-2.5 text-xs text-white" /></div>
     </div>
     <div class="mt-4 flex justify-end"><button onclick="saveSettings()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-5 py-2.5 text-xs font-semibold text-white"><i class="fa-solid fa-check text-[11px]"></i> Save settings</button></div>
+  </div>
+
+  <!-- Backup / restore -->
+  <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
+    <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-database text-xs text-brand-400"></i> Backup &amp; Restore</h3>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="exportBackup()" class="flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-4 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-download text-[11px]"></i> Export full backup</button>
+      <button onclick="openImportBackup()" class="flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-xs font-semibold text-rose-300"><i class="fa-solid fa-upload text-[11px]"></i> Restore from backup</button>
+      <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackup(event)" />
+    </div>
+    <p class="mt-2 text-[11px] text-slate-500">Contains labs, inventory, units, loans, history, fines, extensions, reservations, audit log, students, settings.</p>
   </div>
 
   <div id="manageTeachersCard" class="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/20 to-ink-850/50 p-4 sm:p-5">
@@ -764,6 +829,7 @@
       <input id="cmpStock" type="number" min="0" placeholder="Number of units" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
       <input id="cmpName" type="text" placeholder="Component name" class="focus-ring sm:col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
       <input id="cmpCategory" type="text" placeholder="Category" class="focus-ring sm:col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <input id="cmpDatasheet" type="text" placeholder="Datasheet URL (optional)" class="focus-ring sm:col-span-2 w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
       <textarea id="cmpDesc" rows="2" placeholder="Description" class="focus-ring sm:col-span-2 w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
     </div>
     <div class="rounded-xl border border-brand-500/30 bg-brand-500/5 p-3 text-[11px] text-brand-200"><i class="fa-solid fa-info-circle mr-1"></i> Number of units auto-creates unique serial numbers (e.g. <span class="mono">TI-BOARD-0001</span>). Only <b>Lab Assistant</b> and <b>Head of BAJAJ</b> can modify stock.</div>
@@ -1022,21 +1088,32 @@ const BUILTIN_FIREBASE = {
   appId: "1:13293708546:web:b1344c74fc5e8483a6ce1b",
   measurementId: "G-DP20GNZX7X"
 };
+
+/* EmailJS — optional. Fill these and set enabled:true to turn on email notifications. */
+const EMAILJS = {
+  serviceId:  'YOUR_EMAILJS_SERVICE_ID',
+  templateId: 'YOUR_EMAILJS_TEMPLATE_ID',
+  publicKey:  'YOUR_EMAILJS_PUBLIC_KEY',
+  enabled: false
+};
+
 const STATION_NODE = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v14';
+const STORAGE_KEY = 'bajaj.lending.v15';
 const SESSION_KEY = 'bajaj.session.v13';
 const THEME_KEY = 'bajaj.theme.v2';
 const REGISTERS_KEY = 'bajaj.registers.v1';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
 const MACHINE_INSPECT_NOTIFIED_KEY = 'bajaj.machineInspNotified';
 const MAX_ACTIVITY = 60;
-const SYNC_KEYS = ['labs','inventory','units','loans','history','settings','activity','students','adminConfig','branding','inspections','defects','machines','machineInspections'];
+const SYNC_KEYS = ['labs','inventory','units','loans','history','settings','activity',
+  'students','adminConfig','branding','inspections','defects','machines','machineInspections',
+  'fines','extensions','reservations','auditLog','favorites','machineBookings'];
 const MIN_ADMIN_USER_LEN = 4;
 const MAX_ADMIN_USER_LEN = 12;
 const MIN_ADMIN_PASS_LEN = 6;
 const DEFAULT_INSPECT_DAYS = 90;
 const DEFAULT_MACHINE_INSPECT_DAYS = 30;
-const MAX_TEACHERS = Infinity;   // no limit on staff
+const MAX_TEACHERS = Infinity;
 const OVERDUE_BLOCK_HOURS = 2;
 const OVERDUE_BLOCK_MS = OVERDUE_BLOCK_HOURS * 3600 * 1000;
 
@@ -1090,15 +1167,15 @@ const SEED_LABS = [
   { id:'LAB-MECH', name:'Mechanical Workshop', description:'Motors, actuators, measuring & fabrication tools.' }
 ];
 const SEED_INVENTORY = [
-  { id:'SKU-1001', labId:'LAB-ELEC', name:'Arduino Uno R3 Board',  category:'Microcontrollers',  totalStock:12, description:'ATmega328P microcontroller board.' },
-  { id:'SKU-1002', labId:'LAB-ELEC', name:'Raspberry Pi 4 (4GB)',  category:'Microcontrollers',  totalStock:6,  description:'Quad-core 64-bit SBC.' },
-  { id:'SKU-1003', labId:'LAB-ELEC', name:'Digital Multimeter',    category:'Tools & Equipment', totalStock:8,  description:'Auto-ranging DMM.' },
-  { id:'SKU-1004', labId:'LAB-ELEC', name:'DHT22 Sensor',          category:'Sensors',           totalStock:20, description:'Temp & humidity sensor.' },
-  { id:'SKU-1005', labId:'LAB-ELEC', name:'HC-SR04 Ultrasonic',    category:'Sensors',           totalStock:15, description:'Distance sensor.' },
-  { id:'SKU-1006', labId:'LAB-ELEC', name:'Soldering Iron 60W',    category:'Tools & Equipment', totalStock:5,  description:'Adjustable soldering station.' },
-  { id:'SKU-2001', labId:'LAB-MECH', name:'SG90 Micro Servo',      category:'Actuators & Motors',totalStock:25, description:'180° miniature servo.' },
-  { id:'SKU-2002', labId:'LAB-MECH', name:'NEMA 17 Stepper',       category:'Actuators & Motors',totalStock:8,  description:'1.8° bipolar stepper.' },
-  { id:'SKU-2003', labId:'LAB-MECH', name:'Vernier Caliper',       category:'Measuring',         totalStock:10, description:'0.01mm steel caliper.' }
+  { id:'SKU-1001', labId:'LAB-ELEC', name:'Arduino Uno R3 Board',  category:'Microcontrollers',  totalStock:12, description:'ATmega328P microcontroller board.', datasheet:'' },
+  { id:'SKU-1002', labId:'LAB-ELEC', name:'Raspberry Pi 4 (4GB)',  category:'Microcontrollers',  totalStock:6,  description:'Quad-core 64-bit SBC.', datasheet:'' },
+  { id:'SKU-1003', labId:'LAB-ELEC', name:'Digital Multimeter',    category:'Tools & Equipment', totalStock:8,  description:'Auto-ranging DMM.', datasheet:'' },
+  { id:'SKU-1004', labId:'LAB-ELEC', name:'DHT22 Sensor',          category:'Sensors',           totalStock:20, description:'Temp & humidity sensor.', datasheet:'' },
+  { id:'SKU-1005', labId:'LAB-ELEC', name:'HC-SR04 Ultrasonic',    category:'Sensors',           totalStock:15, description:'Distance sensor.', datasheet:'' },
+  { id:'SKU-1006', labId:'LAB-ELEC', name:'Soldering Iron 60W',    category:'Tools & Equipment', totalStock:5,  description:'Adjustable soldering station.', datasheet:'' },
+  { id:'SKU-2001', labId:'LAB-MECH', name:'SG90 Micro Servo',      category:'Actuators & Motors',totalStock:25, description:'180° miniature servo.', datasheet:'' },
+  { id:'SKU-2002', labId:'LAB-MECH', name:'NEMA 17 Stepper',       category:'Actuators & Motors',totalStock:8,  description:'1.8° bipolar stepper.', datasheet:'' },
+  { id:'SKU-2003', labId:'LAB-MECH', name:'Vernier Caliper',       category:'Measuring',         totalStock:10, description:'0.01mm steel caliper.', datasheet:'' }
 ];
 const SEED_MACHINES = [
   { machineId:'MCH-1001', labId:'LAB-MECH', name:'CNC Milling Machine',  location:'Bay 1',   capacity:4, status:'AVAILABLE', description:'3-axis CNC milling center.' },
@@ -1112,7 +1189,17 @@ const DEFAULT_SETTINGS = {
   posterTitle: 'BEST Component Lending Station',
   posterSubtitle: 'Bajaj Engineering Skills Training',
   posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.',
-  labelWidthCm: 5, labelHeightCm: 3, labelBcHeightMm: 15
+  labelWidthCm: 5, labelHeightCm: 3, labelBcHeightMm: 15,
+  finePerHourOverdue: 10,
+  penaltyPointsPerDay: 5,
+  blockThresholdPoints: 20,
+  blockDurationDays: 7,
+  maxActiveItemsPerStudent: 5,
+  extensionMaxMinutes: 120,
+  extensionMaxPerLoan: 1,
+  sessionTimeoutMinutes: 45,
+  maxFailedLogins: 5,
+  lockoutMinutes: 10
 };
 
 function defaultState() {
@@ -1125,7 +1212,9 @@ function defaultState() {
     borrower: { name:'', id:'' },
     settings: { ...DEFAULT_SETTINGS },
     activity: [], simOffsetMs: 0,
-    students: {}, adminConfig: null, branding: null
+    students: {}, adminConfig: null, branding: null,
+    fines: {}, extensions: [], reservations: [], auditLog: [],
+    favorites: {}, machineBookings: []
   };
 }
 let state = defaultState();
@@ -1143,12 +1232,15 @@ let machineSessionMachineId = null;
 let machineSessionMembers = [];
 let machineSessionMode = 'start';
 let pendingMachineInspectId = null;
+let lastActivityAt = Date.now();
+let deferredInstallPrompt = null;
 
 let scannerTarget = null;
 let html5QrScanner = null;
 let lastScanValue = '';
 let lastScanTime = 0;
 let fastScanSeen = new Set();
+const scanMemory = new Map();
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
@@ -1299,6 +1391,12 @@ function showScannerStatus(msg, type) {
   el.className = 'rounded-xl border p-2.5 text-center text-xs font-semibold ' + (type === 'error' ? 'border-rose-500/40 bg-rose-500/10 text-rose-300' : type === 'success' ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-500/40 bg-brand-500/10 text-brand-200');
   el.classList.remove('hidden');
 }
+function isDuplicateScan(unitId) {
+  const t = Date.now();
+  const prev = scanMemory.get(unitId) || 0;
+  scanMemory.set(unitId, t);
+  return t - prev < 30000;
+}
 function onScanSuccess(decodedText) {
   const clean = String(decodedText || '').trim(); if (!clean) return;
   const ts = Date.now();
@@ -1319,6 +1417,7 @@ function handleCatalogFastScan(code) {
   const normalized = raw.toUpperCase().replace(/\s+/g, '');
   const u = findUnit(normalized);
   if (!u) { showScannerStatus('✗ Not a component barcode (' + raw + ').', 'error'); if (navigator.vibrate) { try { navigator.vibrate([80, 60, 80]); } catch {} } return; }
+  if (isDuplicateScan(u.unitId)) { showScannerStatus('✗ Already scanned in the last 30s.', 'warn'); return; }
   if (u.status === 'ON_LOAN') { showScannerStatus('✗ ' + u.serialNo + ' is already on loan.', 'error'); return; }
   if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { showScannerStatus('✗ ' + u.serialNo + ' is ' + u.status.toLowerCase() + '.', 'error'); return; }
   if (state.cart[u.unitId]) { showScannerStatus('✗ ' + u.serialNo + ' is already in your cart.', 'error'); return; }
@@ -1364,8 +1463,25 @@ function handleScannedCode(code) {
   }
 }
 function closeScanner() {
-  destroyScanner(); scannerTarget = null; lastScanValue = ''; lastScanTime = 0; fastScanSeen = new Set();
+  destroyScanner(); scannerTarget = null; lastScanValue = ''; lastScanTime = 0; fastScanSeen = new Set(); scanMemory.clear();
   closeModal('mScanner'); const rd = $('scannerReader'); if (rd) rd.innerHTML = '';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUDIT LOG
+   ═══════════════════════════════════════════════════════════════════════ */
+function addAudit(action, target, details = '') {
+  const entry = {
+    id: 'AUD-' + Date.now() + '-' + Math.floor(Math.random()*900),
+    ts: now(),
+    actor: session.register || 'anonymous',
+    role: session.role === 'admin' ? (ROLE_LABELS[myRole()] || 'Staff') : (session.role || 'guest'),
+    action, target: String(target || ''), details: String(details || '').slice(0, 400)
+  };
+  if (!Array.isArray(state.auditLog)) state.auditLog = [];
+  state.auditLog.unshift(entry);
+  if (state.auditLog.length > 500) state.auditLog.length = 500;
+  return entry;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1541,15 +1657,17 @@ async function machineSessionPrimary() {
     m.currentSession = { sessionId: 'MSN-' + Math.floor(100000 + Math.random()*900000), machineId: m.machineId, startedBy: session.register || machineSessionMembers[0].register, startedByName: session.name || session.register || '', startTime: t, dueTimeMs: dueMs, members: machineSessionMembers.map(x => ({ register: x.register, name: x.name || x.register, joinedAt: x.joinedAt || t, isStarter: !!x.isStarter })), maxMembers: m.capacity || 1, notes: '' };
     m.status = 'IN_USE';
     logActivity('machine-start', `${m.currentSession.startedBy} started ${m.name} with ${machineSessionMembers.length} member(s)`);
-    saveAndPublish('machines','activity'); closeMachineSession(); renderAll();
+    addAudit('machine.session.start', m.machineId, `by ${session.register} members=${machineSessionMembers.length}`);
+    saveAndPublish('machines','activity','auditLog'); closeMachineSession(); renderAll();
     toast(`${m.name} session started.`, 'success'); return;
   }
   if (machineSessionMode === 'manage') {
     const ok = await confirmDialog('End machine session', `End the session on ${m.name}?`, 'End session', true, 'fa-stop');
     if (!ok) return;
+    addAudit('machine.session.end', m.machineId, `owner=${m.currentSession?.startedBy || ''}`);
     m.currentSession = null; m.status = 'AVAILABLE';
     logActivity('machine-end', `${session.register} ended session on ${m.name}`);
-    saveAndPublish('machines','activity'); closeMachineSession(); renderAll();
+    saveAndPublish('machines','activity','auditLog'); closeMachineSession(); renderAll();
     toast(`${m.name} session ended.`, 'success'); return;
   }
   if (machineSessionMode === 'join') {
@@ -1570,7 +1688,6 @@ async function machineSessionPrimary() {
   }
 }
 
-/* Machine inspection */
 function openMachineInspectModal(machineId) {
   const m = findMachine(machineId); if (!m) return;
   pendingMachineInspectId = machineId;
@@ -1599,10 +1716,9 @@ async function confirmMachineInspection() {
   state.machineInspections.unshift(rec);
   if (state.machineInspections.length > 400) state.machineInspections.length = 400;
   logActivity('machine-inspect', `${m.machineId} inspected by ${session.register} — ${condition}`);
-  saveAndPublish('machines','machineInspections','activity');
-  pendingMachineInspectId = null;
-  closeModal('mMachineInspect');
-  renderAll();
+  addAudit('machine.inspect', m.machineId, `condition=${condition} maint=${sendToMaint||condition==='DAMAGED'}`);
+  saveAndPublish('machines','machineInspections','activity','auditLog');
+  pendingMachineInspectId = null; closeModal('mMachineInspect'); renderAll();
   toast(`Inspection recorded for ${m.name}.`, 'success');
 }
 async function clearMachineMaintenance(machineId) {
@@ -1611,8 +1727,8 @@ async function clearMachineMaintenance(machineId) {
   const ok = await confirmDialog('Clear maintenance', `Mark ${m.name} as available again?`, 'Clear', false, 'fa-check');
   if (!ok) return;
   m.status = 'AVAILABLE';
-  saveAndPublish('machines');
-  renderAll();
+  addAudit('machine.maintenance.clear', m.machineId, `by ${session.register}`);
+  saveAndPublish('machines','auditLog'); renderAll();
   toast('Machine available again.', 'success');
 }
 function machineOverdueList() {
@@ -1668,7 +1784,7 @@ function canManageLab(labId) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LOAN HELPERS / OVERDUE
+   LOAN HELPERS / OVERDUE / FINES
    ═══════════════════════════════════════════════════════════════════════ */
 function loanMs() { return state.settings.loanDurationMinutes * 60000; }
 function isOverdue(l, t=now()) { return t > l.dueTimeMs; }
@@ -1687,12 +1803,362 @@ function myBlockingOverdueLoans() {
   const t = now();
   return state.loans.filter(l => { if (idKey(l.borrowerId) !== idKey(session.register)) return false; return (t - l.dueTimeMs) >= OVERDUE_BLOCK_MS; });
 }
+
+/* Fines & penalty points */
+function fineForLoan(loan, t = now()) {
+  if (t <= loan.dueTimeMs) return 0;
+  const hrsLate = (t - loan.dueTimeMs) / 3600000;
+  return Math.round(hrsLate * (state.settings.finePerHourOverdue || 10) * 100) / 100;
+}
+function pointsForLoan(loan, t = now()) {
+  if (t <= loan.dueTimeMs) return 0;
+  const daysLate = Math.ceil((t - loan.dueTimeMs) / 86400000);
+  return daysLate * (state.settings.penaltyPointsPerDay || 5);
+}
+function finesRecord(register) {
+  const key = idKey(register);
+  if (!state.fines[key]) state.fines[key] = { points: 0, balance: 0, blockUntil: 0, history: [] };
+  return state.fines[key];
+}
+function recomputeFines(register) {
+  if (!register) return null;
+  const key = idKey(register); const rec = finesRecord(key);
+  const my = state.loans.filter(l => idKey(l.borrowerId) === key);
+  let pts = 0, bal = 0;
+  my.forEach(l => { pts += pointsForLoan(l); bal += fineForLoan(l); });
+  rec.points = pts; rec.balance = Math.round(bal * 100) / 100;
+  if (pts >= (state.settings.blockThresholdPoints || 20) && !rec.blockUntil) {
+    rec.blockUntil = now() + (state.settings.blockDurationDays || 7) * 86400000;
+    addAudit('fine.block', key, `points=${pts} until=${fmtDateTime(rec.blockUntil)}`);
+  }
+  return rec;
+}
+function isBorrowBlocked(register) {
+  const rec = state.fines[idKey(register)];
+  if (!rec) return false;
+  if (rec.blockUntil && rec.blockUntil > now()) return true;
+  return false;
+}
+function settleFine(register, amount = null) {
+  if (!isHeadOfBajaj() && !isLabAssistant()) { toast('Only Lab Assistant / Head of BAJAJ.', 'warn'); return; }
+  const key = idKey(register); const rec = finesRecord(key);
+  const paid = amount == null ? rec.balance : Math.min(rec.balance, amount);
+  if (paid <= 0 && !rec.blockUntil) { toast('Nothing to settle.', 'info'); return; }
+  rec.history.push({ ts: now(), kind: 'settle', amount: paid, by: session.register });
+  rec.balance = Math.max(0, Math.round((rec.balance - paid) * 100) / 100);
+  rec.points = 0;
+  rec.blockUntil = 0;
+  saveAndPublish('fines');
+  addAudit('fine.settle', key, `paid=${paid} by=${session.register}`);
+  renderDashboard(); toast(`Fine settled for ${key}.`, 'success');
+}
+
 function blockIfOverdue() {
-  const bl = myBlockingOverdueLoans(); if (!bl.length) return false;
-  const names = bl.slice(0,3).map(l => l.itemName + ' (' + (l.serialNo||l.unitId) + ')').join(', ');
-  const more = bl.length > 3 ? ` +${bl.length-3} more` : '';
-  toast(`Borrowing locked: return overdue item(s) first — ${names}${more}.`, 'error', 6500);
-  return true;
+  if (!session || session.role === 'admin' || !session.register) return false;
+
+  const bl = myBlockingOverdueLoans();
+  if (bl.length) {
+    const names = bl.slice(0,3).map(l => `${l.itemName} (${l.serialNo||l.unitId})`).join(', ');
+    toast(`Borrowing locked: return overdue item(s) first — ${names}${bl.length>3?` +${bl.length-3} more`:''}.`, 'error', 6500);
+    return true;
+  }
+  if (isBorrowBlocked(session.register)) {
+    const rec = state.fines[idKey(session.register)];
+    toast(`Borrowing suspended until ${fmtDateTime(rec.blockUntil)} — ${rec.points} penalty point(s). Settle at the lab desk.`, 'error', 7000);
+    return true;
+  }
+  const active = state.loans.filter(l => idKey(l.borrowerId) === idKey(session.register)).length;
+  const cap = state.settings.maxActiveItemsPerStudent || 5;
+  if (active >= cap) {
+    toast(`Borrow limit reached (${cap}). Return something first.`, 'warn', 5000);
+    return true;
+  }
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EXTENSIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+function requestExtension(loanId) {
+  const loan = state.loans.find(l => l.loanId === loanId);
+  if (!loan) return;
+  if (idKey(loan.borrowerId) !== idKey(session.register) && session.role !== 'admin') {
+    toast('You can only extend your own loans.', 'warn'); return;
+  }
+  if ((loan.extensionCount || 0) >= (state.settings.extensionMaxPerLoan || 1)) {
+    toast('This loan has already used its extension allowance.', 'warn'); return;
+  }
+  if (state.extensions.some(e => e.loanId === loanId && e.status === 'PENDING')) {
+    toast('An extension request is already pending.', 'info'); return;
+  }
+  const maxExtra = Math.min(state.settings.extensionMaxMinutes || 120, state.settings.loanDurationMinutes || 120);
+  const input = prompt(`How many extra minutes? (max ${maxExtra}). Reason (optional)`, String(maxExtra));
+  if (input === null) return;
+  const parsed = parseInt(input, 10);
+  const extraMin = isNaN(parsed) ? maxExtra : Math.max(5, Math.min(maxExtra, parsed));
+  const entry = {
+    id: 'EXT-' + Date.now(),
+    loanId, register: loan.borrowerId,
+    requestedBy: session.register,
+    requestedAt: now(),
+    extraMinutes: extraMin,
+    reason: input.replace(/^\d+\s*/, '').trim().slice(0, 200),
+    status: 'PENDING', decidedBy: '', decidedAt: 0
+  };
+  state.extensions.unshift(entry);
+  saveAndPublish('extensions');
+  addAudit('extension.request', loanId, `+${extraMin}min by ${session.register}`);
+  toast('Extension requested — staff will review.', 'success', 3500);
+  renderAll();
+}
+function decideExtension(extId, approve) {
+  if (session.role !== 'admin') { toast('Staff access required.', 'warn'); return; }
+  const ext = state.extensions.find(e => e.id === extId);
+  if (!ext || ext.status !== 'PENDING') return;
+  const loan = state.loans.find(l => l.loanId === ext.loanId);
+  ext.status = approve ? 'APPROVED' : 'REJECTED';
+  ext.decidedBy = session.register; ext.decidedAt = now();
+  if (approve && loan) {
+    loan.dueTimeMs += ext.extraMinutes * 60000;
+    loan.dueTimeFormatted = fmtDateTime(loan.dueTimeMs);
+    loan.extensionCount = (loan.extensionCount || 0) + 1;
+    const h = state.history.find(x => x.loanId === loan.loanId);
+    if (h) { h.dueTimeMs = loan.dueTimeMs; h.dueTimeFormatted = loan.dueTimeFormatted; }
+  }
+  saveAndPublish('extensions', 'loans', 'history');
+  addAudit(approve ? 'extension.approve' : 'extension.reject', ext.loanId, `by ${session.register}`);
+  toast(approve ? `Extension approved (+${ext.extraMinutes}min).` : 'Extension rejected.', approve ? 'success' : 'info');
+  renderAll(); renderDashboard();
+}
+function renderExtensionQueue() {
+  const wrap = $('extensionQueue'); if (!wrap) return;
+  const pending = state.extensions.filter(e => e.status === 'PENDING');
+  if (!pending.length) { wrap.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-950/40 px-3 py-3 text-center text-xs text-slate-500">No pending extension requests.</div>`; return; }
+  wrap.innerHTML = pending.map(e => {
+    const loan = state.loans.find(l => l.loanId === e.loanId);
+    return `<div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-500/40 bg-amber-500/5 px-3 py-2.5">
+      <div class="min-w-0">
+        <div class="mono text-[11px] text-amber-300">${esc(e.loanId)} · +${e.extraMinutes}min</div>
+        <div class="text-xs text-white font-semibold">${esc(loan?.itemName || '—')} · ${esc(e.register)}</div>
+        ${e.reason ? `<div class="text-[10px] text-slate-400 italic">"${esc(e.reason)}"</div>` : ''}
+      </div>
+      <div class="flex gap-1.5">
+        <button onclick="decideExtension('${esc(e.id)}', true)" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-300">Approve</button>
+        <button onclick="decideExtension('${esc(e.id)}', false)" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-300">Reject</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RESERVATIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+function reserveItem(skuId) {
+  if (blockIfOverdue()) return;
+  const item = findItem(skuId); if (!item) return;
+  if (availableQty(skuId) > 0) { toast('Item is in stock — just add it to your cart.', 'info'); return; }
+  const key = idKey(session.register);
+  if (state.reservations.some(r => r.skuId === skuId && idKey(r.register) === key && r.status === 'WAITING')) {
+    toast('You already have a reservation for this item.', 'info'); return;
+  }
+  const entry = {
+    id: 'RSV-' + Date.now(),
+    skuId, labId: item.labId, register: session.register,
+    requestedAt: now(), status: 'WAITING', notifiedAt: 0, readyAt: 0
+  };
+  state.reservations.unshift(entry);
+  saveAndPublish('reservations');
+  addAudit('reservation.create', skuId, `by ${session.register}`);
+  toast(`Reserved — you are #${queuePosition(entry)} in the queue.`, 'success', 4000);
+  renderCatalog(); renderLoans();
+}
+function queuePosition(entry) {
+  const same = state.reservations
+    .filter(r => r.skuId === entry.skuId && r.status === 'WAITING')
+    .sort((a,b) => a.requestedAt - b.requestedAt);
+  return same.findIndex(r => r.id === entry.id) + 1;
+}
+function cancelReservation(id) {
+  const r = state.reservations.find(x => x.id === id); if (!r) return;
+  if (idKey(r.register) !== idKey(session.register) && session.role !== 'admin') return;
+  r.status = 'CANCELLED';
+  saveAndPublish('reservations');
+  addAudit('reservation.cancel', r.skuId, `by ${session.register}`);
+  toast('Reservation cancelled.', 'info'); renderCatalog(); renderLoans();
+}
+function myReservations() {
+  return state.reservations.filter(r => idKey(r.register) === idKey(session.register) && ['WAITING','READY'].includes(r.status));
+}
+function notifyReservationReady(skuId) {
+  const next = state.reservations
+    .filter(r => r.skuId === skuId && r.status === 'WAITING')
+    .sort((a,b) => a.requestedAt - b.requestedAt)[0];
+  if (!next) return;
+  next.status = 'READY'; next.notifiedAt = now(); next.readyAt = now();
+  addAudit('reservation.ready', skuId, `-> ${next.register}`);
+  const item = findItem(skuId) || { name: skuId };
+  notifyReservationReadyFor(next.register, item.name);
+}
+function renderReservationQueue() {
+  const wrap = $('reservationQueue'); if (!wrap) return;
+  const open = state.reservations.filter(r => ['WAITING','READY'].includes(r.status));
+  if (!open.length) { wrap.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-950/40 px-3 py-3 text-center text-xs text-slate-500">No open reservations.</div>`; return; }
+  wrap.innerHTML = open.map(r => {
+    const item = findItem(r.skuId) || { name: r.skuId };
+    const pos = queuePosition(r);
+    return `<div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand-500/40 bg-brand-500/5 px-3 py-2.5">
+      <div class="min-w-0">
+        <div class="text-xs text-white font-semibold">${esc(item.name)}</div>
+        <div class="mono text-[10px] text-brand-300">${esc(r.register)} · ${r.status === 'READY' ? 'READY to collect' : `position #${pos}`} · ${esc(r.skuId)}</div>
+      </div>
+      <span class="status-pill ${r.status === 'READY' ? 'sp-available' : 'sp-reserved'}">${r.status}</span>
+    </div>`;
+  }).join('');
+}
+function renderMyReservationsStrip() {
+  if (session.role !== 'user') return;
+  const wrap = $('myReservationsStrip'); if (!wrap) return;
+  const list = myReservations();
+  if (!list.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<div class="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-brand-950/30 to-ink-850/50 p-3.5">
+    <div class="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-300"><i class="fa-solid fa-bell text-[10px]"></i> My Reservations</div>
+    <div class="flex flex-wrap gap-2">${list.map(r => { const it = findItem(r.skuId) || {name:r.skuId}; return `<span class="rounded-full border ${r.status==='READY'?'border-emerald-500/40 bg-emerald-500/10 text-emerald-300':'border-brand-500/40 bg-brand-500/10 text-brand-300'} px-2.5 py-1 text-[10px] font-semibold">${r.status==='READY'?'✓ ':''}${esc(it.name)}</span>`; }).join('')}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+function registerToEmail(reg) { return `${String(reg).toLowerCase()}@sastra.ac.in`; }
+
+async function sendEmail({ to, subject, body }) {
+  if (!EMAILJS.enabled || typeof emailjs === 'undefined') return false;
+  try {
+    emailjs.init({ publicKey: EMAILJS.publicKey });
+    await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, { to_email: to, subject, message: body });
+    addAudit('notify.email', to, subject);
+    return true;
+  } catch (e) { console.warn('[email]', e); return false; }
+}
+async function requestPushPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const p = await Notification.requestPermission();
+  return p === 'granted';
+}
+function pushLocal(title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(title, { body, icon: currentLogoSrc() }); } catch {}
+}
+async function notifyDueSoon(loan) {
+  const to = registerToEmail(loan.borrowerId);
+  const body = `${loan.itemName} (${loan.serialNo || ''}) is due at ${loan.dueTimeFormatted}.`;
+  await sendEmail({ to, subject: 'BEST — component due soon', body });
+  pushLocal('Component due soon', body);
+  toast(`Notified ${loan.borrowerId}: due soon.`, 'info', 4000);
+}
+async function notifyOverdue(loan) {
+  const to = registerToEmail(loan.borrowerId);
+  const fine = fineForLoan(loan);
+  const body = `${loan.itemName} (${loan.serialNo || ''}) is overdue. Current fine: ₹${fine.toFixed(2)}.`;
+  await sendEmail({ to, subject: 'BEST — component OVERDUE', body });
+  pushLocal('Component overdue', body);
+}
+async function notifyReservationReadyFor(reg, itemName) {
+  const to = registerToEmail(reg);
+  const body = `Your reserved item "${itemName}" is now available at the lab. Please collect within 24 hours.`;
+  await sendEmail({ to, subject: 'BEST — reservation ready', body });
+  pushLocal('Reservation ready', body);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BACKUP & RESTORE
+   ═══════════════════════════════════════════════════════════════════════ */
+function exportBackup() {
+  if (!isHeadOfBajaj()) { toast('Only Head of BAJAJ can export the full backup.', 'warn'); return; }
+  const payload = {
+    version: STORAGE_KEY, exportedAt: Date.now(), exportedBy: session.register,
+    data: {
+      labs: state.labs, inventory: state.inventory, units: state.units, machines: state.machines,
+      loans: state.loans, history: state.history, settings: state.settings,
+      students: state.students, adminConfig: state.adminConfig, branding: state.branding,
+      inspections: state.inspections, machineInspections: state.machineInspections,
+      defects: state.defects, fines: state.fines, extensions: state.extensions,
+      reservations: state.reservations, auditLog: state.auditLog,
+      favorites: state.favorites, machineBookings: state.machineBookings, activity: state.activity
+    }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `bajaj-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+  a.click();
+  addAudit('backup.export', 'full', `size=${blob.size}B`);
+  toast('Backup exported.', 'success', 4000);
+}
+function openImportBackup() { $('backupFileInput').click(); }
+async function importBackup(ev) {
+  if (!isHeadOfBajaj()) { toast('Only Head of BAJAJ can restore.', 'warn'); return; }
+  const file = ev.target.files && ev.target.files[0]; ev.target.value = '';
+  if (!file) return;
+  const ok = await confirmDialog('Restore backup', `This will REPLACE all current data with ${file.name}. Continue?`, 'Restore', true, 'fa-upload');
+  if (!ok) return;
+  const text = await file.text();
+  try {
+    const parsed = JSON.parse(text);
+    const data = parsed.data || parsed;
+    const keys = Object.keys(data);
+    if (!keys.length) throw new Error('empty');
+    keys.forEach(k => { if (k in state) state[k] = data[k]; });
+    saveLocal();
+    for (const k of SYNC_KEYS) if (k in data) publishKey(k);
+    addAudit('backup.import', file.name, `keys=${keys.length} by ${session.register}`);
+    toast('Backup restored. Reloading…', 'success', 3000);
+    setTimeout(() => location.reload(), 1200);
+  } catch (e) { console.error(e); toast('Invalid backup file.', 'error'); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FAVOURITES / STATS
+   ═══════════════════════════════════════════════════════════════════════ */
+function toggleFavorite(skuId) {
+  const key = idKey(session.register || 'guest');
+  if (!state.favorites[key]) state.favorites[key] = [];
+  const arr = state.favorites[key];
+  const i = arr.indexOf(skuId);
+  if (i === -1) { arr.push(skuId); toast('Added to favourites.', 'success'); }
+  else { arr.splice(i,1); toast('Removed from favourites.', 'info'); }
+  saveAndPublish('favorites');
+  renderCatalog();
+}
+function isFavorite(skuId) {
+  const key = idKey(session.register || 'guest');
+  return !!state.favorites[key]?.includes(skuId);
+}
+function renderMyStats() {
+  if (session.role !== 'user') return;
+  const key = idKey(session.register);
+  const hist = state.history.filter(h => idKey(h.borrowerId) === key);
+  const active = state.loans.filter(l => idKey(l.borrowerId) === key);
+  const onTime = hist.filter(h => h.overdueFlag === 'NO').length;
+  const overdue = hist.filter(h => h.overdueFlag === 'YES').length;
+  const favCounts = {}; hist.forEach(h => { favCounts[h.itemId] = (favCounts[h.itemId]||0)+1; });
+  const top = Object.entries(favCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const rec = recomputeFines(session.register) || { points:0, balance:0 };
+  const wrap = $('myStatsStrip'); if (!wrap) return;
+  wrap.innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="rounded-xl border border-ink-700/60 bg-ink-900/60 p-3"><div class="text-[10px] uppercase text-slate-500">Borrowed</div><div class="mono text-lg font-bold text-white">${hist.length}</div></div>
+      <div class="rounded-xl border border-ink-700/60 bg-ink-900/60 p-3"><div class="text-[10px] uppercase text-slate-500">On time</div><div class="mono text-lg font-bold text-emerald-300">${onTime}</div></div>
+      <div class="rounded-xl border border-ink-700/60 bg-ink-900/60 p-3"><div class="text-[10px] uppercase text-slate-500">Late returns</div><div class="mono text-lg font-bold text-rose-300">${overdue}</div></div>
+      <div class="rounded-xl border border-ink-700/60 bg-ink-900/60 p-3"><div class="text-[10px] uppercase text-slate-500">Points · ₹ due</div><div class="mono text-lg font-bold text-amber-300">${rec.points} · ₹${rec.balance.toFixed(2)}</div></div>
+    </div>
+    ${top.length ? `<div class="mt-3 flex flex-wrap gap-1.5">${top.map(([id,n]) => {
+      const it = findItem(id) || { name:id };
+      return `<button onclick="go('catalog')" class="rounded-full border border-brand-500/40 bg-brand-500/10 px-2.5 py-1 text-[10px] font-semibold text-brand-300">★ ${esc(it.name)} · ${n}×</button>`;
+    }).join('')}</div>` : ''}
+  `;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1849,7 +2315,7 @@ async function attemptStudentLogin() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ADMIN LOGIN
+   ADMIN LOGIN (with lockout)
    ═══════════════════════════════════════════════════════════════════════ */
 async function attemptAdminLogin() {
   const teacherNo = $('adminUserInput').value.trim().toUpperCase();
@@ -1866,8 +2332,29 @@ async function attemptAdminLogin() {
     if (!admins.length) { showLoginError('No staff accounts. Refresh page.'); return; }
     const admin = findAdminByUsername(teacherNo);
     if (!admin) { showLoginError('Incorrect Teacher No or Password.'); return; }
+
+    const lock = admin.__lock || { fails: 0, until: 0 };
+    if (lock.until > Date.now()) {
+      showLoginError(`Account locked. Try again at ${fmtDateTime(lock.until)}.`);
+      return;
+    }
+
     const hash = await hashPassword(password);
-    if (hash !== admin.passwordHash) { showLoginError('Incorrect Teacher No or Password.'); return; }
+    if (hash !== admin.passwordHash) {
+      lock.fails = (lock.fails || 0) + 1;
+      if (lock.fails >= (state.settings.maxFailedLogins || 5)) {
+        lock.until = Date.now() + (state.settings.lockoutMinutes || 10) * 60000;
+        lock.fails = 0;
+        addAudit('auth.lockout', teacherNo, `until=${fmtDateTime(lock.until)}`);
+      }
+      admin.__lock = lock;
+      const idx = (state.adminConfig.admins || []).findIndex(a => a.username === teacherNo);
+      if (idx >= 0) { state.adminConfig.admins[idx].__lock = lock; saveLocal(); publishKey('adminConfig'); }
+      showLoginError('Incorrect Teacher No or Password.'); return;
+    }
+    // success — reset lock
+    const idx = (state.adminConfig.admins || []).findIndex(a => a.username === teacherNo);
+    if (idx >= 0) { state.adminConfig.admins[idx].__lock = { fails: 0, until: 0 }; saveLocal(); publishKey('adminConfig'); }
     enterApp('admin', teacherNo, admin.username, null);
   } catch (e) { console.error(e); showLoginError('Login error.'); }
   finally { btn.disabled = false; btnTxt.textContent = 'Sign in as Staff'; }
@@ -1879,6 +2366,7 @@ async function attemptAdminLogin() {
 function enterApp(role, register, name, activeLabId) {
   session = { role, register, name: register, activeLabId: activeLabId || null };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
+  lastActivityAt = Date.now();
   if (role === 'user') { saveRegister(register); }
   $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
   $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
@@ -1893,15 +2381,15 @@ function enterApp(role, register, name, activeLabId) {
 function applyRoleUI() {
   const isAdminUser = session.role === 'admin';
   const role = isAdminUser ? myRole() : null;
-
-  // Tabs available only to specific roles
   const showTab = (id, condition) => { const el = $(id); if (!el) return; if (condition) el.classList.remove('hidden'); else el.classList.add('hidden'); };
   const canSeeReports = isAdminUser && canViewReports();
-  const canSeeDashboard = isAdminUser;
-  showTab('navDashboard', canSeeDashboard);
-  showTab('navDashboardMobile', canSeeDashboard);
+  const canSeeAudit = isAdminUser && (isHeadOfBajaj() || isStocksHandler());
+  showTab('navDashboard', isAdminUser);
+  showTab('navDashboardMobile', isAdminUser);
   showTab('navReports', canSeeReports);
   showTab('navReportsMobile', canSeeReports);
+  showTab('navAudit', canSeeAudit);
+  showTab('navAuditMobile', canSeeAudit);
   showTab('navUnits', isAdminUser);
   showTab('navUnitsMobile', isAdminUser);
   showTab('navPoster', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
@@ -1909,7 +2397,6 @@ function applyRoleUI() {
   showTab('navSync', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
   showTab('navSyncMobile', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
 
-  // Stock action buttons only for Lab Assistant / Head of BAJAJ
   const stockBtns = $('stockActionBtns');
   if (stockBtns) {
     const show = isAdminUser && canEditStock();
@@ -1947,8 +2434,6 @@ function applyRoleUI() {
       else { labList.innerHTML = session.activeLabId ? labChip(session.activeLabId) : '<span class="text-[10px] text-slate-500">No lab</span>'; }
     }
   }
-
-  // Teacher access to own lab only for Dashboard/Catalog/Machines (server-side gate in render fns).
   go('overview');
 }
 
@@ -1981,6 +2466,7 @@ async function saveNewPassword() {
     if (idx === -1 || curHash !== admins[idx].passwordHash) { show('Current password incorrect.', false); return; }
     admins[idx].passwordHash = newHash; state.adminConfig = { ...(state.adminConfig || {}), admins };
     publishKey('adminConfig'); show('Password updated.', true);
+    addAudit('auth.password', session.register, 'password changed');
   } else {
     const s = (state.students || {})[session.register];
     if (!s || !s.passwordHash || curHash !== s.passwordHash) { show('Current password incorrect.', false); return; }
@@ -1995,17 +2481,19 @@ async function saveNewPassword() {
 function go(view) {
   const isAdminUser = session.role === 'admin';
   const role = isAdminUser ? myRole() : null;
-  if (!isAdminUser && ['dashboard','reports','units','poster','sync'].includes(view)) { toast('Staff access required.', 'warn'); return; }
+  if (!isAdminUser && ['dashboard','reports','audit','units','poster','sync'].includes(view)) { toast('Staff access required.', 'warn'); return; }
   if (view === 'reports' && !canViewReports()) { toast('Reports are for Lab Assistant, Head of BAJAJ and Stocks Handler only.', 'warn'); return; }
+  if (view === 'audit' && !(isHeadOfBajaj() || isStocksHandler())) { toast('Audit log is for Head of BAJAJ / Stocks Handler.', 'warn'); return; }
   if (view === 'poster' && !(isHeadOfBajaj() || isStocksHandler())) { toast('Only Head of BAJAJ or Stocks Handler.', 'warn'); return; }
   if (view === 'sync' && !(isHeadOfBajaj() || isStocksHandler())) { toast('Only Head of BAJAJ or Stocks Handler.', 'warn'); return; }
   activeView = view;
-  ['overview','catalog','machines','loans','reports','dashboard','units','poster','sync'].forEach(v => { const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view); });
+  ['overview','catalog','machines','loans','reports','audit','dashboard','units','poster','sync'].forEach(v => { const el = $(`view-${v}`); if (el) el.classList.toggle('hidden', v !== view); });
   document.querySelectorAll('[data-nav]').forEach(btn => { const a = btn.dataset.nav === view; btn.classList.toggle('active', a); btn.classList.toggle('text-slate-200', a); btn.classList.toggle('text-slate-400', !a); });
   if (view === 'poster') renderPoster();
   if (view === 'sync') renderSyncPage();
   if (view === 'dashboard') renderDashboard();
   if (view === 'reports') renderReports();
+  if (view === 'audit') renderAuditLog();
   if (view === 'units') renderUnitsView();
   if (view === 'catalog') renderCatalogLabTabs();
   if (view === 'machines') renderMachinesView();
@@ -2050,6 +2538,12 @@ function applyRemoteKey(key, val) {
   else if (key === 'students') state.students = (val && typeof val === 'object') ? val : {};
   else if (key === 'adminConfig') state.adminConfig = (val && typeof val === 'object') ? val : null;
   else if (key === 'branding') { state.branding = (val && typeof val === 'object' && val.logo) ? val : null; renderLogos(); }
+  else if (key === 'fines') state.fines = (val && typeof val === 'object') ? val : {};
+  else if (key === 'extensions') state.extensions = Array.isArray(val) ? val : [];
+  else if (key === 'reservations') state.reservations = Array.isArray(val) ? val : [];
+  else if (key === 'auditLog') state.auditLog = Array.isArray(val) ? val : [];
+  else if (key === 'favorites') state.favorites = (val && typeof val === 'object') ? val : {};
+  else if (key === 'machineBookings') state.machineBookings = Array.isArray(val) ? val : [];
   if (key === 'inventory' || key === 'loans' || key === 'history' || key === 'labs' || key === 'machines') {
     migrateInventoryLabs();
     if (session.role === 'user' && session.activeLabId && !labById(session.activeLabId)) {
@@ -2071,6 +2565,7 @@ function connectStation() {
       if (activeView === 'dashboard') renderDashboard();
       if (activeView === 'machines') renderMachinesView();
       if (activeView === 'reports') renderReports();
+      if (activeView === 'audit') renderAuditLog();
       if (key === 'adminConfig') { updateAuthScreen(); applyRoleUI(); }
     });
   });
@@ -2121,7 +2616,15 @@ function forceSync() { if (!stationRef) { toast('Not connected.', 'warn'); retur
    LOCAL PERSISTENCE
    ═══════════════════════════════════════════════════════════════════════ */
 function saveLocal() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ labs: state.labs, inventory: state.inventory, units: state.units, machines: state.machines, loans: state.loans, history: state.history, cart: state.cart, borrower: state.borrower, settings: state.settings, activity: state.activity, students: state.students, adminConfig: state.adminConfig, branding: state.branding, inspections: state.inspections, machineInspections: state.machineInspections, defects: state.defects })); } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    labs: state.labs, inventory: state.inventory, units: state.units, machines: state.machines,
+    loans: state.loans, history: state.history, cart: state.cart, borrower: state.borrower,
+    settings: state.settings, activity: state.activity, students: state.students,
+    adminConfig: state.adminConfig, branding: state.branding, inspections: state.inspections,
+    machineInspections: state.machineInspections, defects: state.defects,
+    fines: state.fines, extensions: state.extensions, reservations: state.reservations,
+    auditLog: state.auditLog, favorites: state.favorites, machineBookings: state.machineBookings
+  })); } catch {}
 }
 function loadLocal() {
   try {
@@ -2144,7 +2647,13 @@ function loadLocal() {
       branding: (s.branding && typeof s.branding === 'object' && s.branding.logo) ? s.branding : null,
       inspections: Array.isArray(s.inspections) ? s.inspections : [],
       machineInspections: Array.isArray(s.machineInspections) ? s.machineInspections : [],
-      defects: Array.isArray(s.defects) ? s.defects : []
+      defects: Array.isArray(s.defects) ? s.defects : [],
+      fines: (s.fines && typeof s.fines === 'object') ? s.fines : {},
+      extensions: Array.isArray(s.extensions) ? s.extensions : [],
+      reservations: Array.isArray(s.reservations) ? s.reservations : [],
+      auditLog: Array.isArray(s.auditLog) ? s.auditLog : [],
+      favorites: (s.favorites && typeof s.favorites === 'object') ? s.favorites : {},
+      machineBookings: Array.isArray(s.machineBookings) ? s.machineBookings : []
     };
     migrateInventoryLabs(); migrateUnitsInspection(); migrateCart(); sanitizeCart(); ensureAllUnits();
   } catch {}
@@ -2172,9 +2681,18 @@ function checkOverdueForCurrentUser() {
   if (!session || !session.register || session.role === 'admin') { const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden'); return; }
   const myOverdue = state.loans.filter(l => isMyLoan(l) && isOverdue(l, now()));
   const banner = $('overdueAlertBanner');
+  const rec = recomputeFines(session.register) || { points: 0, balance: 0 };
   if (banner) {
-    if (myOverdue.length) { banner.classList.remove('hidden'); const blocking = myBlockingOverdueLoans().length; $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due${blocking ? ' · borrowing is locked' : ''}`; }
-    else banner.classList.add('hidden');
+    if (myOverdue.length) {
+      banner.classList.remove('hidden');
+      const total = myOverdue.reduce((s,l) => s + fineForLoan(l), 0);
+      const blocking = myBlockingOverdueLoans().length;
+      $('overdueAlertDetail').textContent =
+        `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due · ₹${total.toFixed(2)} fine · ${rec.points} point(s)${blocking ? ' · borrowing locked' : ''}`;
+    } else if (rec.blockUntil && rec.blockUntil > now()) {
+      banner.classList.remove('hidden');
+      $('overdueAlertDetail').textContent = `Borrowing suspended until ${fmtDateTime(rec.blockUntil)} — ${rec.points} penalty point(s).`;
+    } else banner.classList.add('hidden');
   }
   let notified = {}; try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
   const newOnes = myOverdue.filter(l => !notified[l.loanId]);
@@ -2189,6 +2707,13 @@ function checkOverdueForCurrentUser() {
     newOnes.forEach(l => { notified[l.loanId] = true; });
     try { sessionStorage.setItem(OVERDUE_NOTIFIED_KEY, JSON.stringify(notified)); } catch {}
   }
+  // Fire overdue emails (once per loan)
+  myOverdue.forEach(l => {
+    if (!l.__notifiedOverdue) {
+      l.__notifiedOverdue = true;
+      notifyOverdue(l);
+    }
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2204,7 +2729,7 @@ function fmtDurShort(ms) { const m = Math.max(0, Math.round(ms/60000)); const h 
 function relTime(ms) { const d = now() - ms; if (d < 45000) return 'just now'; if (d < 3600000) return `${Math.floor(d/60000)}m ago`; if (d < 86400000) return `${Math.floor(d/3600000)}h ago`; return `${Math.floor(d/86400000)}d ago`; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   HASHING / THEME
+   HASHING / THEME / PWA
    ═══════════════════════════════════════════════════════════════════════ */
 function stableHash(text) {
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
@@ -2233,6 +2758,15 @@ function applyTheme(theme) {
 }
 function toggleTheme() { applyTheme(currentTheme === 'light' ? 'dark' : 'light'); toast(`Switched to ${currentTheme} mode.`, 'info', 1500); }
 function loadTheme() { let saved = 'dark'; try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch {} applyTheme(saved); }
+function installPWA() {
+  if (!deferredInstallPrompt) { toast('Use your browser menu → Add to Home screen.', 'info', 4000); return; }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') toast('Installed!', 'success');
+    deferredInstallPrompt = null;
+    const btn = $('installBtn'); if (btn) btn.classList.add('hidden');
+  });
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    RENDER OVERVIEW
@@ -2266,7 +2800,6 @@ function renderOverview() {
 function renderCatalogLabTabs() {
   const wrap = $('catalogLabTabs'); if (!wrap) return;
   if (!state.labs.length) { wrap.innerHTML = `<span class="text-xs text-slate-500">No labs.</span>`; return; }
-  // Staff: only their labs (unless head of bajaj / stocks handler)
   let allowedLabs = state.labs;
   if (session.role === 'admin') {
     if (canSeeAllLabs()) allowedLabs = state.labs;
@@ -2291,22 +2824,31 @@ function populateCategories() {
   sel.innerHTML = `<option value="ALL">All categories</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   sel.value = cats.includes(cur) || cur === 'ALL' ? cur : 'ALL';
 }
+function popularityOf(skuId) {
+  return state.history.filter(h => h.itemId === skuId).length;
+}
 function renderCatalog() {
   const grid = $('catalogGrid'); if (!grid) return;
   const q = ($('catalogSearch').value || '').trim().toLowerCase();
   const cat = $('catalogCategory').value || 'ALL';
   const inStockOnly = $('catalogInStock').checked;
+  const favOnly = $('catalogFavOnly') ? $('catalogFavOnly').checked : false;
+  const sortBy = $('catalogSort') ? $('catalogSort').value : 'NAME';
   let allowedLabs = state.labs.map(l => l.id);
   if (session.role === 'admin' && !canSeeAllLabs()) allowedLabs = myLabIds();
   let list = state.inventory.filter(it => {
     if (!allowedLabs.includes(it.labId)) return false;
     if (catalogLabFilter !== 'ALL' && it.labId !== catalogLabFilter) return false;
+    if (favOnly && !isFavorite(it.id)) return false;
     const hay = `${it.name} ${it.id} ${it.category} ${it.description}`.toLowerCase();
     if (q && !hay.includes(q)) return false;
     if (cat !== 'ALL' && it.category !== cat) return false;
     if (inStockOnly && availableQty(it.id) <= 0) return false;
     return true;
-  }).sort((a,b) => (a.labId + a.name).localeCompare(b.labId + b.name));
+  });
+  if (sortBy === 'AVAIL') list.sort((a,b) => availableQty(b.id) - availableQty(a.id) || a.name.localeCompare(b.name));
+  else if (sortBy === 'POPULAR') list.sort((a,b) => popularityOf(b.id) - popularityOf(a.id) || a.name.localeCompare(b.name));
+  else list.sort((a,b) => (a.labId + a.name).localeCompare(b.labId + b.name));
   $('catalogResultCount').textContent = `${list.length} item${list.length===1?'':'s'}`;
   if (!list.length) { grid.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 text-center"><i class="fa-solid fa-box-open mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No components match</p></div>`; return; }
   const low = state.settings.lowStockThreshold;
@@ -2321,13 +2863,23 @@ function renderCatalog() {
     let sCls = 'border-rose-500/40 bg-rose-500/15 text-rose-400', sTxt = 'Out of stock', bCls = 'from-rose-500 to-rose-600';
     if (avail > 0 && isLow) { sCls = 'border-amber-500/40 bg-amber-500/15 text-amber-400'; sTxt = `Low · ${avail}`; bCls = 'from-amber-500 to-amber-600'; }
     else if (avail > 0) { sCls = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400'; sTxt = `${avail} available`; bCls = 'from-emerald-500 to-emerald-600'; }
-    const action = inCart > 0
-      ? `<div class="flex items-center justify-between rounded-xl border border-brand-500/40 bg-brand-500/15 p-1"><button onclick="changeQty('${item.id}',-1)" class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30"><i class="fa-solid fa-minus text-[10px]"></i></button><span class="mono text-sm font-bold text-brand-300">${inCart}</span><button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30 disabled:opacity-30"><i class="fa-solid fa-plus text-[10px]"></i></button></div>`
-      : `<button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-semibold text-white disabled:opacity-40 transition"><i class="fa-solid fa-cart-plus text-[11px]"></i> Add</button>`;
+    const myRes = myReservations().find(r => r.skuId === item.id);
+    let action;
+    if (inCart > 0) action = `<div class="flex items-center justify-between rounded-xl border border-brand-500/40 bg-brand-500/15 p-1"><button onclick="changeQty('${item.id}',-1)" class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30"><i class="fa-solid fa-minus text-[10px]"></i></button><span class="mono text-sm font-bold text-brand-300">${inCart}</span><button onclick="changeQty('${item.id}',1)" ${canAdd?'':'disabled'} class="grid h-7 w-7 place-items-center rounded-lg text-brand-300 hover:bg-brand-500/30 disabled:opacity-30"><i class="fa-solid fa-plus text-[10px]"></i></button></div>`;
+    else if (canAdd) action = `<button onclick="changeQty('${item.id}',1)" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-semibold text-white transition"><i class="fa-solid fa-cart-plus text-[11px]"></i> Add</button>`;
+    else if (myRes) action = `<button onclick="cancelReservation('${myRes.id}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 py-2.5 text-xs font-semibold text-amber-300"><i class="fa-solid fa-hourglass-half text-[11px]"></i> In queue (#${queuePosition(myRes)}) — cancel</button>`;
+    else action = `<button onclick="reserveItem('${item.id}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 py-2.5 text-xs font-semibold text-brand-300"><i class="fa-solid fa-bell text-[11px]"></i> Reserve &amp; notify me</button>`;
+    const fav = isFavorite(item.id);
     return `<article class="fade-up flex flex-col rounded-2xl border border-ink-700/60 bg-gradient-to-br from-ink-850/70 to-ink-900/70 p-4 hover:border-brand-500/40 transition">
-      <div class="flex items-start justify-between gap-3"><div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500/20 to-neon-violet/20 text-brand-300"><i class="fa-solid fa-microchip text-sm"></i></div><span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sCls}">${sTxt}</span></div>
+      <div class="flex items-start justify-between gap-3">
+        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500/20 to-neon-violet/20 text-brand-300"><i class="fa-solid fa-microchip text-sm"></i></div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleFavorite('${item.id}')" title="Favourite" class="grid h-7 w-7 place-items-center rounded-lg ${fav ? 'text-amber-400 bg-amber-500/15' : 'text-slate-500 hover:text-amber-300'}"><i class="fa-solid fa-star text-[11px]"></i></button>
+          <span class="rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sCls}">${sTxt}</span>
+        </div>
+      </div>
       <div class="mt-3">${labChip(item.labId)}</div>
-      <div class="mt-2 flex-1"><div class="mono text-[10px] text-slate-600">${esc(item.id)}</div><h3 class="mt-1 text-sm font-bold text-white line-clamp-2">${esc(item.name)}</h3><p class="line-clamp-2 mt-1.5 text-[11px] text-slate-500">${esc(item.description)}</p></div>
+      <div class="mt-2 flex-1"><div class="mono text-[10px] text-slate-600">${esc(item.id)}</div><h3 class="mt-1 text-sm font-bold text-white line-clamp-2">${esc(item.name)}</h3><p class="line-clamp-2 mt-1.5 text-[11px] text-slate-500">${esc(item.description)}</p>${item.datasheet ? `<a href="${esc(item.datasheet)}" target="_blank" rel="noopener" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold text-brand-300 hover:text-brand-200"><i class="fa-solid fa-file-lines text-[10px]"></i> Datasheet</a>` : ''}</div>
       <div class="mt-4 space-y-2"><div class="flex items-center justify-between text-[10px]"><span class="text-slate-500">${esc(item.category)}</span><span class="mono text-slate-600">${availUnits} / ${totalUnits} units</span></div><div class="h-1 overflow-hidden rounded-full bg-ink-800"><div class="h-full rounded-full bg-gradient-to-r ${bCls}" style="width:${pct}%"></div></div></div>
       <div class="mt-4">${action}</div>
     </article>`;
@@ -2389,13 +2941,17 @@ function checkoutCart() {
   cartUnits.forEach(c => {
     const u = findUnit(c.unitId); if (!u) return;
     const item = findItem(u.skuId) || {};
-    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE' };
+    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE', extensionCount: 0 };
     state.loans.unshift(record); state.history.unshift({ ...record });
     setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
   });
+  // Fulfil any of my reservations for these SKUs
+  const borrowedSkus = new Set(cartUnits.map(c => c.skuId));
+  state.reservations.forEach(r => { if (idKey(r.register) === idKey(idRef) && borrowedSkus.has(r.skuId) && r.status !== 'FULFILLED') r.status = 'FULFILLED'; });
   state.cart = {}; fastScanSeen = new Set(); state.borrower = { name: borrowName, id: idRef };
   logActivity('checkout', `${idRef} borrowed ${cartUnits.length} unit(s)`);
-  saveAndPublish('loans', 'history', 'activity', 'units');
+  addAudit('loan.checkout', idRef, `units=${cartUnits.length}`);
+  saveAndPublish('loans', 'history', 'activity', 'units', 'reservations', 'auditLog');
   renderAll(); closeCart();
   toast(`Checkout complete — ${cartUnits.length} unit(s).`, 'success', 4000);
   go('loans');
@@ -2415,6 +2971,8 @@ function renderLoans() {
   $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
   $('loansSubheading').textContent = isAdminUser ? 'Each row is a specific unit barcode.' : `All loans for register ${session.register || '—'}`;
   const loans = visibleLoans().slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
+  if (!isAdminUser) { renderMyStats(); renderMyReservationsStrip(); }
+  else { const s = $('myStatsStrip'); if (s) s.innerHTML=''; const r = $('myReservationsStrip'); if (r) r.innerHTML=''; }
   if (!loans.length) { box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans.</p></div>`; return; }
   box.innerHTML = loans.map(loan => {
     const overdue = isOverdue(loan, t);
@@ -2422,16 +2980,20 @@ function renderLoans() {
     const elapsed = Math.max(0, t - loan.borrowTimeMs);
     const pct = Math.min(100, (elapsed / loanMs()) * 100);
     const rem = loan.dueTimeMs - t;
+    const fine = fineForLoan(loan, t);
     let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/40 bg-emerald-500/15 text-emerald-300', pTxt='Active', bCls='from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
     if (overdue) { cCls='border-rose-500/50 bg-gradient-to-br from-rose-950/40 to-ink-850/50 overdue-pulse'; pCls='bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; pTxt='Overdue'; bCls='from-rose-500 to-rose-600'; tCls='text-rose-400'; tLbl='Overdue by'; }
     else if (dueSoon) { cCls='border-amber-500/50 bg-gradient-to-br from-amber-950/20 to-ink-850/50'; pCls='border-amber-500/40 bg-amber-500/15 text-amber-300'; pTxt='Due soon'; bCls='from-amber-500 to-amber-600'; tCls='text-amber-400'; }
     let actionHtml = '';
     if (isAdminUser) actionHtml = `<button onclick="openReturnVerify('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-semibold text-white"><i class="fa-solid fa-clipboard-check text-[11px]"></i> Verify return</button>`;
-    else actionHtml = `<div class="rounded-xl border border-ink-700/60 bg-ink-950/40 p-3 text-center"><div class="text-[11px] font-semibold text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Hand the item to a staff in <b class="text-slate-200">${esc(labName(loan.labId))}</b>.</div></div>`;
+    else {
+      const canExtend = !overdue && (loan.extensionCount || 0) < (state.settings.extensionMaxPerLoan || 1) && !state.extensions.some(e => e.loanId === loan.loanId && e.status === 'PENDING');
+      actionHtml = `<div class="space-y-2"><div class="rounded-xl border border-ink-700/60 bg-ink-950/40 p-3 text-center"><div class="text-[11px] font-semibold text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Hand the item to a staff in <b class="text-slate-200">${esc(labName(loan.labId))}</b>.</div></div>${canExtend ? `<button onclick="requestExtension('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 py-2 text-xs font-semibold text-brand-300"><i class="fa-solid fa-clock-rotate-left text-[11px]"></i> Request extension</button>` : ''}</div>`;
+    }
     return `<article class="fade-up flex flex-col gap-4 rounded-2xl border p-4 sm:p-5 ${cCls}">
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0"><div class="mono text-[10px] text-brand-400">${esc(loan.loanId)}</div><div class="mt-1.5">${labChip(loan.labId)}</div><h3 class="mt-1.5 text-sm font-bold text-white line-clamp-2">${esc(loan.itemName)}</h3>${loan.serialNo ? `<div class="mono mt-1 text-[11px] text-brand-300"><i class="fa-solid fa-barcode mr-1"></i>${esc(loan.serialNo)}</div>` : ''}<p class="mono mt-1 text-[11px] text-slate-500">${esc(loan.borrowerId)}</p></div>
-        <span class="shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${pCls}">${pTxt}</span>
+        <div class="flex flex-col items-end gap-1.5"><span class="shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${pCls}">${pTxt}</span>${fine > 0 ? `<span class="rounded-full border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300">₹${fine.toFixed(2)}</span>` : ''}</div>
       </div>
       <div class="space-y-2"><div class="flex items-center justify-between text-[11px]"><span class="text-slate-500">${tLbl}</span><span data-remaining="${loan.loanId}" class="mono font-bold ${tCls}">${fmtDuration(Math.abs(rem))}</span></div><div class="h-1.5 overflow-hidden rounded-full bg-ink-800"><div data-bar="${loan.loanId}" class="h-full rounded-full bg-gradient-to-r ${bCls}" style="width:${pct}%"></div></div></div>
       <div class="grid grid-cols-2 gap-3 border-t border-ink-700/50 pt-4"><div><span class="block text-[10px] uppercase text-slate-600">Elapsed</span><span data-elapsed="${loan.loanId}" class="mono text-xs font-semibold text-slate-300">${fmtDuration(elapsed)}</span></div><div class="text-right"><span class="block text-[10px] uppercase text-slate-600">Due</span><span class="mono text-xs font-semibold text-slate-300">${esc(loan.dueTimeFormatted)}</span></div></div>
@@ -2450,8 +3012,9 @@ function openReturnVerify(loanId) {
   pendingReturnLoanId = loanId;
   const overdue = isOverdue(loan, now());
   const u = loan.unitId ? findUnit(loan.unitId) : null;
+  const fine = fineForLoan(loan);
   $('returnVerifyInfo').innerHTML = `
-    <div class="flex flex-wrap items-center gap-2 mb-1.5">${labChip(loan.labId)}${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}</div>
+    <div class="flex flex-wrap items-center gap-2 mb-1.5">${labChip(loan.labId)}${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}${fine > 0 ? `<span class="rounded-full border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[9px] font-bold text-rose-300">₹${fine.toFixed(2)} fine</span>` : ''}</div>
     <div><b class="text-white">${esc(loan.itemName)}</b></div>
     <div class="mt-1">Unit barcode: <span class="mono text-brand-300">${esc(loan.serialNo || u?.serialNo || '—')}</span></div>
     <div class="mt-1">Register No: <b class="mono text-slate-200">${esc(loan.borrowerId)}</b></div>
@@ -2471,6 +3034,13 @@ async function confirmReturnVerify() {
   await new Promise(r => setTimeout(r, 80));
   const t = now();
   const idx = state.loans.findIndex(l => l.loanId === loan.loanId); if (idx === -1) return;
+  // Settle fine if any
+  const fine = fineForLoan(loan, t);
+  if (fine > 0) {
+    const rec = finesRecord(loan.borrowerId);
+    rec.history.push({ ts: t, kind: 'settle-on-return', amount: fine, by: session.register });
+    rec.balance = Math.max(0, Math.round((rec.balance - fine) * 100) / 100);
+  }
   if (loan.unitId) {
     const u = findUnit(loan.unitId);
     if (u) {
@@ -2486,7 +3056,13 @@ async function confirmReturnVerify() {
   if (h) { h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t); h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; h.verifiedBy = session.register; h.condition = condition; h.notes = notes; }
   state.loans.splice(idx, 1);
   logActivity('return', `${loan.borrowerId} returned ${loan.itemName} (${loan.serialNo || ''}) — ${condition}`);
-  saveAndPublish('loans', 'history', 'activity', 'units', 'defects');
+  addAudit('loan.return', loan.loanId, `${loan.itemName} · ${loan.serialNo||''} · condition=${condition}`);
+  // Reservation queue: notify next in line for this SKU if stock became available
+  if (loan.unitId) {
+    const u = findUnit(loan.unitId);
+    if (u && u.status === 'AVAILABLE') notifyReservationReady(loan.itemId);
+  }
+  saveAndPublish('loans', 'history', 'activity', 'units', 'defects', 'fines', 'reservations', 'auditLog');
   renderAll(); checkOverdueForCurrentUser(false);
   toast(`Return recorded — condition: ${condition}${sendToMaintenance ? ' (sent to maintenance)' : ''}`, condition === 'DAMAGED' ? 'warn' : 'success', 4000);
 }
@@ -2587,7 +3163,6 @@ function renderUnitsView() {
     </div>`;
   }).join('');
 }
-
 function openUnitDetail(unitId) {
   const u = findUnit(unitId); if (!u) return;
   const item = findItem(u.skuId) || { name: u.skuId };
@@ -2624,7 +3199,9 @@ async function recordInspectionFor(unitId) {
   if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') u.status = 'AVAILABLE';
   state.inspections.push({ inspectionId: 'INSP-'+Date.now(), unitId, skuId: u.skuId, date: t, inspector: session.register || '', condition: 'GOOD', passed: true });
   logActivity('inspect', `${item.name} ${u.serialNo} inspected by ${session.register}`);
-  saveAndPublish('units','inspections','activity'); renderAll();
+  addAudit('unit.inspect', u.unitId, `condition=GOOD`);
+  if (u.status === 'AVAILABLE') notifyReservationReady(u.skuId);
+  saveAndPublish('units','inspections','activity','auditLog','reservations'); renderAll();
   toast('Inspection recorded.', 'success');
 }
 async function reportDefect(unitId) {
@@ -2638,7 +3215,8 @@ async function reportDefect(unitId) {
   state.defects.push({ defectId: 'DEF-'+Date.now(), unitId, skuId: u.skuId, reportedBy: session.register || '', reportedAt: t, notes: String(notes).slice(0,500), severity: severity.toUpperCase() });
   u.status = 'DEFECTIVE'; u.condition = 'DAMAGED'; u.notes = String(notes).slice(0,300);
   logActivity('defect', `Unit ${u.serialNo} (${item.name}) marked defective by ${session.register}`);
-  saveAndPublish('units','defects','activity'); renderAll();
+  addAudit('unit.defect', u.unitId, `severity=${severity.toUpperCase()}`);
+  saveAndPublish('units','defects','activity','auditLog'); renderAll();
   toast('Defect recorded.', 'warn', 4000);
 }
 async function clearDefect(unitId) {
@@ -2648,8 +3226,40 @@ async function clearDefect(unitId) {
   if (!ok) return;
   u.status = 'AVAILABLE'; u.condition = 'GOOD'; u.notes = ''; u.lastInspectionMs = now();
   state.inspections.push({ inspectionId: 'INSP-'+Date.now(), unitId, skuId: u.skuId, date: now(), inspector: session.register || '', condition: 'GOOD', passed: true, note:'cleared defect' });
-  saveAndPublish('units','inspections'); renderAll();
+  addAudit('unit.defect.clear', unitId, 'cleared');
+  notifyReservationReady(u.skuId);
+  saveAndPublish('units','inspections','auditLog','reservations'); renderAll();
   toast('Defect cleared.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUDIT LOG VIEW
+   ═══════════════════════════════════════════════════════════════════════ */
+function renderAuditLog() {
+  if (!isHeadOfBajaj() && !isStocksHandler()) return;
+  const q = (($('auditSearch').value || '')).trim().toLowerCase();
+  const rows = (state.auditLog || []).filter(e =>
+    !q || (e.actor + ' ' + e.action + ' ' + e.target + ' ' + e.details).toLowerCase().includes(q)
+  ).slice(0, 300);
+  const tbody = $('auditBody'); if (!tbody) return;
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-12 text-center text-xs text-slate-500">No matching entries.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(e => `<tr class="hover:bg-ink-800/40 transition">
+    <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(fmtDateTime(e.ts))}</td>
+    <td class="mono px-3 py-3 text-slate-200">${esc(e.actor)}</td>
+    <td class="px-3 py-3 text-slate-400">${esc(e.role)}</td>
+    <td class="px-3 py-3"><span class="rounded-full border border-brand-500/40 bg-brand-500/10 px-2 py-0.5 text-[10px] font-bold text-brand-300">${esc(e.action)}</span></td>
+    <td class="mono px-3 py-3 text-[11px] text-slate-400">${esc(e.target)}</td>
+    <td class="px-3 py-3 text-slate-400">${esc(e.details)}</td>
+  </tr>`).join('');
+}
+function exportAuditCSV() {
+  if (!isHeadOfBajaj()) { toast('Only Head of BAJAJ.', 'warn'); return; }
+  const rows = [['When','Actor','Role','Action','Target','Details'], ...(state.auditLog||[]).map(e => [fmtDateTime(e.ts), e.actor, e.role, e.action, e.target, e.details])];
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `audit-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  toast('Audit log exported.', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2705,7 +3315,8 @@ async function saveNewStudent() {
   students[reg] = { register: reg, name: name || reg, passwordHash: hash, dob: dob || '', idPhoto: pendingRegPhoto || '', createdAt: Date.now(), registeredBy: session.register || '' };
   state.students = students;
   logActivity('student-register', `${reg} registered by ${session.register}`);
-  saveRegister(reg); publishKey('students'); publishKey('activity');
+  addAudit('student.register', reg, `by ${session.register}`);
+  saveRegister(reg); saveAndPublish('students', 'activity', 'auditLog');
   closeModal('mStudentReg'); renderDashboard();
   toast(`Student "${reg}" registered.`, 'success', 4000);
 }
@@ -2720,7 +3331,8 @@ async function deleteStudent(reg) {
   if (!ok) return;
   delete state.students[key];
   logActivity('student-remove', `${key} removed by ${session.register}`);
-  saveAndPublish('students', 'activity'); renderStudentsList(); renderDashboard();
+  addAudit('student.remove', key, `by ${session.register}`);
+  saveAndPublish('students', 'activity', 'auditLog'); renderStudentsList(); renderDashboard();
   toast(`Student "${key}" removed.`, 'success');
 }
 async function deleteAllStudents() {
@@ -2730,7 +3342,8 @@ async function deleteAllStudents() {
   if (!count) { toast('No students to remove.', 'info'); return; }
   const ok = await confirmDialog('Remove all students', `Remove all ${count} registered student(s)?`, 'Remove all', true, 'fa-user-minus');
   if (!ok) return;
-  state.students = {}; saveAndPublish('students'); renderStudentsList(); renderDashboard();
+  state.students = {}; addAudit('student.remove.all', 'all', `count=${count}`);
+  saveAndPublish('students', 'auditLog'); renderStudentsList(); renderDashboard();
   toast('All students removed.', 'success');
 }
 function renderStudentsList() {
@@ -2786,12 +3399,15 @@ function renderDashboard() {
   $('setLowStock').value = state.settings.lowStockThreshold;
   $('setInspectDays').value = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
   $('setMachineInspectDays').value = state.settings.machineInspectDays || DEFAULT_MACHINE_INSPECT_DAYS;
+  const setFinePerHour = $('setFinePerHour'); if (setFinePerHour) setFinePerHour.value = state.settings.finePerHourOverdue || 10;
+  const setPts = $('setPenaltyPoints'); if (setPts) setPts.value = state.settings.penaltyPointsPerDay || 5;
+  const setBt = $('setBlockThreshold'); if (setBt) setBt.value = state.settings.blockThresholdPoints || 20;
+  const setMax = $('setMaxItems'); if (setMax) setMax.value = state.settings.maxActiveItemsPerStudent || 5;
   renderTeachersList(); renderStudentsList(); renderDefectLog(scopedUnits);
-  renderLogos();
+  renderExtensionQueue(); renderReservationQueue(); renderLogos();
   const inspectDue = scopedUnits.filter(u => isInspectionDue(u)).length;
   const banner = $('inspectionDueBanner');
   if (banner) { if (inspectDue > 0) { banner.classList.remove('hidden'); $('inspectionDueDetail').textContent = `${inspectDue} unit(s) need inspection — click to open.`; } else banner.classList.add('hidden'); }
-  // Stock action button visibilities
   const stockBtns = $('stockActionBtns');
   if (stockBtns) { const show = canEditStock(); stockBtns.querySelectorAll('button').forEach(b => { b.style.display = show ? '' : 'none'; }); }
   const addTeacherBtn = $('addTeacherBtn'); if (addTeacherBtn) addTeacherBtn.style.display = canManageTeachers() ? '' : 'none';
@@ -2806,6 +3422,7 @@ function renderLedger(loans, t) {
     const dueSoon = !overdue && isDueSoon(loan, t);
     let pill = 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300', label = 'Normal';
     if (overdue) { pill = 'bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; label = 'Overdue'; } else if (dueSoon) { pill = 'border-amber-500/40 bg-amber-500/15 text-amber-300'; label = 'Due soon'; }
+    const fine = fineForLoan(loan, t);
     return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40 transition">
       <td class="mono whitespace-nowrap px-3 py-3 text-[11px] font-semibold text-brand-400">${esc(loan.loanId)}</td>
       <td class="px-3 py-3 whitespace-nowrap">${labChip(loan.labId)}</td>
@@ -2813,9 +3430,9 @@ function renderLedger(loans, t) {
       <td class="mono px-3 py-3 text-[11px] text-slate-500">${esc(loan.borrowerId)}</td>
       <td class="px-3 py-3"><div class="text-slate-200">${esc(loan.itemName)}</div><div class="mono text-[10px] text-slate-600">${esc(loan.itemId)}</div></td>
       <td class="mono px-3 py-3 text-[11px] text-brand-300">${esc(loan.serialNo || '—')}</td>
-      <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(loan.dueTimeFormatted)}</td>
+      <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(loan.dueTimeFormatted)}${fine > 0 ? `<div class="text-rose-400 font-bold">₹${fine.toFixed(2)}</div>` : ''}</td>
       <td class="px-3 py-3"><span class="whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${pill}">${label}</span></td>
-      <td class="px-3 py-3 text-right"><button onclick="openReturnVerify('${loan.loanId}')" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300"><i class="fa-solid fa-clipboard-check mr-1 text-[10px]"></i>Verify</button></td>
+      <td class="px-3 py-3 text-right"><div class="flex justify-end gap-1.5"><button onclick="openReturnVerify('${loan.loanId}')" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300"><i class="fa-solid fa-clipboard-check mr-1 text-[10px]"></i>Verify</button>${(isHeadOfBajaj() || isLabAssistant()) && (state.fines[idKey(loan.borrowerId)]?.balance || 0) > 0 ? `<button onclick="settleFine('${esc(loan.borrowerId)}')" class="rounded-lg border border-brand-500/40 bg-brand-500/10 px-2.5 py-1 text-[10px] font-semibold text-brand-300">Settle ₹${state.fines[idKey(loan.borrowerId)].balance.toFixed(2)}</button>` : ''}</div></td>
     </tr>`;
   }).join('');
 }
@@ -2827,11 +3444,12 @@ function renderInventoryTable(items) {
     const units = unitsForSku(item.id);
     const availUnits = units.filter(u => u.status === 'AVAILABLE').length;
     const onLoanUnits = units.filter(u => u.status === 'ON_LOAN').length;
-    const defectUnits = units.filter(u => u.status === 'DEFECTIVE').length;
+    const defectUnits = units.filter(u => u.status === 'DEFECTED').length || units.filter(u => u.status === 'DEFECTIVE').length;
+    const resCount = state.reservations.filter(r => r.skuId === item.id && ['WAITING','READY'].includes(r.status)).length;
     return `<tr class="hover:bg-ink-800/40 transition">
       <td class="mono whitespace-nowrap px-3 py-3 text-[11px] text-slate-500">${esc(item.id)}</td>
       <td class="px-3 py-3 whitespace-nowrap">${labChip(item.labId)}</td>
-      <td class="px-3 py-3 font-semibold text-white">${esc(item.name)}</td>
+      <td class="px-3 py-3 font-semibold text-white">${esc(item.name)}${resCount ? `<span class="ml-2 rounded-full bg-brand-500/15 border border-brand-500/40 px-2 py-0.5 text-[10px] font-bold text-brand-300"><i class="fa-solid fa-bell mr-1 text-[9px]"></i>${resCount} queued</span>` : ''}</td>
       <td class="px-3 py-3 text-slate-400">${esc(item.category)}</td>
       <td class="mono px-3 py-3 text-slate-300">${item.totalStock}</td>
       <td class="mono px-3 py-3 font-bold text-emerald-400">${availUnits}</td>
@@ -2917,12 +3535,17 @@ function saveSettings() {
   state.settings.lowStockThreshold = Math.max(0, parseInt($('setLowStock').value, 10) || 0);
   state.settings.inspectDays = Math.max(7, parseInt($('setInspectDays').value, 10) || DEFAULT_INSPECT_DAYS);
   state.settings.machineInspectDays = Math.max(7, parseInt($('setMachineInspectDays').value, 10) || DEFAULT_MACHINE_INSPECT_DAYS);
-  publishKey('settings'); renderAll();
+  const sfh = $('setFinePerHour'); if (sfh) state.settings.finePerHourOverdue = Math.max(0, parseFloat(sfh.value) || 0);
+  const spp = $('setPenaltyPoints'); if (spp) state.settings.penaltyPointsPerDay = Math.max(0, parseInt(spp.value, 10) || 0);
+  const sbt = $('setBlockThreshold'); if (sbt) state.settings.blockThresholdPoints = Math.max(1, parseInt(sbt.value, 10) || 20);
+  const smi = $('setMaxItems'); if (smi) state.settings.maxActiveItemsPerStudent = Math.max(1, parseInt(smi.value, 10) || 5);
+  addAudit('settings.update', 'settings', JSON.stringify(state.settings).slice(0,300));
+  publishKey('settings'); publishKey('auditLog'); renderAll();
   toast('Settings saved.', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   REPORTS (30-day)
+   REPORTS
    ═══════════════════════════════════════════════════════════════════════ */
 function build30DayReport() {
   const t = now(); const from = t - 30*24*3600*1000;
@@ -3008,32 +3631,12 @@ function download30DayReportExcel() {
     { Metric: 'Defects in Period', Value: summary.defectsInPeriod },
     { Metric: 'Machines Due Inspection', Value: summary.machinesDueInspection }
   ];
-  const stockRows = inv.map(i => {
-    const us = unitsForSku(i.id);
-    return { 'Lab': labName(i.labId), 'SKU': i.id, 'Component': i.name, 'Category': i.category, 'Total Units': i.totalStock,
-      'Available': us.filter(u => u.status === 'AVAILABLE').length,
-      'On Loan': us.filter(u => u.status === 'ON_LOAN').length,
-      'Defective': us.filter(u => u.status === 'DEFECTIVE').length,
-      'Maintenance': us.filter(u => u.status === 'MAINTENANCE').length,
-      'All Unit Serials': us.map(u => u.serialNo).join(' | ') };
-  });
-  const loanRows = history.map(h => ({
-    'Lab': labName(h.labId), 'TXN': h.loanId, 'Register': h.borrowerId, 'SKU': h.itemId, 'Component': h.itemName, 'Unit Barcode': h.serialNo || '',
-    'Borrowed': h.borrowTimeFormatted, 'Due': h.dueTimeFormatted, 'Returned': h.returnTimeFormatted || '', 'Status': h.status, 'Condition': h.condition || '', 'Verified By': h.verifiedBy || '', 'Overdue': h.overdueFlag || ''
-  }));
-  const returnRows = returns.map(h => ({
-    'Lab': labName(h.labId), 'TXN': h.loanId, 'Register': h.borrowerId, 'Component': h.itemName, 'Unit Barcode': h.serialNo || '',
-    'Returned At': h.returnTimeFormatted || '', 'Elapsed (min)': h.elapsedMinutes || '', 'Overdue': h.overdueFlag || '', 'Condition': h.condition || '', 'Verified By': h.verifiedBy || '', 'Notes': h.notes || ''
-  }));
-  const unitInspRows = insp.map(x => {
-    const it = findItem(x.skuId) || {};
-    return { 'Lab': labName(it.labId || ''), 'Unit': x.unitId, 'SKU': x.skuId, 'Component': it.name || x.skuId, 'Inspected At': fmtDateTime(x.date), 'Inspector': x.inspector || '', 'Condition': x.condition || '' };
-  });
+  const stockRows = inv.map(i => { const us = unitsForSku(i.id); return { 'Lab': labName(i.labId), 'SKU': i.id, 'Component': i.name, 'Category': i.category, 'Total Units': i.totalStock, 'Available': us.filter(u => u.status === 'AVAILABLE').length, 'On Loan': us.filter(u => u.status === 'ON_LOAN').length, 'Defective': us.filter(u => u.status === 'DEFECTIVE').length, 'Maintenance': us.filter(u => u.status === 'MAINTENANCE').length, 'All Unit Serials': us.map(u => u.serialNo).join(' | ') }; });
+  const loanRows = history.map(h => ({ 'Lab': labName(h.labId), 'TXN': h.loanId, 'Register': h.borrowerId, 'SKU': h.itemId, 'Component': h.itemName, 'Unit Barcode': h.serialNo || '', 'Borrowed': h.borrowTimeFormatted, 'Due': h.dueTimeFormatted, 'Returned': h.returnTimeFormatted || '', 'Status': h.status, 'Condition': h.condition || '', 'Verified By': h.verifiedBy || '', 'Overdue': h.overdueFlag || '' }));
+  const returnRows = returns.map(h => ({ 'Lab': labName(h.labId), 'TXN': h.loanId, 'Register': h.borrowerId, 'Component': h.itemName, 'Unit Barcode': h.serialNo || '', 'Returned At': h.returnTimeFormatted || '', 'Elapsed (min)': h.elapsedMinutes || '', 'Overdue': h.overdueFlag || '', 'Condition': h.condition || '', 'Verified By': h.verifiedBy || '', 'Notes': h.notes || '' }));
+  const unitInspRows = insp.map(x => { const it = findItem(x.skuId) || {}; return { 'Lab': labName(it.labId || ''), 'Unit': x.unitId, 'SKU': x.skuId, 'Component': it.name || x.skuId, 'Inspected At': fmtDateTime(x.date), 'Inspector': x.inspector || '', 'Condition': x.condition || '' }; });
   const machineInspRows = mInsp.map(x => ({ 'Lab': labName(x.labId), 'Machine ID': x.machineId, 'Inspected At': fmtDateTime(x.inspectedAt), 'Inspector': x.inspector || '', 'Condition': x.condition || '', 'Passed': x.passed ? 'YES' : 'NO', 'Sent to Maintenance': x.sentToMaintenance ? 'YES' : 'NO', 'Notes': x.notes || '' }));
-  const defectRows = defects.map(d => {
-    const it = findItem(d.skuId) || {};
-    return { 'Lab': labName(it.labId || ''), 'Unit': d.unitId, 'SKU': d.skuId, 'Component': it.name || d.skuId, 'Reported At': fmtDateTime(d.reportedAt), 'Reported By': d.reportedBy || '', 'Severity': d.severity || '', 'Notes': d.notes || '' };
-  });
+  const defectRows = defects.map(d => { const it = findItem(d.skuId) || {}; return { 'Lab': labName(it.labId || ''), 'Unit': d.unitId, 'SKU': d.skuId, 'Component': it.name || d.skuId, 'Reported At': fmtDateTime(d.reportedAt), 'Reported By': d.reportedBy || '', 'Severity': d.severity || '', 'Notes': d.notes || '' }; });
   const machineRows = machines.map(m => ({ 'Lab': labName(m.labId), 'Machine ID': m.machineId, 'Name': m.name, 'Location': m.location || '', 'Capacity': m.capacity || 1, 'Status': m.status, 'Last Inspection': m.lastInspectionMs ? fmtDateTime(m.lastInspectionMs) : 'never', 'Inspection Due': isMachineInspectionDue(m) ? 'YES' : 'NO' }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'Summary');
@@ -3115,6 +3718,7 @@ function openComponentModal(id = null) {
   $('cmpCategory').value = item ? item.category : 'Sensors';
   $('cmpStock').value = item ? item.totalStock : 10;
   $('cmpDesc').value = item ? item.description : '';
+  const ds = $('cmpDatasheet'); if (ds) ds.value = item ? (item.datasheet || '') : '';
   openModal('mComponent');
 }
 function nextSku() { const nums = state.inventory.map(i => parseInt(String(i.id).replace(/\D/g,''),10)).filter(n => !isNaN(n)); return 'SKU-' + ((nums.length ? Math.max(...nums) : 1000) + 1); }
@@ -3128,6 +3732,7 @@ function saveComponent() {
   const cat = $('cmpCategory').value.trim() || 'General';
   const stock = Math.max(0, parseInt($('cmpStock').value, 10) || 0);
   const desc = $('cmpDesc').value.trim();
+  const datasheet = ($('cmpDatasheet')?.value || '').trim();
   if (!labId || !labById(labId)) { toast('Select a lab.', 'warn'); return; }
   if (!canManageLab(labId)) { toast('Not your lab.', 'error'); return; }
   if (!sku || !name) { toast('SKU and name required.', 'warn'); return; }
@@ -3135,12 +3740,14 @@ function saveComponent() {
     const item = findItem(orig); if (!item) { toast('Not found.', 'error'); return; }
     const out = borrowedQty(orig); if (stock < out) { toast(`Cannot set stock below ${out}.`, 'error'); return; }
     if (sku !== orig && findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
-    Object.assign(item, { id:sku, name, category:cat, totalStock:stock, description:desc, labId });
+    Object.assign(item, { id:sku, name, category:cat, totalStock:stock, description:desc, labId, datasheet });
   } else {
     if (findItem(sku)) { toast(`SKU ${sku} exists.`, 'error'); return; }
-    state.inventory.push({ id:sku, name, category:cat, totalStock:stock, description:desc || 'Lab component.', labId });
+    state.inventory.push({ id:sku, name, category:cat, totalStock:stock, description:desc || 'Lab component.', labId, datasheet });
   }
-  ensureUnitsForSku(sku); publishKey('inventory'); publishKey('units'); populateCategories(); closeModal('mComponent'); renderAll();
+  ensureUnitsForSku(sku);
+  addAudit(orig ? 'stock.edit' : 'stock.create', sku, `lab=${labId} units=${stock}`);
+  publishKey('inventory'); publishKey('units'); publishKey('auditLog'); populateCategories(); closeModal('mComponent'); renderAll();
   toast('Saved. Unique unit barcodes generated.', 'success');
 }
 async function deleteComponent(id) {
@@ -3153,7 +3760,8 @@ async function deleteComponent(id) {
   if (!ok) return;
   state.inventory = state.inventory.filter(i => i.id !== id);
   state.units = state.units.filter(u => u.skuId !== id);
-  publishKey('inventory'); publishKey('units'); populateCategories(); renderAll();
+  addAudit('stock.delete', id, `name=${item.name} lab=${item.labId}`);
+  publishKey('inventory'); publishKey('units'); publishKey('auditLog'); populateCategories(); renderAll();
   toast('Deleted.', 'success');
 }
 function showQr(itemId) { const item = findItem(itemId); if (!item) return; $('qrTitle').textContent = item.name; $('qrSku').textContent = item.id; $('qrTarget').innerHTML = `<img crossorigin="anonymous" width="140" height="140" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(item.id)}" />`; openModal('mQr'); }
@@ -3210,7 +3818,8 @@ function importComponentsFromRows(rows) {
     if (existing) { const out = borrowedQty(sku); existing.name = name; existing.category = category; existing.totalStock = Math.max(stock, out); existing.description = desc || existing.description || ''; existing.labId = labId; ensureUnitsForSku(sku); updated++; }
     else { state.inventory.push({ id: sku, name, category, totalStock: stock, description: desc || 'Imported from Excel.', labId }); ensureUnitsForSku(sku); added++; }
   });
-  saveAndPublish('inventory', 'units'); populateCategories(); renderAll();
+  addAudit('stock.import', 'excel', `added=${added} updated=${updated} skipped=${skipped}`);
+  saveAndPublish('inventory', 'units', 'auditLog'); populateCategories(); renderAll();
   let msg = `Import complete — ${added} added, ${updated} updated, ${skipped} skipped.`;
   if (skipped && reasons.length) msg += `\n${reasons.slice(0, 5).join('\n')}` + (reasons.length > 5 ? `\n…and ${reasons.length-5} more.` : '');
   showImportResult(msg, added + updated > 0);
@@ -3259,9 +3868,9 @@ function saveMachine() {
   if (!canManageLab(labId)) { toast('Not your lab.', 'error'); return; }
   if (!machineId || !name) { toast('Machine ID and name required.', 'warn'); return; }
   if (!Array.isArray(state.machines)) state.machines = [];
-  if (orig) { const m = findMachine(orig); if (!m) { toast('Machine not found.', 'error'); return; } if (machineId !== orig && findMachine(machineId)) { toast('Machine ID exists.', 'error'); return; } Object.assign(m, { machineId, name, location, capacity, description: desc, labId }); }
-  else { if (findMachine(machineId)) { toast('Machine ID exists.', 'error'); return; } state.machines.push({ machineId, labId, name, location, capacity, status: 'AVAILABLE', description: desc, currentSession: null, lastInspectionMs: 0, createdAt: Date.now() }); }
-  saveAndPublish('machines'); closeModal('mMachine'); renderAll(); toast('Machine saved.', 'success');
+  if (orig) { const m = findMachine(orig); if (!m) { toast('Machine not found.', 'error'); return; } if (machineId !== orig && findMachine(machineId)) { toast('Machine ID exists.', 'error'); return; } Object.assign(m, { machineId, name, location, capacity, description: desc, labId }); addAudit('machine.edit', machineId, `lab=${labId}`); }
+  else { if (findMachine(machineId)) { toast('Machine ID exists.', 'error'); return; } state.machines.push({ machineId, labId, name, location, capacity, status: 'AVAILABLE', description: desc, currentSession: null, lastInspectionMs: 0, createdAt: Date.now() }); addAudit('machine.create', machineId, `lab=${labId} cap=${capacity}`); }
+  saveAndPublish('machines', 'auditLog'); closeModal('mMachine'); renderAll(); toast('Machine saved.', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3315,7 +3924,8 @@ async function saveNewTeacher() {
   const admins = getAdmins();
   admins.push({ username: no, passwordHash: hash, role, isSuper: role === ROLE.HEAD_BAJAJ, labIds: (role === ROLE.HEAD_BAJAJ || role === ROLE.STOCKS_HANDLER) ? [] : labIds, createdAt: Date.now() });
   state.adminConfig = { ...(state.adminConfig || {}), admins };
-  publishKey('adminConfig'); closeModal('mAddTeacher'); renderTeachersList();
+  addAudit('staff.add', no, `role=${role}`);
+  publishKey('adminConfig'); publishKey('auditLog'); closeModal('mAddTeacher'); renderTeachersList();
   toast(`${ROLE_LABELS[role]} "${no}" added.`, 'success');
 }
 async function removeTeacher(username) {
@@ -3325,7 +3935,8 @@ async function removeTeacher(username) {
   if (!ok) return;
   const admins = getAdmins().filter(a => a.username !== username);
   state.adminConfig = { ...(state.adminConfig || {}), admins };
-  publishKey('adminConfig'); renderTeachersList();
+  addAudit('staff.remove', username, '');
+  publishKey('adminConfig'); publishKey('auditLog'); renderTeachersList();
   toast(`Removed.`, 'success');
 }
 function openEditTeacherLabs(username) {
@@ -3346,7 +3957,8 @@ async function saveEditTeacherLabs() {
   const admins = getAdmins(); const idx = admins.findIndex(a => a.username === username);
   if (idx === -1) { toast('Staff not found.', 'error'); return; }
   admins[idx].labIds = labIds; state.adminConfig = { ...(state.adminConfig || {}), admins };
-  publishKey('adminConfig'); closeModal('mEditTeacherLabs'); renderTeachersList();
+  addAudit('staff.labs', username, `labs=${labIds.join(',')}`);
+  publishKey('adminConfig'); publishKey('auditLog'); closeModal('mEditTeacherLabs'); renderTeachersList();
   toast(`Labs updated for "${username}".`, 'success');
 }
 function openEditTeacherRole(username) {
@@ -3369,7 +3981,8 @@ async function saveEditTeacherRole() {
   if (newRole === ROLE.HEAD_BAJAJ || newRole === ROLE.STOCKS_HANDLER) admins[idx].labIds = [];
   else if (!admins[idx].labIds || !admins[idx].labIds.length) admins[idx].labIds = state.labs.map(l => l.id);
   state.adminConfig = { ...(state.adminConfig || {}), admins };
-  publishKey('adminConfig'); closeModal('mEditTeacherRole'); renderTeachersList();
+  addAudit('staff.role', username, `newRole=${newRole}`);
+  publishKey('adminConfig'); publishKey('auditLog'); closeModal('mEditTeacherRole'); renderTeachersList();
   toast(`"${username}" is now ${ROLE_LABELS[newRole]}.`, 'success');
 }
 
@@ -3430,7 +4043,8 @@ function clearHistory() {
   if (session.role !== 'admin') return;
   const mine = myLabIds(); const before = state.history.length;
   state.history = state.history.filter(h => !mine.includes(h.labId));
-  saveAndPublish('history'); renderAll();
+  addAudit('history.clear', 'history', `removed=${before - state.history.length}`);
+  saveAndPublish('history', 'auditLog'); renderAll();
   toast(`Cleared ${before - state.history.length} history record(s).`, 'success');
 }
 
@@ -3546,6 +4160,7 @@ function renderAll() {
   if (session.role === 'admin') {
     if (activeView === 'dashboard') renderDashboard();
     if (activeView === 'reports') renderReports();
+    if (activeView === 'audit') renderAuditLog();
     if (activeView === 'units') renderUnitsView();
     if (activeView === 'poster') renderPoster();
     if (activeView === 'sync') renderSyncPage();
@@ -3572,8 +4187,24 @@ function tick() {
     if (session.role === 'admin') { renderDashboard(); if (activeView === 'reports') renderReports(); }
     checkOverdueForCurrentUser(false);
   }
-  // Monthly machine inspection notification for Head of BAJAJ
   if (isHeadOfBajaj()) checkMachineInspectionNotification();
+
+  // Due-soon email (once per loan)
+  if (session.role === 'user') {
+    visible.forEach(l => {
+      if (isDueSoon(l, t) && !l.__notifiedDueSoon && idKey(l.borrowerId) === idKey(session.register)) {
+        l.__notifiedDueSoon = true;
+        notifyDueSoon(l);
+      }
+    });
+  }
+
+  // Session timeout on shared devices
+  if (session.role && (Date.now() - lastActivityAt) > (state.settings.sessionTimeoutMinutes || 45) * 60000) {
+    toast('Session timed out — please sign in again.', 'warn', 5000);
+    lastActivityAt = Date.now();
+    logout();
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3602,6 +4233,17 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(tick, 1000);
   setInterval(updateSyncPill, 3000);
   setInterval(() => { checkOverdueForCurrentUser(false); checkMachineInspectionNotification(); }, 30000);
+
+  // Activity listener for session timeout
+  ['click','keydown','touchstart','mousemove'].forEach(ev =>
+    window.addEventListener(ev, () => { lastActivityAt = Date.now(); }, { passive: true })
+  );
+
+  // PWA install prompt
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferredInstallPrompt = e;
+    const btn = $('installBtn'); if (btn) btn.classList.remove('hidden');
+  });
 });
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3647,7 +4289,6 @@ window.reportDefect = reportDefect; window.clearDefect = clearDefect;
 window.renderUnitsView = renderUnitsView; window.renderDashboard = renderDashboard;
 window.updateLabelSize = updateLabelSize; window.resetLabelSize = resetLabelSize;
 window.removeCartUnit = removeCartUnit;
-/* machines */
 window.renderMachinesView = renderMachinesView;
 window.openMachineSessionModal = openMachineSessionModal; window.closeMachineSession = closeMachineSession;
 window.machineAddMember = machineAddMember; window.machineRemoveMember = machineRemoveMember; window.machineSessionPrimary = machineSessionPrimary;
@@ -3655,14 +4296,22 @@ window.openAddMachineModal = openAddMachineModal; window.openMachineModal = open
 window.openMachineInspectModal = openMachineInspectModal; window.confirmMachineInspection = confirmMachineInspection;
 window.clearMachineMaintenance = clearMachineMaintenance;
 window.showMachineInspectionReport = showMachineInspectionReport;
-/* excel */
 window.openImportExcelModal = openImportExcelModal;
 window.handleExcelImport = handleExcelImport;
 window.downloadSampleExcel = downloadSampleExcel;
-/* reports */
 window.renderReports = renderReports;
 window.download30DayReportExcel = download30DayReportExcel;
 window.print30DayReport = print30DayReport;
+/* new features */
+window.renderAuditLog = renderAuditLog; window.exportAuditCSV = exportAuditCSV;
+window.settleFine = settleFine; window.recomputeFines = recomputeFines;
+window.requestExtension = requestExtension; window.decideExtension = decideExtension; window.renderExtensionQueue = renderExtensionQueue;
+window.reserveItem = reserveItem; window.cancelReservation = cancelReservation; window.renderReservationQueue = renderReservationQueue;
+window.notifyDueSoon = notifyDueSoon; window.notifyOverdue = notifyOverdue; window.notifyReservationReadyFor = notifyReservationReadyFor;
+window.exportBackup = exportBackup; window.openImportBackup = openImportBackup; window.importBackup = importBackup;
+window.toggleFavorite = toggleFavorite; window.renderMyStats = renderMyStats;
+window.installPWA = installPWA;
+window.requestPushPermission = requestPushPermission;
 </script>
 </body>
 </html>
