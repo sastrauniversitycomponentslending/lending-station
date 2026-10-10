@@ -1584,7 +1584,7 @@ function isInspectionDue(u) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL RENDERING + PRINTING
+   BARCODE LABEL RENDERING + PRINTING (iframe-based, isolated)
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
@@ -1661,20 +1661,34 @@ function renderUnitLabelsForUnits(units) {
   area.innerHTML = units.map(buildUnitLabelHtml).join('');
   openModal('mUnitLabels');
 }
+
+/**
+ * Print unit labels using a HIDDEN IFRAME.
+ * The parent page contains `@media print { body * { visibility:hidden } }`
+ * which would hide every label if we printed the main document directly.
+ * An isolated iframe avoids that entirely.
+ */
 function printUnitLabels() {
   const area = $('labelPrintArea');
   if (!area) return;
   const html = area.innerHTML;
   if (!html.trim()) { toast('No labels to print.', 'warn'); return; }
 
-  const w = window.open('', '_blank');
-  if (!w) { toast('Please allow pop-ups to print labels.', 'warn', 4000); return; }
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  iframe.style.opacity = '0';
+  iframe.style.pointerEvents = 'none';
+  document.body.appendChild(iframe);
 
-  // ⚠️ Do NOT copy the parent <style> blocks — they contain
-  // `@media print { body * { visibility:hidden } }` which would hide every label.
-  // Use self-contained CSS for the print window instead.
-  w.document.open();
-  w.document.write(`<!DOCTYPE html>
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -1683,7 +1697,7 @@ function printUnitLabels() {
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
-    padding: 10px;
+    padding: 12px;
     background: #ffffff;
     color: #0f172a;
     font-family: Inter, Arial, Helvetica, sans-serif;
@@ -1732,36 +1746,41 @@ function printUnitLabels() {
 </head>
 <body>${html}</body>
 </html>`);
-  w.document.close();
+  doc.close();
 
-  const fire = () => {
-    try { w.focus(); w.print(); } catch (e) { console.warn('[print]', e); }
-    setTimeout(() => { try { w.close(); } catch {} }, 1500);
+  const doPrint = () => {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (e) { console.warn('[print]', e); }
+    setTimeout(() => { try { document.body.removeChild(iframe); } catch {} }, 2500);
   };
 
-  const waitForImages = () => {
-    const imgs = w.document.images;
-    const total = imgs.length;
-    if (!total) { setTimeout(fire, 250); return; }
-    let done = 0;
-    let fired = false;
-    const ready = () => {
-      if (fired) return;
+  const imgs = doc.images;
+  const total = imgs.length;
+  if (!total) { setTimeout(doPrint, 350); return; }
+
+  let done = 0;
+  let fired = false;
+  const maybeReady = () => {
+    if (fired) return;
+    done++;
+    if (done >= total) {
       fired = true;
-      setTimeout(fire, 200);
-    };
-    for (let i = 0; i < total; i++) {
-      if (imgs[i].complete && imgs[i].naturalWidth > 0) {
-        if (++done === total) ready();
-      } else {
-        imgs[i].addEventListener('load',  () => { if (++done === total) ready(); });
-        imgs[i].addEventListener('error', () => { if (++done === total) ready(); });
-      }
+      setTimeout(doPrint, 250);
     }
-    setTimeout(ready, 2500);
   };
-
-  setTimeout(waitForImages, 100);
+  for (let i = 0; i < total; i++) {
+    const im = imgs[i];
+    if (im.complete && im.naturalWidth > 0) {
+      maybeReady();
+    } else {
+      im.addEventListener('load', maybeReady, { once: true });
+      im.addEventListener('error', maybeReady, { once: true });
+    }
+  }
+  // Safety net: never get stuck if some image never fires load/error.
+  setTimeout(() => { if (!fired) { fired = true; doPrint(); } }, 3000);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
