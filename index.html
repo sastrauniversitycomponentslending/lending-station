@@ -651,7 +651,7 @@
       <button id="addTeacherBtn" onclick="openAddTeacherModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 px-4 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-user-plus text-[11px]"></i> Add Staff</button>
     </div>
     <div class="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-[11px] text-amber-200 mb-3">
-      <i class="fa-solid fa-crown mr-1"></i> This station supports up to <b id="maxTeachersLabel">5</b> staff. Only <b>Head of BAJAJ</b> can add/remove staff or assign labs.
+      <i class="fa-solid fa-crown mr-1"></i> This station supports <b id="maxTeachersLabel">Unlimited</b> staff. Only <b>Head of BAJAJ</b> can add/remove staff or assign labs.
     </div>
     <div id="teachersList" class="space-y-2"></div>
   </div>
@@ -856,7 +856,7 @@
 <div id="mAddTeacher" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-violet-700/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between"><h3 class="text-base font-bold text-white">Add Staff</h3><button onclick="closeModal('mAddTeacher')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
-    <div class="rounded-lg border border-amber-500/40 bg-amber-500/5 p-2.5 text-[11px] text-amber-200"><i class="fa-solid fa-crown mr-1"></i> Station supports up to <b>5 staff</b> total.</div>
+    <div class="rounded-lg border border-amber-500/40 bg-amber-500/5 p-2.5 text-[11px] text-amber-200"><i class="fa-solid fa-crown mr-1"></i> Station supports <b>unlimited staff</b>.</div>
     <div class="space-y-4">
       <div class="flex gap-2 items-stretch">
         <input id="newTeacherNo" type="text" maxlength="12" placeholder="Teacher No (min 4)" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)" class="mono focus-ring flex-1 min-w-0 rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs tracking-[.2em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
@@ -1036,7 +1036,7 @@ const MAX_ADMIN_USER_LEN = 12;
 const MIN_ADMIN_PASS_LEN = 6;
 const DEFAULT_INSPECT_DAYS = 90;
 const DEFAULT_MACHINE_INSPECT_DAYS = 30;
-const MAX_TEACHERS = 5;
+const MAX_TEACHERS = Infinity;   // no limit on staff
 const OVERDUE_BLOCK_HOURS = 2;
 const OVERDUE_BLOCK_MS = OVERDUE_BLOCK_HOURS * 3600 * 1000;
 
@@ -2880,7 +2880,8 @@ function renderDefectLog(units) {
 function renderTeachersList() {
   const admins = getAdmins();
   const badge = $('teacherCountBadge'); if (badge) badge.textContent = admins.length;
-  const label = $('maxTeachersLabel'); if (label) label.textContent = MAX_TEACHERS;
+  const label = $('maxTeachersLabel');
+  if (label) label.textContent = MAX_TEACHERS === Infinity ? 'Unlimited' : MAX_TEACHERS;
   const list = $('teachersList'); if (!list) return;
   if (!admins.length) { list.innerHTML = `<p class="text-xs text-slate-500">No staff.</p>`; return; }
   const superAdmin = isHeadOfBajaj();
