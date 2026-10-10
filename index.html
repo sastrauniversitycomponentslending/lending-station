@@ -117,7 +117,7 @@
   .scan-frame::before { content:''; position:absolute; left:5%; right:5%; top:50%; height:2px; transform:translateY(-50%); background: linear-gradient(90deg, transparent, rgba(34,211,238,.9), transparent); pointer-events:none; z-index:5; animation: scanLine 2s ease-in-out infinite; }
   @keyframes scanLine { 0%,100% { opacity:.25; } 50% { opacity:1; } }
 
-  /* Unit label — dimensions set dynamically via JS (cm / mm) */
+  /* Unit label — NO component name, ONLY: SKU + UNIT NUMBER + barcode */
   .unit-label {
     padding: 2mm;
     border: 1px dashed #cbd5e1;
@@ -135,10 +135,10 @@
     overflow: hidden;
     box-sizing: border-box;
   }
-  .unit-label .unit-title { font-size: 8pt; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; }
-  .unit-label .unit-sku { font-size: 6pt; color: #475569; line-height: 1; }
+  .unit-label .unit-id { font-size: 10pt; font-weight: 900; color: #0f172a; letter-spacing: .04em; line-height: 1.05; font-family: 'JetBrains Mono', monospace; }
+  .unit-label .unit-num { font-size: 8pt; font-weight: 800; color: #1e5fa8; line-height: 1; letter-spacing: .05em; font-family: 'JetBrains Mono', monospace; }
   .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
-  .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; color: #0f172a; }
   .unit-label .unit-lab { font-size: 5pt; color: #64748b; text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
 
   .status-pill { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.15rem .55rem; font-size:9px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
@@ -1054,7 +1054,6 @@
       </div>
     </div>
 
-    <!-- SIZE CONTROLS -->
     <div class="rounded-xl border border-brand-500/40 bg-gradient-to-br from-brand-500/10 to-ink-850/60 p-3.5">
       <div class="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-200">
         <i class="fa-solid fa-ruler-combined text-[10px]"></i> Exact label size
@@ -1080,7 +1079,7 @@
       </div>
       <p class="mt-2 text-[10px] text-slate-400">
         <i class="fa-solid fa-circle-info mr-1"></i>
-        These are <b>physical print dimensions</b>. When you print from Chrome, choose <b>Scale: 100 %</b> (or "Actual size") and disable "Fit to page" for exact cm measurements.
+        Labels show only <b>Component ID</b>, <b>Unit #</b> and the <b>barcode</b>. Print with <b>Scale: 100 %</b> (or "Actual size") for exact cm.
       </p>
     </div>
 
@@ -1638,7 +1637,7 @@ function isInspectionDue(u) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL RENDERING + PRINTING (iframe-based, isolated, cm-accurate)
+   BARCODE LABEL (NO name — only SKU + Unit# + barcode)
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
@@ -1660,22 +1659,32 @@ function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   }
 }
 
+/* Extract just the trailing unit number, e.g. "SKU-1001-0042" → "0042" */
+function unitNumberFromSerial(serial) {
+  const parts = String(serial || '').split('-');
+  return parts.length ? parts[parts.length - 1] : '';
+}
+
+/* Label shows ONLY: Component ID (SKU), Unit #, barcode. NO component name. */
 function buildUnitLabelHtml(u) {
   const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
-  const lab = labName(item.labId);
-  const bc = generateBarcodeDataURL(u.serialNo, 3, 60); // high-res source
+  const bc = generateBarcodeDataURL(u.serialNo, 3, 60);
+  const unitNum = unitNumberFromSerial(u.serialNo);
+  const sku = u.skuId;
+
   const bcHtml = bc
     ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />`
     : `<div style="height:50px;line-height:50px;color:#999;font-size:10px;">barcode unavailable</div>`;
+
   const W = state.settings.labelWidthCm || 5;
   const H = state.settings.labelHeightCm || 3;
   const BCH = state.settings.labelBcHeightMm || 15;
+
   return `<div class="unit-label" data-serial="${esc(u.serialNo)}" style="width:${W}cm;height:${H}cm;">
-    <div class="unit-title">${esc(item.name)}</div>
-    <div class="unit-sku">${esc(u.skuId)}</div>
+    <div class="unit-id">${esc(sku)}</div>
+    <div class="unit-num">UNIT #${esc(unitNum)}</div>
     ${bcHtml.replace('<img class="unit-bc-img"', `<img class="unit-bc-img" style="width:100%;height:${BCH}mm;"`)}
     <div class="unit-serial">${esc(u.serialNo)}</div>
-    <div class="unit-lab">${esc(lab)}</div>
   </div>`;
 }
 
@@ -1754,11 +1763,6 @@ function resetLabelSize() {
   updateLabelSize();
 }
 
-/**
- * Print unit labels using a HIDDEN IFRAME, size-accurate in cm/mm.
- * The parent page contains `@media print { body * { visibility:hidden } }`
- * which would hide every label if we printed the main document directly.
- */
 function printUnitLabels() {
   const area = $('labelPrintArea');
   if (!area) return;
@@ -1810,13 +1814,11 @@ function printUnitLabels() {
     break-inside: avoid;
     vertical-align: top;
   }
-  .unit-label .unit-title { font-size: 8pt; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; }
-  .unit-label .unit-sku { font-size: 6pt; color: #475569; line-height: 1; }
+  .unit-label .unit-id { font-size: 10pt; font-weight: 900; color: #0f172a; letter-spacing: .04em; line-height: 1.05; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .unit-label .unit-num { font-size: 8pt; font-weight: 800; color: #1e5fa8; line-height: 1; letter-spacing: .05em; font-family: 'JetBrains Mono', ui-monospace, monospace; }
   .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
-  .unit-label .unit-serial { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; }
-  .unit-label .unit-lab { font-size: 5pt; color: #64748b; text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
+  .unit-label .unit-serial { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; color: #0f172a; }
 
-  /* Exact size — 0 page margin so cm/mm dimensions are respected */
   @page { margin: 0; size: auto; }
   @media print {
     html, body { padding: 4mm; background: #ffffff !important; }
@@ -3495,7 +3497,7 @@ async function removeTeacher(username) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   TEACHER ROLE SWAP — promote / demote
+   TEACHER ROLE SWAP
    ═══════════════════════════════════════════════════════════════════════ */
 async function promoteTeacher(username) {
   if (!isSuperAdmin()) { toast('Only head teacher can promote.', 'warn'); return; }
@@ -3627,7 +3629,8 @@ function exportExcel() {
     const it = findItem(u.skuId) || {};
     return {
       'Lab': labName(it.labId||''), 'SKU': u.skuId, 'Component': it.name||u.skuId,
-      'Unit Barcode': u.serialNo, 'Status': u.status, 'Condition': u.condition || 'GOOD',
+      'Unit Barcode': u.serialNo, 'Unit #': unitNumberFromSerial(u.serialNo),
+      'Status': u.status, 'Condition': u.condition || 'GOOD',
       'Last Inspection': u.lastInspectionMs ? fmtDateTime(u.lastInspectionMs) : 'never',
       'Last Borrower ID': u.lastBorrowerId || '',
       'Notes': u.notes || ''
