@@ -16,7 +16,7 @@
       fontFamily: { sans: ['Inter','system-ui','sans-serif'], mono: ['JetBrains Mono','ui-monospace','monospace'] },
       colors: {
         ink: { 950:'#05080f',900:'#0a0f1a',850:'#0e1421',800:'#131b2a',750:'#182233',700:'#1e2a3d',600:'#2b3a52',500:'#3d4f6b' },
-        brand: { 50:'#eef4ff',100:'#dde7ff',200:'#bcd0ff',300:'#90aeff',400:'#5b83fc',500:'#3b62f6',600:'#2544eb',700:'#1d33d8',800:'#1e2caf',900:'#1e2b8a' },
+        brand: { 50:'#eef4ff',100:'#dde7ff',200:'#bcd0ff',300:'#90aeff',400:'#5b83fc',500:'#3b62f6',600:'#2544eb',700:'#1d33d8',800:'#1e2caf',900:'#1e2b8a',950:'#141c5e' },
         bajaj: { 50:'#eff8ff',100:'#dff0fe',200:'#b8e0fd',300:'#7ac8fc',400:'#34acf8',500:'#0a92eb',600:'#0073c8',700:'#015ba2',800:'#064d86',900:'#0b416f' },
         neon: { pink:'#ff3d9a', violet:'#8b5cf6', cyan:'#22d3ee', lime:'#a3e635', amber:'#fbbf24' }
       },
@@ -81,65 +81,38 @@
   .theme-switch.light .knob { left: calc(100% - 27px); background: linear-gradient(135deg, #3b62f6, #8b5cf6); color: #ffffff; box-shadow: 0 2px 8px rgba(59,98,246,.5); }
   @media print { body * { visibility:hidden !important; } #posterCanvas, #posterCanvas * { visibility:visible !important; } #posterCanvas { position:absolute; left:50%; top:40px; transform: translateX(-50%); box-shadow:none !important; } }
 
-  /* ═══════════════════════════════════════════════════════════════
-     LIGHT THEME — comprehensive overrides so gradients, borders
-     and text all shift to a clean, readable light palette.
-     ═══════════════════════════════════════════════════════════════ */
+  /* ═════ LIGHT THEME ═════ */
   body.theme-light { background-color: #eef2f9 !important; color: #0f172a !important; }
   body.theme-light .orb { display: none !important; }
   body.theme-light .glass { background: rgba(255,255,255,.94) !important; backdrop-filter: blur(16px) saturate(140%) !important; -webkit-backdrop-filter: blur(16px) saturate(140%) !important; border-bottom-color: #dbe4f0 !important; }
-
-  /* solid backgrounds */
   body.theme-light [class*="bg-ink-950"] { background-color: #f0f4fa !important; }
   body.theme-light [class*="bg-ink-900"] { background-color: #ffffff !important; }
   body.theme-light [class*="bg-ink-850"] { background-color: #fbfcfe !important; }
   body.theme-light [class*="bg-ink-800"] { background-color: #f1f5fb !important; }
   body.theme-light [class*="bg-ink-750"] { background-color: #eef2f8 !important; }
   body.theme-light [class*="bg-ink-700"] { background-color: #e6ecf5 !important; }
-
-  /* gradient backgrounds — replace the dark gradient-stops */
-  body.theme-light [class*="from-ink-950"],
-  body.theme-light [class*="from-ink-900"],
-  body.theme-light [class*="from-ink-850"],
-  body.theme-light [class*="from-ink-800"] {
-    --tw-gradient-from: #ffffff !important;
-    --tw-gradient-to: #eef2f9 !important;
+  body.theme-light [class*="from-ink-950"], body.theme-light [class*="from-ink-900"],
+  body.theme-light [class*="from-ink-850"], body.theme-light [class*="from-ink-800"] {
+    --tw-gradient-from: #ffffff !important; --tw-gradient-to: #eef2f9 !important;
     --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
     background-image: linear-gradient(135deg, #ffffff, #eef2f9) !important;
   }
-  body.theme-light [class*="to-ink-950"],
-  body.theme-light [class*="to-ink-900"],
-  body.theme-light [class*="to-ink-850"],
-  body.theme-light [class*="to-ink-800"] {
-    --tw-gradient-to: #eef2f9 !important;
-  }
+  body.theme-light [class*="to-ink-950"], body.theme-light [class*="to-ink-900"],
+  body.theme-light [class*="to-ink-850"], body.theme-light [class*="to-ink-800"] { --tw-gradient-to: #eef2f9 !important; }
   body.theme-light [class*="via-ink-"] { --tw-gradient-via: #f5f8fd !important; }
-
-  /* tinted gradient panels (brand, rose, amber, emerald, orange, bajaj) */
-  body.theme-light [class*="from-brand-950"],
-  body.theme-light [class*="from-brand-900"] { --tw-gradient-from: #eef4ff !important; }
-  body.theme-light [class*="from-emerald-950"],
-  body.theme-light [class*="from-emerald-900"] { --tw-gradient-from: #ecfdf5 !important; }
-  body.theme-light [class*="from-amber-950"],
-  body.theme-light [class*="from-amber-900"],
-  body.theme-light [class*="from-orange-950"],
-  body.theme-light [class*="from-orange-900"] { --tw-gradient-from: #fffbeb !important; }
-  body.theme-light [class*="from-rose-950"],
-  body.theme-light [class*="from-rose-900"] { --tw-gradient-from: #fff1f2 !important; }
-  body.theme-light [class*="from-bajaj-950"],
-  body.theme-light [class*="from-bajaj-900"] { --tw-gradient-from: #eff8ff !important; }
-
-  /* text colors */
+  body.theme-light [class*="from-brand-950"], body.theme-light [class*="from-brand-900"] { --tw-gradient-from: #eef4ff !important; }
+  body.theme-light [class*="from-emerald-950"], body.theme-light [class*="from-emerald-900"] { --tw-gradient-from: #ecfdf5 !important; }
+  body.theme-light [class*="from-amber-950"], body.theme-light [class*="from-amber-900"],
+  body.theme-light [class*="from-orange-950"], body.theme-light [class*="from-orange-900"] { --tw-gradient-from: #fffbeb !important; }
+  body.theme-light [class*="from-rose-950"], body.theme-light [class*="from-rose-900"] { --tw-gradient-from: #fff1f2 !important; }
+  body.theme-light [class*="from-bajaj-950"], body.theme-light [class*="from-bajaj-900"] { --tw-gradient-from: #eff8ff !important; }
   body.theme-light .text-white { color: #0a1120 !important; }
-  body.theme-light .text-slate-100 { color: #1e293b !important; }
-  body.theme-light .text-slate-200 { color: #1e293b !important; }
+  body.theme-light .text-slate-100, body.theme-light .text-slate-200 { color: #1e293b !important; }
   body.theme-light .text-slate-300 { color: #334155 !important; }
   body.theme-light .text-slate-400 { color: #475569 !important; }
-  body.theme-light .text-slate-500 { color: #64748b !important; }
-  body.theme-light .text-slate-600 { color: #64748b !important; }
+  body.theme-light .text-slate-500, body.theme-light .text-slate-600 { color: #64748b !important; }
   body.theme-light .text-brand-200 { color: #1e2caf !important; }
-  body.theme-light .text-brand-300 { color: #1d33d8 !important; }
-  body.theme-light .text-brand-400 { color: #2544eb !important; }
+  body.theme-light .text-brand-300, body.theme-light .text-brand-400 { color: #1d33d8 !important; }
   body.theme-light .text-emerald-300 { color: #047857 !important; }
   body.theme-light .text-emerald-400 { color: #059669 !important; }
   body.theme-light .text-amber-300 { color: #b45309 !important; }
@@ -151,33 +124,17 @@
   body.theme-light .text-bajaj-200 { color: #075985 !important; }
   body.theme-light .text-bajaj-300 { color: #0369a1 !important; }
   body.theme-light .text-neon-cyan { color: #0e7490 !important; }
-  body.theme-light .text-ink-600 { color: #94a3b8 !important; }
-
-  /* borders */
   body.theme-light [class*="border-ink-"] { border-color: #dbe4f0 !important; }
   body.theme-light [class*="border-brand-"] { border-color: #bcd0ff !important; }
   body.theme-light [class*="border-emerald-"] { border-color: #a7f3d0 !important; }
   body.theme-light [class*="border-amber-"] { border-color: #fcd34d !important; }
   body.theme-light [class*="border-rose-"] { border-color: #fecdd3 !important; }
   body.theme-light [class*="border-orange-"] { border-color: #fdba74 !important; }
-
-  /* inputs */
   body.theme-light input, body.theme-light textarea, body.theme-light select {
     background-color: #ffffff !important; color: #0a1120 !important; border-color: #d6dfec !important;
   }
   body.theme-light input::placeholder, body.theme-light textarea::placeholder { color: #94a3b8 !important; }
-
-  /* card gradient ring */
   body.theme-light .card-gradient::before { background: linear-gradient(135deg, rgba(59,98,246,.35), rgba(139,92,246,.2), rgba(34,211,238,.3)) !important; }
-
-  /* specific panels that had dark gradients */
-  body.theme-light #view-overview .bg-gradient-to-br,
-  body.theme-light #view-units .bg-gradient-to-r,
-  body.theme-light #view-dashboard .bg-gradient-to-r,
-  body.theme-light #view-sync .bg-gradient-to-br { background-image: linear-gradient(135deg, #ffffff, #eef2f9) !important; }
-
-  /* poster stays white anyway */
-  body.theme-light #posterCanvas { background:#ffffff !important; }
 
   .lab-chip { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.1rem .5rem; font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
   .lab-chip-0 { background: rgba(59,98,246,.15); color:#90aeff; border:1px solid rgba(59,98,246,.4); }
@@ -209,21 +166,9 @@
   @keyframes scanLine { 0%,100% { opacity:.25; } 50% { opacity:1; } }
 
   .unit-label {
-    padding: 2mm;
-    border: 1px dashed #cbd5e1;
-    border-radius: 4px;
-    background: #fff;
-    color: #0f172a;
-    text-align: center;
-    font-family: Inter, Arial, sans-serif;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1mm;
-    overflow: hidden;
-    box-sizing: border-box;
+    padding: 2mm; border: 1px dashed #cbd5e1; border-radius: 4px; background: #fff; color: #0f172a;
+    text-align: center; font-family: Inter, Arial, sans-serif; page-break-inside: avoid; break-inside: avoid;
+    display: flex; flex-direction: column; justify-content: center; gap: 1mm; overflow: hidden; box-sizing: border-box;
   }
   .unit-label .unit-id { font-size: 10pt; font-weight: 900; color: #0f172a; letter-spacing: .04em; line-height: 1.05; font-family: 'JetBrains Mono', monospace; }
   .unit-label .unit-num { font-size: 8pt; font-weight: 800; color: #1e5fa8; line-height: 1; letter-spacing: .05em; font-family: 'JetBrains Mono', monospace; }
@@ -662,6 +607,7 @@
     <div class="flex flex-wrap gap-2">
       <button onclick="openScanner('unitsAdmin')" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20"><i class="fa-solid fa-camera"></i> Scan a unit</button>
       <button onclick="printAllLabelsForVisible()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-brand-600/20"><i class="fa-solid fa-print"></i> Print visible labels</button>
+      <button onclick="printAllMachineLabels()" class="focus-ring flex items-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-3.5 py-2 text-xs font-semibold text-brand-200"><i class="fa-solid fa-gears"></i> Machine labels</button>
     </div>
   </div>
 
@@ -791,6 +737,8 @@
       <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-warehouse text-amber-400 text-xs"></i> Master Inventory (SKUs)</h3>
       <div class="flex flex-wrap gap-2">
         <button onclick="openComponentModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-plus text-[11px]"></i> Add</button>
+        <button onclick="openImportExcelModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-bajaj-500 to-bajaj-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-file-import text-[11px]"></i> Import Excel</button>
+        <button onclick="downloadSampleExcel()" class="focus-ring flex items-center gap-2 rounded-xl border border-bajaj-500/40 bg-bajaj-500/10 px-3.5 py-2 text-xs font-semibold text-bajaj-200"><i class="fa-solid fa-file-arrow-down text-[11px]"></i> Sample</button>
         <button onclick="openUnitLabelPrintAll()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-barcode text-[11px]"></i> Print all unit labels</button>
       </div>
     </div>
@@ -813,6 +761,7 @@
       <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-gears text-brand-400 text-xs"></i> Machines</h3>
       <div class="flex flex-wrap gap-2">
         <button onclick="openAddMachineModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-plus text-[11px]"></i> Add machine</button>
+        <button onclick="printAllMachineLabels()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-barcode text-[11px]"></i> Print machine labels</button>
       </div>
     </div>
     <div class="overflow-x-auto mobile-scroll-x">
@@ -825,6 +774,9 @@
         </thead>
         <tbody id="machineTableBody" class="divide-y divide-ink-700/60"></tbody>
       </table>
+    </div>
+    <div class="border-t border-ink-700/60 px-4 sm:px-5 py-2.5 text-[10px] text-slate-500">
+      <i class="fa-solid fa-lock mr-1"></i> Machines are protected — they cannot be deleted, only edited or placed in maintenance.
     </div>
   </div>
 
@@ -881,7 +833,7 @@
       <button onclick="openAddTeacherModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 px-4 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-user-plus text-[11px]"></i> Add Teacher</button>
     </div>
     <div class="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-[11px] text-amber-200 mb-3">
-      <i class="fa-solid fa-crown mr-1"></i> This station supports up to <b id="maxTeachersLabel">5</b> teachers. As head teacher, you can <b>promote</b> or <b>demote</b> others.
+      <i class="fa-solid fa-crown mr-1"></i> This station supports up to <b id="maxTeachersLabel">5</b> teachers. As head teacher you can <b>promote</b>, <b>demote</b> and <b>assign labs</b> to any teacher.
     </div>
     <div id="teachersList" class="space-y-2"></div>
   </div>
@@ -1013,11 +965,38 @@
       <textarea id="cmpDesc" rows="2" placeholder="Description" class="focus-ring sm:col-span-2 w-full resize-none rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600"></textarea>
     </div>
     <div class="rounded-xl border border-brand-500/30 bg-brand-500/5 p-3 text-[11px] text-brand-200">
-      <i class="fa-solid fa-info-circle mr-1"></i> When you enter a number of units, the system auto-creates that many <b>unique serial numbers</b> (e.g. <span class="mono">TI-BOARD-0001</span>, <span class="mono">TI-BOARD-0002</span>) and you can print one barcode label per unit from the Units page.
+      <i class="fa-solid fa-info-circle mr-1"></i> When you enter a number of units, the system auto-creates that many <b>unique serial numbers</b> (e.g. <span class="mono">TI-BOARD-0001</span>) and you can print one barcode label per unit from the Units page.
     </div>
     <div class="flex gap-2">
       <button onclick="closeModal('mComponent')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
       <button onclick="saveComponent()" class="w-1/2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-bold text-white">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Excel import modal -->
+<div id="mImportExcel" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
+  <div class="scale-in w-full max-w-lg space-y-4 rounded-2xl border-2 border-emerald-500/60 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white"><i class="fa-solid fa-file-import mr-2 text-emerald-400"></i>Import Components from Excel</h3>
+      <button onclick="closeModal('mImportExcel')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-[11px] text-emerald-200">
+      <b>Required columns (header row):</b> <span class="mono">SKU</span>, <span class="mono">Name</span>, <span class="mono">Total Stock</span> (or <span class="mono">Units</span>)<br>
+      <b>Optional columns:</b> <span class="mono">Lab</span> (lab ID or lab name), <span class="mono">Category</span>, <span class="mono">Description</span><br>
+      Files can be <b>.xlsx</b>, <b>.xls</b> or <b>.csv</b>. If <span class="mono">Lab</span> is missing, the first lab you manage is used.
+    </div>
+    <div class="rounded-xl border border-brand-500/30 bg-brand-500/5 p-3 text-[11px] text-brand-200">
+      <i class="fa-solid fa-lightbulb mr-1"></i> Download a sample file first to see the exact layout.
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="downloadSampleExcel()" class="rounded-xl border border-brand-500/40 bg-brand-500/10 px-3.5 py-2 text-xs font-semibold text-brand-200"><i class="fa-solid fa-file-arrow-down mr-1"></i> Download sample</button>
+      <button onclick="document.getElementById('excelFileInput').click()" class="rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-bold text-white"><i class="fa-solid fa-upload mr-1"></i> Choose file</button>
+      <input id="excelFileInput" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" class="hidden" onchange="handleExcelImport(event)" />
+    </div>
+    <div id="excelImportResult" class="hidden rounded-xl border p-3 text-xs"></div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mImportExcel')" class="w-full rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Close</button>
     </div>
   </div>
 </div>
@@ -1110,6 +1089,24 @@
     <div class="flex gap-2">
       <button onclick="closeModal('mAddTeacher')" class="w-1/2 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
       <button onclick="saveNewTeacher()" class="w-1/2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white">Add Teacher</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit teacher labs modal -->
+<div id="mEditTeacherLabs" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
+  <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-rose-500/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between"><h3 class="text-base font-bold text-white"><i class="fa-solid fa-building-columns mr-2 text-rose-400"></i>Assign Labs</h3><button onclick="closeModal('mEditTeacherLabs')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="rounded-lg border border-rose-500/30 bg-rose-500/5 p-2.5 text-[11px] text-rose-200">
+      Teacher: <span id="editLabsTeacherNo" data-username="" class="mono font-bold text-white">—</span>
+    </div>
+    <div>
+      <label class="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Labs this teacher manages</label>
+      <div id="editTeacherLabs" class="space-y-1.5"></div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mEditTeacherLabs')" class="w-1/3 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button onclick="saveEditTeacherLabs()" class="flex-1 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 py-2.5 text-xs font-bold text-white"><i class="fa-solid fa-check mr-1 text-[11px]"></i> Save</button>
     </div>
   </div>
 </div>
@@ -1264,7 +1261,7 @@
   <div class="scale-in w-full max-w-5xl space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[92vh] overflow-y-auto">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h3 class="text-base font-bold text-white"><i class="fa-solid fa-barcode mr-2 text-brand-400"></i>Print Unit Barcode Labels</h3>
+        <h3 class="text-base font-bold text-white"><i class="fa-solid fa-barcode mr-2 text-brand-400"></i><span id="labelModalTitle">Print Unit Barcode Labels</span></h3>
         <p id="labelSubtitle" class="mt-0.5 text-xs text-slate-400">Each physical unit gets its own unique barcode.</p>
       </div>
       <div class="flex flex-wrap gap-2">
@@ -1298,7 +1295,7 @@
       </div>
       <p class="mt-2 text-[10px] text-slate-400">
         <i class="fa-solid fa-circle-info mr-1"></i>
-        Labels show only <b>Component ID</b>, <b>Unit #</b> and the <b>barcode</b>. Print with <b>Scale: 100 %</b> (or "Actual size") for exact cm.
+        Labels show only <b>Component ID</b> / <b>Machine ID</b>, unit # and the <b>barcode</b>. Print with <b>Scale: 100 %</b> for exact cm.
       </p>
     </div>
 
@@ -1333,8 +1330,8 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const STATION_NODE = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v12';
-const SESSION_KEY = 'bajaj.session.v11';
+const STORAGE_KEY = 'bajaj.lending.v13';
+const SESSION_KEY = 'bajaj.session.v12';
 const THEME_KEY = 'bajaj.theme.v2';
 const REGISTERS_KEY = 'bajaj.registers.v1';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
@@ -1344,8 +1341,8 @@ const MIN_ADMIN_USER_LEN = 4;
 const MAX_ADMIN_USER_LEN = 12;
 const MIN_ADMIN_PASS_LEN = 6;
 const DEFAULT_INSPECT_DAYS = 90;
-const MAX_TEACHERS = 5;                       /* ⬅ station supports up to 5 teachers */
-const OVERDUE_BLOCK_HOURS = 2;                /* ⬅ overdue block kicks in after this many hours */
+const MAX_TEACHERS = 5;
+const OVERDUE_BLOCK_HOURS = 2;
 const OVERDUE_BLOCK_MS = OVERDUE_BLOCK_HOURS * 3600 * 1000;
 
 const FALLBACK_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 130" width="500" height="130">
@@ -1380,10 +1377,10 @@ const SEED_INVENTORY = [
 ];
 
 const SEED_MACHINES = [
-  { machineId:'MCH-1001', labId:'LAB-MECH', name:'CNC Milling Machine',  location:'Bay 1',   capacity:4, status:'AVAILABLE', description:'3-axis CNC milling center.' },
-  { machineId:'MCH-1002', labId:'LAB-MECH', name:'3D Printer (FDM)',      location:'Bay 2',   capacity:3, status:'AVAILABLE', description:'FDM 3D printer for rapid prototyping.' },
-  { machineId:'MCH-1003', labId:'LAB-ELEC', name:'Oscilloscope Bench',    location:'Bench A', capacity:2, status:'AVAILABLE', description:'Digital storage oscilloscope.' },
-  { machineId:'MCH-1004', labId:'LAB-ELEC', name:'Soldering Station',     location:'Bench B', capacity:2, status:'AVAILABLE', description:'Temperature controlled soldering station.' }
+  { machineId:'MCH-1001', labId:'LAB-MECH', name:'CNC Milling Machine',  location:'Bay 1',   capacity:4, status:'AVAILABLE', description:'3-axis CNC milling center.', required:true },
+  { machineId:'MCH-1002', labId:'LAB-MECH', name:'3D Printer (FDM)',      location:'Bay 2',   capacity:3, status:'AVAILABLE', description:'FDM 3D printer for rapid prototyping.', required:true },
+  { machineId:'MCH-1003', labId:'LAB-ELEC', name:'Oscilloscope Bench',    location:'Bench A', capacity:2, status:'AVAILABLE', description:'Digital storage oscilloscope.', required:true },
+  { machineId:'MCH-1004', labId:'LAB-ELEC', name:'Soldering Station',     location:'Bench B', capacity:2, status:'AVAILABLE', description:'Temperature controlled soldering station.', required:true }
 ];
 
 const DEFAULT_SETTINGS = {
@@ -1391,9 +1388,7 @@ const DEFAULT_SETTINGS = {
   posterTitle: 'BEST Component Lending Station',
   posterSubtitle: 'Bajaj Engineering Skills Training',
   posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.',
-  labelWidthCm: 5,
-  labelHeightCm: 3,
-  labelBcHeightMm: 15
+  labelWidthCm: 5, labelHeightCm: 3, labelBcHeightMm: 15
 };
 
 function defaultState() {
@@ -1401,16 +1396,12 @@ function defaultState() {
     labs: SEED_LABS.map(l => ({ ...l })),
     inventory: SEED_INVENTORY.map(x => ({ ...x })),
     machines: SEED_MACHINES.map(m => ({ ...m, currentSession: null })),
-    units: [],
-    loans: [], history: [], cart: {},
-    inspections: [],
-    defects: [],
+    units: [], loans: [], history: [], cart: {},
+    inspections: [], defects: [],
     borrower: { name:'', id:'' },
     settings: { ...DEFAULT_SETTINGS },
     activity: [], simOffsetMs: 0,
-    students: {},
-    adminConfig: null,
-    branding: null
+    students: {}, adminConfig: null, branding: null
   };
 }
 let state = defaultState();
@@ -1425,10 +1416,9 @@ let currentTheme = 'dark';
 let catalogLabFilter = 'ALL';
 let pendingReturnLoanId = null;
 
-/* Machine session modal state */
 let machineSessionMachineId = null;
 let machineSessionMembers = [];
-let machineSessionMode = 'start'; // 'start' | 'manage' | 'join' | 'view'
+let machineSessionMode = 'start';
 
 let scannerTarget = null;
 let html5QrScanner = null;
@@ -1681,7 +1671,6 @@ function onScanSuccess(decodedText) {
   handleScannedCode(clean);
 }
 
-/* Only accepts valid component unit barcodes. Adds the exact unit to cart. */
 function handleCatalogFastScan(code) {
   if (blockIfOverdue()) { destroyScanner(); closeScanner(); return; }
   const raw = String(code || '').trim();
@@ -1711,7 +1700,6 @@ function handleCatalogFastScan(code) {
   saveLocal();
 }
 
-/* Machine barcode handler */
 function handleMachineScan(code) {
   const raw = String(code || '').trim();
   if (!raw) return;
@@ -1821,9 +1809,6 @@ function closeScanner() {
 /* ═══════════════════════════════════════════════════════════════════════
    OVERDUE BLOCK
    ═══════════════════════════════════════════════════════════════════════ */
-/* A loan is "blocking overdue" once it has been past-due by more than
-   OVERDUE_BLOCK_HOURS. While a student has at least one such loan they
-   cannot borrow any new component until it is returned. */
 function myBlockingOverdueLoans() {
   if (!session || !session.register || session.role === 'admin') return [];
   const t = now();
@@ -1911,7 +1896,6 @@ function unitStatusPill(u) {
   const [cls, txt] = map[u.status] || ['sp-available', u.status];
   return `<span class="status-pill ${cls}">${txt}</span>`;
 }
-
 function isInspectionDue(u) {
   const days = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
   const baseline = u.lastInspectionMs || u.createdAt || 0;
@@ -1936,10 +1920,7 @@ function machineStatusPill(m) {
   const [cls, txt] = map[m.status] || ['sp-available', m.status];
   return `<span class="status-pill ${cls}">${txt}</span>`;
 }
-
-function machineCapacityUsed(m) {
-  return m.currentSession ? (m.currentSession.members || []).length : 0;
-}
+function machineCapacityUsed(m) { return m.currentSession ? (m.currentSession.members || []).length : 0; }
 
 function openMachineSessionModal(machineId) {
   const m = findMachine(machineId);
@@ -1959,13 +1940,9 @@ function openMachineSessionModal(machineId) {
     machineSessionMembers = (m.currentSession.members || []).map(x => ({ ...x }));
     machineSessionMode = (isStarter || isAdmin) ? 'manage' : 'join';
   } else {
-    // available — start new session
     machineSessionMode = 'start';
     machineSessionMembers = [{
-      register: owner,
-      name: owner,
-      joinedAt: Date.now(),
-      isStarter: true
+      register: owner, name: owner, joinedAt: Date.now(), isStarter: true
     }];
   }
 
@@ -2000,7 +1977,6 @@ function renderMachineSessionModal() {
   };
   $('machineSessionSub').textContent = subMap[machineSessionMode] || '';
 
-  const item = findItem(m.labId);
   $('machineSessionInfo').innerHTML = `
     <div class="flex flex-wrap items-center gap-2 mb-1.5">${labChip(m.labId)} ${machineStatusPill(m)}</div>
     <div><b class="text-white">${esc(m.name)}</b></div>
@@ -2021,7 +1997,7 @@ function renderMachineSessionModal() {
           <div class="mono text-[11px] font-bold text-slate-200 truncate">${esc(mem.register)}</div>
           <div class="text-[10px] text-slate-500">${mem.isStarter ? 'Session owner' : 'Member'} · joined ${relTime(mem.joinedAt||Date.now())}</div>
         </div>
-        ${machineSessionMode !== 'view' && (machineSessionMode !== 'join' || mem.register === session.register) && (i > 0 || mem.register === session.register) && (isSessionOwner() || session.role==='admin')
+        ${(machineSessionMode === 'start' || machineSessionMode === 'manage') && i > 0 && (isSessionOwner() || session.role==='admin')
           ? `<button onclick="machineRemoveMember('${esc(mem.register)}')" class="grid h-7 w-7 place-items-center rounded-md bg-ink-800 text-rose-300 hover:bg-rose-500/20"><i class="fa-solid fa-xmark text-[11px]"></i></button>`
           : ''}
       </div>
@@ -2034,10 +2010,8 @@ function renderMachineSessionModal() {
   $('machineSessionAddMsg').classList.add('hidden');
 
   const pBtn = $('machineSessionPrimaryBtn');
-  const pTxt = $('machineSessionPrimaryText');
   if (machineSessionMode === 'start') {
     pBtn.className = 'flex-1 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-bold text-white';
-    pTxt.textContent = 'Start session';
     pBtn.innerHTML = '<i class="fa-solid fa-play mr-1 text-[11px]"></i> <span id="machineSessionPrimaryText">Start session</span>';
     pBtn.onclick = machineSessionPrimary;
   } else if (machineSessionMode === 'manage') {
@@ -2068,7 +2042,7 @@ function isSessionOwner() {
   const m = findMachine(machineSessionMachineId);
   if (!m) return false;
   if (session.role === 'admin') return true;
-  if (!m.currentSession) return true; // starting new session, we are owner
+  if (!m.currentSession) return true;
   return idKey(m.currentSession.startedBy) === idKey(session.register);
 }
 
@@ -2084,7 +2058,6 @@ function machineAddMember() {
   if (machineSessionMembers.some(x => idKey(x.register) === idKey(reg))) { show(reg + ' is already in the list.', false); return; }
   const cap = m.capacity || 1;
   if (machineSessionMembers.length >= cap) { show(`Capacity reached (${cap}).`, false); return; }
-
   machineSessionMembers.push({ register: reg, name: reg, joinedAt: Date.now() });
   inp.value = '';
   renderMachineSessionModal();
@@ -2104,17 +2077,15 @@ async function machineSessionPrimary() {
 
   if (machineSessionMode === 'start') {
     if (!machineSessionMembers.length) { toast('Add at least one member.', 'warn'); return; }
-    const dueMs = t + (state.settings.loanDurationMinutes * 60000); // same default duration
+    const dueMs = t + (state.settings.loanDurationMinutes * 60000);
     m.currentSession = {
       sessionId: 'MSN-' + Math.floor(100000 + Math.random()*900000),
       machineId: m.machineId,
       startedBy: session.register || machineSessionMembers[0].register,
       startedByName: session.name || session.register || '',
-      startTime: t,
-      dueTimeMs: dueMs,
+      startTime: t, dueTimeMs: dueMs,
       members: machineSessionMembers.map(x => ({ register: x.register, name: x.name || x.register, joinedAt: x.joinedAt || t, isStarter: !!x.isStarter })),
-      maxMembers: m.capacity || 1,
-      notes: ''
+      maxMembers: m.capacity || 1, notes: ''
     };
     m.status = 'IN_USE';
     logActivity('machine-start', `${m.currentSession.startedBy} started ${m.name} with ${machineSessionMembers.length} member(s)`);
@@ -2143,15 +2114,11 @@ async function machineSessionPrimary() {
     const reg = session.register;
     const alreadyIn = m.currentSession.members.some(x => idKey(x.register) === idKey(reg));
     if (alreadyIn) {
-      // Leave
       m.currentSession.members = m.currentSession.members.filter(x => idKey(x.register) !== idKey(reg));
-      if (!m.currentSession.members.length) {
-        m.currentSession = null; m.status = 'AVAILABLE';
-      }
+      if (!m.currentSession.members.length) { m.currentSession = null; m.status = 'AVAILABLE'; }
       logActivity('machine-leave', `${reg} left session on ${m.name}`);
       saveAndPublish('machines','activity');
-      closeMachineSession();
-      renderAll();
+      closeMachineSession(); renderAll();
       toast(`You left ${m.name}.`, 'info');
     } else {
       const cap = m.capacity || 1;
@@ -2159,8 +2126,7 @@ async function machineSessionPrimary() {
       m.currentSession.members.push({ register: reg, name: session.name || reg, joinedAt: now() });
       logActivity('machine-join', `${reg} joined session on ${m.name}`);
       saveAndPublish('machines','activity');
-      closeMachineSession();
-      renderAll();
+      closeMachineSession(); renderAll();
       toast(`You joined ${m.name}.`, 'success');
     }
     return;
@@ -2240,41 +2206,28 @@ function renderMachinesView() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL
+   BARCODES / LABELS
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
     if (!window.JsBarcode) return '';
     const canvas = document.createElement('canvas');
     JsBarcode(canvas, String(text), {
-      format: 'CODE128',
-      width: w,
-      height: h,
-      displayValue: false,
-      margin: 0,
-      background: '#ffffff',
-      lineColor: '#000000'
+      format: 'CODE128', width: w, height: h, displayValue: false, margin: 0,
+      background: '#ffffff', lineColor: '#000000'
     });
     return canvas.toDataURL('image/png');
-  } catch (e) {
-    console.warn('barcode gen failed', e);
-    return '';
-  }
+  } catch (e) { console.warn('barcode gen failed', e); return ''; }
 }
-
 function unitNumberFromSerial(serial) {
   const parts = String(serial || '').split('-');
   return parts.length ? parts[parts.length - 1] : '';
 }
-
 function buildUnitLabelHtml(u) {
-  const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
   const bc = generateBarcodeDataURL(u.serialNo, 3, 60);
   const unitNum = unitNumberFromSerial(u.serialNo);
   const sku = u.skuId;
-  const bcHtml = bc
-    ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />`
-    : `<div style="height:50px;line-height:50px;color:#999;font-size:10px;">barcode unavailable</div>`;
+  const bcHtml = bc ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />` : '';
   const W = state.settings.labelWidthCm || 5;
   const H = state.settings.labelHeightCm || 3;
   const BCH = state.settings.labelBcHeightMm || 15;
@@ -2283,6 +2236,19 @@ function buildUnitLabelHtml(u) {
     <div class="unit-num">UNIT #${esc(unitNum)}</div>
     ${bcHtml.replace('<img class="unit-bc-img"', `<img class="unit-bc-img" style="width:100%;height:${BCH}mm;"`)}
     <div class="unit-serial">${esc(u.serialNo)}</div>
+  </div>`;
+}
+function buildMachineLabelHtml(m) {
+  const bc = generateBarcodeDataURL(m.machineId, 3, 60);
+  const bcHtml = bc ? `<img class="unit-bc-img" src="${bc}" alt="${esc(m.machineId)}" />` : '';
+  const W = state.settings.labelWidthCm || 5;
+  const H = state.settings.labelHeightCm || 3;
+  const BCH = state.settings.labelBcHeightMm || 15;
+  return `<div class="unit-label" data-serial="${esc(m.machineId)}" style="width:${W}cm;height:${H}cm;">
+    <div class="unit-id">${esc(m.labId)}</div>
+    <div class="unit-num">MACHINE</div>
+    ${bcHtml.replace('<img class="unit-bc-img"', `<img class="unit-bc-img" style="width:100%;height:${BCH}mm;"`)}
+    <div class="unit-serial">${esc(m.machineId)}</div>
   </div>`;
 }
 
@@ -2323,10 +2289,31 @@ function syncLabelSizeInputs() {
 }
 function renderUnitLabelsForUnits(units) {
   const area = $('labelPrintArea');
+  $('labelModalTitle').textContent = 'Print Unit Barcode Labels';
   $('labelSubtitle').textContent = units.length + ' unit label(s) — unique barcode per physical board.';
   if (!window.JsBarcode) { setTimeout(() => renderUnitLabelsForUnits(units), 300); return; }
   syncLabelSizeInputs();
   area.innerHTML = units.map(buildUnitLabelHtml).join('');
+  openModal('mUnitLabels');
+}
+function printAllMachineLabels() {
+  if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
+  const mine = myLabIds();
+  const list = (state.machines || []).filter(m => mine.includes(m.labId));
+  if (!list.length) { toast('No machines.', 'warn'); return; }
+  renderMachineLabelsFor(list);
+}
+function printMachineLabel(machineId) {
+  const m = findMachine(machineId); if (!m) return;
+  renderMachineLabelsFor([m]);
+}
+function renderMachineLabelsFor(machines) {
+  const area = $('labelPrintArea');
+  $('labelModalTitle').textContent = 'Print Machine Barcode Labels';
+  $('labelSubtitle').textContent = machines.length + ' machine label(s) — unique barcode per machine.';
+  if (!window.JsBarcode) { setTimeout(() => renderMachineLabelsFor(machines), 300); return; }
+  syncLabelSizeInputs();
+  area.innerHTML = machines.map(buildMachineLabelHtml).join('');
   openModal('mUnitLabels');
 }
 function updateLabelSize() {
@@ -2369,10 +2356,7 @@ function printUnitLabels() {
   const doc = iframe.contentWindow.document;
   doc.open();
   doc.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Print Unit Labels</title>
+<html><head><meta charset="utf-8"><title>Print Labels</title>
 <style>
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin: 0; padding: 8mm; background: #ffffff; color: #0f172a; font-family: Inter, Arial, Helvetica, sans-serif; }
@@ -2383,10 +2367,7 @@ function printUnitLabels() {
   .unit-label .unit-serial { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; color: #0f172a; }
   @page { margin: 0; size: auto; }
   @media print { html, body { padding: 4mm; background: #ffffff !important; } .unit-label { background: #ffffff !important; } }
-</style>
-</head>
-<body>${html}</body>
-</html>`);
+</style></head><body>${html}</body></html>`);
   doc.close();
 
   const doPrint = () => {
@@ -2455,10 +2436,7 @@ function renderUnitsView() {
     return `<div class="rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-900/70 to-ink-850/50 p-3.5">
       <div class="flex items-start justify-between gap-2">
         <div class="min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            ${labChip(item.labId)}
-            ${unitStatusPill(u)}
-          </div>
+          <div class="flex items-center gap-2 flex-wrap">${labChip(item.labId)} ${unitStatusPill(u)}</div>
           <div class="mt-1.5 text-sm font-bold text-white line-clamp-1">${esc(item.name)}</div>
           <div class="mono text-[11px] text-brand-300 mt-0.5">${esc(u.serialNo)}</div>
           ${lastUse}
@@ -3135,7 +3113,7 @@ function applyRemoteKey(key, val) {
   else if (key === 'settings') { if (val) state.settings = { ...DEFAULT_SETTINGS, ...val }; }
   else if (key === 'inventory') { if (Array.isArray(val) && val.length) state.inventory = val; }
   else if (key === 'units') { if (Array.isArray(val)) state.units = val; migrateUnitsInspection(); }
-  else if (key === 'machines') { if (Array.isArray(val)) state.machines = val; else if (!state.machines) state.machines = SEED_MACHINES.map(m => ({ ...m, currentSession: null })); }
+  else if (key === 'machines') { if (Array.isArray(val) && val.length) state.machines = val; else if (!Array.isArray(state.machines) || !state.machines.length) state.machines = SEED_MACHINES.map(m => ({ ...m, currentSession: null })); }
   else if (key === 'loans') state.loans = Array.isArray(val) ? val : [];
   else if (key === 'history') state.history = Array.isArray(val) ? val : [];
   else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
@@ -3675,7 +3653,7 @@ function renderDashboard() {
   $('dashScopeLabel').textContent = isSuperAdmin() ? 'Head teacher' : `${myLabIds().length} lab(s)`;
   renderLedger(scopedLoans, t);
   renderInventoryTable(scopedInventory);
-  renderMachineTable(scopedInventory.map(i => i.labId));
+  renderMachineTable(scope);
   $('setLoanMinutes').value = state.settings.loanDurationMinutes;
   $('setLowStock').value = state.settings.lowStockThreshold;
   $('setInspectDays').value = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
@@ -3736,10 +3714,10 @@ function renderInventoryTable(items) {
     </tr>`;
   }).join('');
 }
-function renderMachineTable(labIds) {
+function renderMachineTable(scope) {
   const tbody = $('machineTableBody'); if (!tbody) return;
-  const mine = session.role === 'admin' ? myLabIds() : allLabIds();
-  const list = (state.machines || []).filter(m => mine.includes(m.labId) && (!labIds || labIds.includes(m.labId)));
+  const labs = scope && scope.length ? scope : myLabIds();
+  const list = (state.machines || []).filter(m => labs.includes(m.labId));
   if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-12 text-center text-xs text-slate-500">No machines.</td></tr>`; return; }
   tbody.innerHTML = list.map(m => {
     const used = machineCapacityUsed(m);
@@ -3752,8 +3730,8 @@ function renderMachineTable(labIds) {
       <td class="px-3 py-3">${machineStatusPill(m)}</td>
       <td class="px-3 py-3"><div class="flex justify-end gap-2">
         ${m.currentSession ? `<button onclick="openMachineSessionModal('${esc(m.machineId)}')" class="text-[11px] font-semibold text-brand-400">Manage</button>` : ''}
+        <button onclick="printMachineLabel('${esc(m.machineId)}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/60"><i class="fa-solid fa-barcode text-[10px]"></i> Labels</button>
         <button onclick="openMachineModal('${esc(m.machineId)}')" class="text-[11px] font-semibold text-brand-400">Edit</button>
-        <button onclick="deleteMachine('${esc(m.machineId)}')" class="text-[11px] font-semibold text-rose-400">Delete</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -3786,6 +3764,7 @@ function renderTeachersList() {
     const isMe = a.username === session.register;
     const labIds = a.isSuper ? state.labs.map(l => l.id) : (a.labIds || []);
     const canAct = !isMe && superAdmin;
+    const canAssign = superAdmin && !a.isSuper && !isMe;
     return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border ${a.isSuper ? 'border-amber-500/40 bg-gradient-to-br from-amber-950/20 to-ink-900/60' : 'border-rose-500/25 bg-gradient-to-br from-ink-900/60 to-rose-950/10'} p-3">
       <div class="flex items-center gap-3 min-w-0">
         <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg ${a.isSuper ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-rose-500 to-rose-700'} text-xs font-bold text-white">${esc(a.username.slice(0,1))}</div>
@@ -3799,6 +3778,7 @@ function renderTeachersList() {
         </div>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
+        ${canAssign ? `<button onclick="openEditTeacherLabs('${esc(a.username)}')" class="rounded-lg border border-brand-500/40 bg-brand-500/10 px-2.5 py-1 text-[10px] font-bold text-brand-300 hover:bg-brand-500/20 transition" title="Assign labs"><i class="fa-solid fa-building-columns mr-1 text-[10px]"></i>Labs</button>` : ''}
         ${canAct && !a.isSuper ? `<button onclick="promoteTeacher('${esc(a.username)}')" class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20 transition" title="Promote to head teacher"><i class="fa-solid fa-crown mr-1 text-[10px]"></i>Make Head</button>` : ''}
         ${canAct && a.isSuper ? `<button onclick="demoteTeacher('${esc(a.username)}')" class="rounded-lg border border-slate-500/40 bg-slate-500/10 px-2.5 py-1 text-[10px] font-bold text-slate-300 hover:bg-slate-500/20 transition" title="Demote to regular teacher"><i class="fa-solid fa-arrow-down mr-1 text-[10px]"></i>Demote</button>` : ''}
         ${canAct ? `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[10px] font-semibold text-rose-300 hover:bg-rose-500/20 transition" title="Remove teacher"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>` : ''}
@@ -3890,6 +3870,104 @@ function showQr(itemId) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   EXCEL IMPORT / EXPORT
+   ═══════════════════════════════════════════════════════════════════════ */
+function openImportExcelModal() {
+  if (session.role !== 'admin') return;
+  $('excelImportResult').classList.add('hidden');
+  openModal('mImportExcel');
+}
+function downloadSampleExcel() {
+  if (typeof XLSX === 'undefined') { toast('Excel library not loaded.', 'error'); return; }
+  const mine = myLabIds();
+  const sampleLab = state.labs.find(l => mine.includes(l.id)) || state.labs[0];
+  const rows = [
+    { 'SKU': 'SKU-9001', 'Name': 'Example Component A', 'Category': 'Sensors', 'Lab': sampleLab ? sampleLab.id : 'LAB-ELEC', 'Total Stock': 10, 'Description': 'Example description' },
+    { 'SKU': 'SKU-9002', 'Name': 'Example Component B', 'Category': 'Tools',   'Lab': sampleLab ? sampleLab.id : 'LAB-ELEC', 'Total Stock': 5,  'Description': 'Second example' }
+  ];
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Components');
+  XLSX.writeFile(wb, 'bajaj-components-sample.xlsx');
+  toast('Sample file downloaded.', 'success');
+}
+function handleExcelImport(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if (!file) return;
+  if (typeof XLSX === 'undefined') { toast('Excel library not loaded.', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      if (!wb.SheetNames.length) { showImportResult('No sheets found in the file.', false); return; }
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      importComponentsFromRows(rows);
+    } catch (err) {
+      console.error(err);
+      showImportResult('Could not read the Excel file. Please check the format.', false);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function showImportResult(msg, ok) {
+  const el = $('excelImportResult');
+  el.textContent = msg;
+  el.className = 'rounded-xl border p-3 text-xs ' + (ok ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300');
+  el.classList.remove('hidden');
+}
+function importComponentsFromRows(rows) {
+  const mine = myLabIds();
+  const labs = state.labs.filter(l => mine.includes(l.id));
+  if (!labs.length) { showImportResult('You are not assigned to any lab.', false); return; }
+  const byId = {}; const byName = {};
+  labs.forEach(l => { byId[l.id.toUpperCase()] = l.id; byName[l.name.toUpperCase()] = l.id; });
+  let added = 0, updated = 0, skipped = 0; const skippedReasons = [];
+  rows.forEach((r, idx) => {
+    const sku = String(r.SKU || r.sku || r.Id || r.id || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g,'');
+    const name = String(r.Name || r.name || r.Component || r.component || '').trim();
+    const rawStock = r['Total Stock'] != null ? r['Total Stock'] : (r.Total != null ? r.Total : (r.Units != null ? r.Units : r.Stock));
+    const stock = Math.max(0, parseInt(rawStock, 10) || 0);
+    const category = String(r.Category || r.category || 'General').trim() || 'General';
+    const desc = String(r.Description || r.description || '').trim();
+    const labKeyRaw = String(r.Lab || r.lab || '').trim();
+    let labId = labs[0].id;
+    if (labKeyRaw) {
+      const key = labKeyRaw.toUpperCase();
+      if (byId[key]) labId = byId[key];
+      else if (byName[key]) labId = byName[key];
+      else { skipped++; skippedReasons.push(`Row ${idx+2}: lab "${labKeyRaw}" not found or not yours`); return; }
+    }
+    if (!sku || !name) { skipped++; skippedReasons.push(`Row ${idx+2}: missing SKU or Name`); return; }
+    if (!mine.includes(labId)) { skipped++; skippedReasons.push(`Row ${idx+2}: lab ${labId} not yours`); return; }
+    let existing = state.inventory.find(i => i.id === sku);
+    if (existing) {
+      const out = borrowedQty(sku);
+      existing.name = name;
+      existing.category = category;
+      existing.totalStock = Math.max(stock, out);
+      existing.description = desc || existing.description || '';
+      existing.labId = labId;
+      ensureUnitsForSku(sku);
+      updated++;
+    } else {
+      state.inventory.push({ id: sku, name, category, totalStock: stock, description: desc || 'Imported from Excel.', labId });
+      ensureUnitsForSku(sku);
+      added++;
+    }
+  });
+  saveAndPublish('inventory', 'units');
+  populateCategories();
+  renderAll();
+  let msg = `Import complete — ${added} added, ${updated} updated, ${skipped} skipped.`;
+  if (skipped && skippedReasons.length) msg += `\n${skippedReasons.slice(0, 5).join('\n')}` + (skippedReasons.length > 5 ? `\n…and ${skippedReasons.length-5} more.` : '');
+  showImportResult(msg, added + updated > 0);
+  toast(`Excel import: ${added} added, ${updated} updated, ${skipped} skipped.`, added+updated ? 'success' : 'warn', 5000);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    MACHINE MODAL (admin add/edit)
    ═══════════════════════════════════════════════════════════════════════ */
 function fillMachineLabSelect(selectedLabId) {
@@ -3925,7 +4003,7 @@ function saveMachine() {
   if (session.role !== 'admin') return;
   const orig = $('mchOriginalId').value;
   const labId = $('mchLab').value;
-  const machineId = $('mchId').value.trim().toUpperCase();
+  const machineId = $('mchId').value.trim().toUpperCase().replace(/[^A-Z0-9-]/g,'');
   const name = $('mchName').value.trim();
   const location = $('mchLocation').value.trim();
   const capacity = Math.max(1, Math.min(20, parseInt($('mchCapacity').value, 10) || 2));
@@ -3947,18 +4025,6 @@ function saveMachine() {
   closeModal('mMachine');
   renderAll();
   toast('Machine saved.', 'success');
-}
-async function deleteMachine(machineId) {
-  if (session.role !== 'admin') return;
-  const m = findMachine(machineId); if (!m) return;
-  if (!canManageLab(m.labId)) { toast('Not your lab.', 'error'); return; }
-  if (m.currentSession) { toast('Cannot delete — machine is in use.', 'error'); return; }
-  const ok = await confirmDialog('Delete machine', `Remove "${m.name}"?`, 'Delete', true, 'fa-trash');
-  if (!ok) return;
-  state.machines = state.machines.filter(x => x.machineId !== machineId);
-  saveAndPublish('machines');
-  renderAll();
-  toast('Machine deleted.', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -4061,6 +4127,35 @@ async function demoteTeacher(username) {
   publishKey('activity');
   renderTeachersList();
   toast(`"${username}" is now a regular teacher.`, 'success', 4000);
+}
+function openEditTeacherLabs(username) {
+  if (!isSuperAdmin()) { toast('Only head teacher can assign labs.', 'warn'); return; }
+  const admin = findAdminByUsername(username);
+  if (!admin) { toast('Teacher not found.', 'error'); return; }
+  if (admin.isSuper) { toast('Head teachers automatically have all labs.', 'info'); return; }
+  $('editLabsTeacherNo').textContent = admin.username;
+  $('editLabsTeacherNo').dataset.username = admin.username;
+  renderLabCheckboxes('editTeacherLabs', admin.labIds || []);
+  openModal('mEditTeacherLabs');
+}
+async function saveEditTeacherLabs() {
+  if (!isSuperAdmin()) return;
+  const username = $('editLabsTeacherNo').dataset.username;
+  if (!username) { toast('No teacher selected.', 'error'); return; }
+  const labIds = readLabCheckboxes('editTeacherLabs');
+  if (!labIds.length) { toast('Select at least one lab.', 'warn'); return; }
+  const admins = getAdmins();
+  const idx = admins.findIndex(a => a.username === username);
+  if (idx === -1) { toast('Teacher not found.', 'error'); return; }
+  if (admins[idx].isSuper) { toast('Head teachers have all labs automatically.', 'info'); return; }
+  admins[idx].labIds = labIds;
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  logActivity('teacher-labs', `${username} labs updated by ${session.register}`);
+  publishKey('activity');
+  closeModal('mEditTeacherLabs');
+  renderTeachersList();
+  toast(`Labs updated for "${username}".`, 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -4295,6 +4390,8 @@ window.saveNewTeacher = saveNewTeacher;
 window.removeTeacher = removeTeacher;
 window.promoteTeacher = promoteTeacher;
 window.demoteTeacher = demoteTeacher;
+window.openEditTeacherLabs = openEditTeacherLabs;
+window.saveEditTeacherLabs = saveEditTeacherLabs;
 window.pickLab = pickLab; window.cancelLabPick = cancelLabPick; window.switchLab = switchLab;
 window.handleLogoUpload = handleLogoUpload; window.resetLogo = resetLogo;
 window.useSavedRegister = useSavedRegister; window.removeSavedRegister = removeSavedRegister;
@@ -4314,6 +4411,8 @@ window.openUnitLabelPrint = openUnitLabelPrint;
 window.openUnitLabelPrintAll = openUnitLabelPrintAll;
 window.printAllLabelsForVisible = printAllLabelsForVisible;
 window.printUnitLabels = printUnitLabels;
+window.printAllMachineLabels = printAllMachineLabels;
+window.printMachineLabel = printMachineLabel;
 window.openUnitDetail = openUnitDetail;
 window.recordInspectionFor = recordInspectionFor;
 window.reportDefect = reportDefect;
@@ -4333,7 +4432,10 @@ window.machineSessionPrimary = machineSessionPrimary;
 window.openAddMachineModal = openAddMachineModal;
 window.openMachineModal = openMachineModal;
 window.saveMachine = saveMachine;
-window.deleteMachine = deleteMachine;
+/* excel */
+window.openImportExcelModal = openImportExcelModal;
+window.handleExcelImport = handleExcelImport;
+window.downloadSampleExcel = downloadSampleExcel;
 </script>
 </body>
 </html>
