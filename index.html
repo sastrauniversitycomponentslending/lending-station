@@ -117,7 +117,6 @@
   .scan-frame::before { content:''; position:absolute; left:5%; right:5%; top:50%; height:2px; transform:translateY(-50%); background: linear-gradient(90deg, transparent, rgba(34,211,238,.9), transparent); pointer-events:none; z-index:5; animation: scanLine 2s ease-in-out infinite; }
   @keyframes scanLine { 0%,100% { opacity:.25; } 50% { opacity:1; } }
 
-  /* Unit label — NO component name, ONLY: SKU + UNIT NUMBER + barcode */
   .unit-label {
     padding: 2mm;
     border: 1px dashed #cbd5e1;
@@ -139,7 +138,6 @@
   .unit-label .unit-num { font-size: 8pt; font-weight: 800; color: #1e5fa8; line-height: 1; letter-spacing: .05em; font-family: 'JetBrains Mono', monospace; }
   .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
   .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; color: #0f172a; }
-  .unit-label .unit-lab { font-size: 5pt; color: #64748b; text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
 
   .status-pill { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.15rem .55rem; font-size:9px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
   .sp-available { background:#dcfce7; color:#166534; border:1px solid #86efac; }
@@ -497,7 +495,7 @@
       </div>
       <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-[11px] text-emerald-200 flex items-start gap-2">
         <i class="fa-solid fa-circle-info mt-0.5"></i>
-        <span>Tap <b>Scan component barcode</b> to open the fast scanner. It stays open — scan each physical board's barcode and it drops straight into your cart. Only valid component barcodes are accepted.</span>
+        <span>Tap <b>Scan component barcode</b> to open the fast scanner. It stays open — scan each physical board's barcode and the <b>exact board</b> drops into your cart. Only valid component barcodes are accepted.</span>
       </div>
     </div>
   </div>
@@ -1114,7 +1112,7 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 const STATION_NODE = 'LAB-MAIN';
-const STORAGE_KEY = 'bajaj.lending.v10';
+const STORAGE_KEY = 'bajaj.lending.v11';
 const SESSION_KEY = 'bajaj.session.v10';
 const THEME_KEY = 'bajaj.theme.v2';
 const REGISTERS_KEY = 'bajaj.registers.v1';
@@ -1172,7 +1170,7 @@ function defaultState() {
     labs: SEED_LABS.map(l => ({ ...l })),
     inventory: SEED_INVENTORY.map(x => ({ ...x })),
     units: [],
-    loans: [], history: [], cart: {},
+    loans: [], history: [], cart: {}, // cart is now { unitId: unitSnapshot }
     inspections: [],
     defects: [],
     borrower: { name:'', id:'' },
@@ -1327,15 +1325,9 @@ function openScanner(target, hintText) {
   lastScanValue = ''; lastScanTime = 0;
 
   const titles = {
-    login: 'Scan Student ID card',
-    studentReg: 'Scan Student ID card',
-    borrowerId: 'Scan Student ID card',
-    unitsAdmin: 'Scan unit barcode',
-    checkoutUnit: 'Scan unit barcode',
-    returnUnit: 'Scan unit barcode',
-    adminLogin: 'Scan Teacher ID card',
-    newTeacher: 'Scan Teacher ID card',
-    setupTeacher: 'Scan Teacher ID card',
+    login: 'Scan Student ID card', studentReg: 'Scan Student ID card', borrowerId: 'Scan Student ID card',
+    unitsAdmin: 'Scan unit barcode', checkoutUnit: 'Scan unit barcode', returnUnit: 'Scan unit barcode',
+    adminLogin: 'Scan Teacher ID card', newTeacher: 'Scan Teacher ID card', setupTeacher: 'Scan Teacher ID card',
     catalogFast: 'Fast Component Scanner'
   };
   const hints = {
@@ -1348,7 +1340,7 @@ function openScanner(target, hintText) {
     adminLogin: 'Point the camera at the barcode on your teacher ID card.',
     newTeacher: 'Point the camera at the barcode on the new teacher ID card.',
     setupTeacher: 'Point the camera at the barcode on your teacher ID card.',
-    catalogFast: 'Scan a component barcode — it will be added to your cart instantly. Only component barcodes are accepted.'
+    catalogFast: 'Scan a component barcode — the exact unit will be added to your cart. Only component labels are accepted.'
   };
   $('scannerTitle').textContent = titles[target] || 'Scan barcode';
   $('scannerHint').textContent = hintText || hints[target] || 'Point the camera at the barcode.';
@@ -1427,7 +1419,7 @@ function onScanSuccess(decodedText) {
   const clean = String(decodedText || '').trim();
   if (!clean) return;
   const ts = Date.now();
-  const debounceMs = scannerTarget === 'catalogFast' ? 700 : 1500;
+  const debounceMs = scannerTarget === 'catalogFast' ? 900 : 1500;
   if (clean === lastScanValue && (ts - lastScanTime) < debounceMs) return;
   lastScanValue = clean; lastScanTime = ts;
   if (navigator.vibrate) { try { navigator.vibrate(60); } catch {} }
@@ -1449,33 +1441,45 @@ function onScanSuccess(decodedText) {
   handleScannedCode(clean);
 }
 
+/* Only accepts valid component unit barcodes. Adds the exact unit to cart. */
 function handleCatalogFastScan(code) {
-  const clean = String(code || '').trim().toUpperCase();
-  if (!clean) return;
-  const u = findUnit(clean);
+  const raw = String(code || '').trim();
+  if (!raw) return;
+  // Normalize: strip whitespace, uppercase for match, but keep dashes
+  const normalized = raw.toUpperCase().replace(/\s+/g, '');
+  const u = findUnit(normalized);
   if (!u) {
-    showScannerStatus('✗ Not a component barcode — only component labels are accepted.', 'error');
+    showScannerStatus('✗ Not a component barcode (' + raw + '). Only component labels are accepted.', 'error');
     if (navigator.vibrate) { try { navigator.vibrate([80, 60, 80]); } catch {} }
+    return;
+  }
+  if (u.status === 'ON_LOAN') { showScannerStatus('✗ ' + u.serialNo + ' is already on loan.', 'error'); return; }
+  if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { showScannerStatus('✗ ' + u.serialNo + ' is ' + u.status.toLowerCase() + '.', 'error'); return; }
+  if (state.cart[u.unitId]) {
+    showScannerStatus('✗ ' + u.serialNo + ' is already in your cart.', 'error');
     return;
   }
   if (fastScanSeen.has(u.unitId)) {
     showScannerStatus('✗ ' + u.serialNo + ' is already in this session.', 'error');
     return;
   }
-  if (u.status === 'ON_LOAN') { showScannerStatus('✗ ' + u.serialNo + ' is already on loan.', 'error'); return; }
-  if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { showScannerStatus('✗ ' + u.serialNo + ' is not available.', 'error'); return; }
-  if (isInspectionDue(u)) { showScannerStatus('✗ ' + u.serialNo + ' needs inspection first.', 'error'); return; }
-  const cur = state.cart[u.skuId] || 0;
-  if (cur + 1 > availableQty(u.skuId)) {
-    showScannerStatus('✗ No more units of ' + (findItem(u.skuId)?.name || u.skuId) + ' available.', 'error');
-    return;
-  }
-  state.cart[u.skuId] = cur + 1;
+
+  // Add the exact unit
+  const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
+  state.cart[u.unitId] = {
+    unitId: u.unitId,
+    skuId: u.skuId,
+    serialNo: u.serialNo,
+    itemName: item.name,
+    labId: item.labId,
+    addedAt: Date.now()
+  };
   fastScanSeen.add(u.unitId);
   renderCart(); renderCatalog(); updateBadges();
-  const item = findItem(u.skuId) || { name: u.skuId };
-  showScannerStatus('✓ Added ' + item.name + ' · ' + u.serialNo, 'success');
+
+  showScannerStatus('✓ Added ' + item.name + ' — ' + u.serialNo, 'success');
   if (navigator.vibrate) { try { navigator.vibrate(35); } catch {} }
+  saveLocal();
 }
 
 function scannerManualSubmit() {
@@ -1542,7 +1546,7 @@ function handleScannedCode(code) {
     }
     case 'checkoutUnit':
       closeScanner();
-      addUnitToCart(clean);
+      handleCatalogFastScan(clean);
       break;
     case 'returnUnit': {
       closeScanner();
@@ -1568,12 +1572,21 @@ function closeScanner() {
 /* ═══════════════════════════════════════════════════════════════════════
    UNITS
    ═══════════════════════════════════════════════════════════════════════ */
-function findUnit(unitId) { return state.units.find(u => u.unitId === unitId || u.serialNo === unitId); }
+function findUnit(unitId) {
+  const key = String(unitId || '').trim().toUpperCase();
+  return state.units.find(u => (u.unitId || '').toUpperCase() === key || (u.serialNo || '').toUpperCase() === key);
+}
 function unitsForSku(skuId) { return state.units.filter(u => u.skuId === skuId); }
 function availableUnitsForSku(skuId) { return state.units.filter(u => u.skuId === skuId && u.status === 'AVAILABLE'); }
 function borrowedQty(id) { return state.loans.reduce((s,l) => l.itemId === id ? s + l.quantity : s, 0); }
 function availableQty(id) { const it = findItem(id); return it ? Math.max(0, it.totalStock - borrowedQty(id)) : 0; }
-function selectableQty(id) { return Math.max(0, availableQty(id) - (state.cart[id]||0)); }
+
+/* Cart is now keyed by unitId. Count how many units of a SKU are in the cart. */
+function cartQtyForSku(skuId) {
+  return Object.values(state.cart || {}).filter(c => c && c.skuId === skuId).length;
+}
+/* How many more units of this SKU can be added (avail - in cart) */
+function selectableQty(id) { return Math.max(0, availableQty(id) - cartQtyForSku(id)); }
 
 function generateSerial(skuId, index) { return skuId + '-' + String(index).padStart(4, '0'); }
 
@@ -1594,6 +1607,7 @@ function ensureUnitsForSku(skuId) {
     return isNaN(n) ? m : Math.max(m, n);
   }, 0);
   let addCount = item.totalStock - nowExisting.length;
+  const t = Date.now();
   for (let i = 1; i <= addCount; i++) {
     const idx = highestIndex + i;
     const serial = generateSerial(skuId, idx);
@@ -1605,8 +1619,9 @@ function ensureUnitsForSku(skuId) {
       status: 'AVAILABLE',
       condition: 'GOOD',
       notes: '',
-      createdAt: Date.now(),
-      lastInspectionMs: 0,
+      createdAt: t,
+      // ⚡ Freshly created unit = freshly inspected (no immediate "inspection due")
+      lastInspectionMs: t,
       currentLoanId: null,
       lastBorrowerId: '',
       lastBorrowerName: ''
@@ -1614,6 +1629,15 @@ function ensureUnitsForSku(skuId) {
   }
 }
 function ensureAllUnits() { state.inventory.forEach(i => ensureUnitsForSku(i.id)); }
+
+/* Migrate any old units that have lastInspectionMs = 0 so they are not falsely "inspection due" */
+function migrateUnitsInspection() {
+  const t = Date.now();
+  (state.units || []).forEach(u => {
+    if (!u.lastInspectionMs) u.lastInspectionMs = u.createdAt || t;
+  });
+}
+
 function setUnitStatus(unitId, status, extra = {}) {
   const u = findUnit(unitId); if (!u) return;
   u.status = status;
@@ -1630,14 +1654,17 @@ function unitStatusPill(u) {
   const [cls, txt] = map[u.status] || ['sp-available', u.status];
   return `<span class="status-pill ${cls}">${txt}</span>`;
 }
+
+/* Baseline = last inspection OR creation date. A freshly created unit is never "due". */
 function isInspectionDue(u) {
   const days = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
+  const baseline = u.lastInspectionMs || u.createdAt || 0;
   const cutoff = now() - days * 24 * 3600 * 1000;
-  return !u.lastInspectionMs || u.lastInspectionMs < cutoff;
+  return baseline < cutoff;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL (NO name — only SKU + Unit# + barcode)
+   BARCODE LABEL
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
@@ -1659,27 +1686,22 @@ function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   }
 }
 
-/* Extract just the trailing unit number, e.g. "SKU-1001-0042" → "0042" */
 function unitNumberFromSerial(serial) {
   const parts = String(serial || '').split('-');
   return parts.length ? parts[parts.length - 1] : '';
 }
 
-/* Label shows ONLY: Component ID (SKU), Unit #, barcode. NO component name. */
 function buildUnitLabelHtml(u) {
   const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
   const bc = generateBarcodeDataURL(u.serialNo, 3, 60);
   const unitNum = unitNumberFromSerial(u.serialNo);
   const sku = u.skuId;
-
   const bcHtml = bc
     ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />`
     : `<div style="height:50px;line-height:50px;color:#999;font-size:10px;">barcode unavailable</div>`;
-
   const W = state.settings.labelWidthCm || 5;
   const H = state.settings.labelHeightCm || 3;
   const BCH = state.settings.labelBcHeightMm || 15;
-
   return `<div class="unit-label" data-serial="${esc(u.serialNo)}" style="width:${W}cm;height:${H}cm;">
     <div class="unit-id">${esc(sku)}</div>
     <div class="unit-num">UNIT #${esc(unitNum)}</div>
@@ -1695,10 +1717,7 @@ function openUnitLabelPrintAll() {
   if (!skus.length) { toast('No components.', 'warn'); return; }
   renderUnitLabelsForSkus(skus.map(s => s.id));
 }
-function openUnitLabelPrint(skuId) {
-  if (!skuId) return;
-  renderUnitLabelsForSkus([skuId]);
-}
+function openUnitLabelPrint(skuId) { if (skuId) renderUnitLabelsForSkus([skuId]); }
 function printAllLabelsForVisible() {
   const sel = $('unitsLabFilter'); const statusSel = $('unitsStatusFilter');
   const lab = sel ? sel.value : 'ALL';
@@ -1720,14 +1739,12 @@ function renderUnitLabelsForSkus(skuIds) {
   skuIds.forEach(id => { ensureUnitsForSku(id); all.push(...unitsForSku(id)); });
   renderUnitLabelsForUnits(all);
 }
-
 function syncLabelSizeInputs() {
   const w = $('labelWidthCm'); const h = $('labelHeightCm'); const b = $('labelBcHeightMm');
   if (w) w.value = state.settings.labelWidthCm || 5;
   if (h) h.value = state.settings.labelHeightCm || 3;
   if (b) b.value = state.settings.labelBcHeightMm || 15;
 }
-
 function renderUnitLabelsForUnits(units) {
   const area = $('labelPrintArea');
   $('labelSubtitle').textContent = units.length + ' unit label(s) — unique barcode per physical board.';
@@ -1736,7 +1753,6 @@ function renderUnitLabelsForUnits(units) {
   area.innerHTML = units.map(buildUnitLabelHtml).join('');
   openModal('mUnitLabels');
 }
-
 function updateLabelSize() {
   const w = Math.max(2, Math.min(30, parseFloat($('labelWidthCm').value) || 5));
   const h = Math.max(1, Math.min(30, parseFloat($('labelHeightCm').value) || 3));
@@ -1746,15 +1762,12 @@ function updateLabelSize() {
   state.settings.labelBcHeightMm = bch;
   saveLocal(); publishKey('settings');
   document.querySelectorAll('#labelPrintArea .unit-label').forEach(el => {
-    el.style.width = w + 'cm';
-    el.style.height = h + 'cm';
+    el.style.width = w + 'cm'; el.style.height = h + 'cm';
   });
   document.querySelectorAll('#labelPrintArea .unit-bc-img').forEach(el => {
-    el.style.width = '100%';
-    el.style.height = bch + 'mm';
+    el.style.width = '100%'; el.style.height = bch + 'mm';
   });
 }
-
 function resetLabelSize() {
   state.settings.labelWidthCm = 5;
   state.settings.labelHeightCm = 3;
@@ -1772,13 +1785,9 @@ function printUnitLabels() {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('aria-hidden', 'true');
   iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  iframe.style.opacity = '0';
-  iframe.style.pointerEvents = 'none';
+  iframe.style.right = '0'; iframe.style.bottom = '0';
+  iframe.style.width = '0'; iframe.style.height = '0';
+  iframe.style.border = '0'; iframe.style.opacity = '0'; iframe.style.pointerEvents = 'none';
   document.body.appendChild(iframe);
 
   const doc = iframe.contentWindow.document;
@@ -1790,40 +1799,14 @@ function printUnitLabels() {
 <title>Print Unit Labels</title>
 <style>
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  html, body {
-    margin: 0;
-    padding: 8mm;
-    background: #ffffff;
-    color: #0f172a;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-  }
-  .unit-label {
-    padding: 2mm;
-    border: 1px dashed #cbd5e1;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #0f172a;
-    text-align: center;
-    margin: 2mm;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1mm;
-    overflow: hidden;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    vertical-align: top;
-  }
+  html, body { margin: 0; padding: 8mm; background: #ffffff; color: #0f172a; font-family: Inter, Arial, Helvetica, sans-serif; }
+  .unit-label { padding: 2mm; border: 1px dashed #cbd5e1; border-radius: 4px; background: #ffffff; color: #0f172a; text-align: center; margin: 2mm; display: inline-flex; flex-direction: column; justify-content: center; gap: 1mm; overflow: hidden; page-break-inside: avoid; break-inside: avoid; vertical-align: top; }
   .unit-label .unit-id { font-size: 10pt; font-weight: 900; color: #0f172a; letter-spacing: .04em; line-height: 1.05; font-family: 'JetBrains Mono', ui-monospace, monospace; }
   .unit-label .unit-num { font-size: 8pt; font-weight: 800; color: #1e5fa8; line-height: 1; letter-spacing: .05em; font-family: 'JetBrains Mono', ui-monospace, monospace; }
   .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
   .unit-label .unit-serial { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; color: #0f172a; }
-
   @page { margin: 0; size: auto; }
-  @media print {
-    html, body { padding: 4mm; background: #ffffff !important; }
-    .unit-label { background: #ffffff !important; }
-  }
+  @media print { html, body { padding: 4mm; background: #ffffff !important; } .unit-label { background: #ffffff !important; } }
 </style>
 </head>
 <body>${html}</body>
@@ -1831,35 +1814,17 @@ function printUnitLabels() {
   doc.close();
 
   const doPrint = () => {
-    try {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    } catch (e) { console.warn('[print]', e); }
+    try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch (e) { console.warn('[print]', e); }
     setTimeout(() => { try { document.body.removeChild(iframe); } catch {} }, 2500);
   };
-
-  const imgs = doc.images;
-  const total = imgs.length;
+  const imgs = doc.images; const total = imgs.length;
   if (!total) { setTimeout(doPrint, 350); return; }
-
-  let done = 0;
-  let fired = false;
-  const maybeReady = () => {
-    if (fired) return;
-    done++;
-    if (done >= total) {
-      fired = true;
-      setTimeout(doPrint, 250);
-    }
-  };
+  let done = 0, fired = false;
+  const maybeReady = () => { if (fired) return; done++; if (done >= total) { fired = true; setTimeout(doPrint, 250); } };
   for (let i = 0; i < total; i++) {
     const im = imgs[i];
-    if (im.complete && im.naturalWidth > 0) {
-      maybeReady();
-    } else {
-      im.addEventListener('load', maybeReady, { once: true });
-      im.addEventListener('error', maybeReady, { once: true });
-    }
+    if (im.complete && im.naturalWidth > 0) maybeReady();
+    else { im.addEventListener('load', maybeReady, { once: true }); im.addEventListener('error', maybeReady, { once: true }); }
   }
   setTimeout(() => { if (!fired) { fired = true; doPrint(); } }, 3000);
 }
@@ -1963,20 +1928,6 @@ function openUnitDetail(unitId) {
         <div class="text-[10px] text-slate-500">${esc(h.borrowTimeFormatted)} → ${h.status==='RETURNED' ? esc(h.returnTimeFormatted||'') : 'still on loan'}</div>
       </div>`).join('') : `<div class="text-[11px] text-slate-500">No history.</div>`}
     </div>
-    <div>
-      <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Defect reports</div>
-      ${defectsForUnit.length ? defectsForUnit.map(d => `<div class="rounded-lg border border-rose-500/40 bg-rose-500/5 px-3 py-2 mb-1">
-        <div class="text-[11px] text-rose-200 font-semibold">${esc(d.severity)} · ${esc(d.notes || 'no note')}</div>
-        <div class="text-[10px] text-rose-300/70">Reported by ${esc(d.reportedBy||'—')} · ${fmtDateTime(d.reportedAt)}</div>
-      </div>`).join('') : `<div class="text-[11px] text-slate-500">No defects.</div>`}
-    </div>
-    <div>
-      <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Inspections</div>
-      ${inspectionsForUnit.length ? inspectionsForUnit.map(i => `<div class="rounded-lg border border-ink-700/60 bg-ink-950/40 px-3 py-2 mb-1">
-        <div class="text-[11px] text-slate-200 font-semibold">${esc(i.condition)} ${i.passed ? '<span class="text-emerald-400">✓ passed</span>' : '<span class="text-rose-400">✗ failed</span>'}</div>
-        <div class="text-[10px] text-slate-500">${esc(i.inspector||'')} · ${fmtDateTime(i.date)}</div>
-      </div>`).join('') : `<div class="text-[11px] text-slate-500">No inspections yet.</div>`}
-    </div>
     <div class="flex flex-wrap gap-2 pt-1">
       <button onclick="openUnitLabelPrint('${esc(u.skuId)}')" class="rounded-xl border border-brand-500/40 bg-brand-500/10 px-3 py-2 text-xs font-semibold text-brand-200"><i class="fa-solid fa-print mr-1"></i>Print label</button>
       <button onclick="recordInspectionFor('${esc(u.unitId)}')" class="rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-xs font-semibold text-orange-200"><i class="fa-solid fa-clipboard-check mr-1"></i>Record inspection</button>
@@ -1989,16 +1940,10 @@ function openUnitDetail(unitId) {
 async function recordInspectionFor(unitId) {
   const u = findUnit(unitId); if (!u) return;
   const item = findItem(u.skuId) || { name: u.skuId };
-  const ok = await confirmDialog(
-    'Record inspection',
-    `Mark unit ${u.serialNo} (${item.name}) as inspected today? Only choose OK if the unit was physically checked and is working.`,
-    'Inspected & OK', false, 'fa-clipboard-check'
-  );
+  const ok = await confirmDialog('Record inspection', `Mark unit ${u.serialNo} (${item.name}) as inspected today?`, 'Inspected & OK', false, 'fa-clipboard-check');
   if (!ok) return;
   const t = now();
-  u.lastInspectionMs = t;
-  u.condition = 'GOOD';
-  u.notes = '';
+  u.lastInspectionMs = t; u.condition = 'GOOD'; u.notes = '';
   if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') u.status = 'AVAILABLE';
   state.inspections.push({ inspectionId: 'INSP-'+Date.now(), unitId, skuId: u.skuId, date: t, inspector: session.register || '', condition: 'GOOD', passed: true });
   logActivity('inspect', `${item.name} ${u.serialNo} inspected by ${session.register}`);
@@ -2015,17 +1960,8 @@ async function reportDefect(unitId) {
   if (notes === null) return;
   const severity = prompt('Severity? (LOW / MEDIUM / HIGH)', 'MEDIUM') || 'MEDIUM';
   const t = now();
-  state.defects.push({
-    defectId: 'DEF-'+Date.now(),
-    unitId, skuId: u.skuId,
-    reportedBy: session.register || '',
-    reportedAt: t,
-    notes: String(notes).slice(0,500),
-    severity: severity.toUpperCase()
-  });
-  u.status = 'DEFECTIVE';
-  u.condition = 'DAMAGED';
-  u.notes = String(notes).slice(0,300);
+  state.defects.push({ defectId: 'DEF-'+Date.now(), unitId, skuId: u.skuId, reportedBy: session.register || '', reportedAt: t, notes: String(notes).slice(0,500), severity: severity.toUpperCase() });
+  u.status = 'DEFECTIVE'; u.condition = 'DAMAGED'; u.notes = String(notes).slice(0,300);
   logActivity('defect', `Unit ${u.serialNo} (${item.name}) marked defective by ${session.register}`);
   saveAndPublish('units','defects','activity');
   renderAll();
@@ -2037,10 +1973,7 @@ async function clearDefect(unitId) {
   const u = findUnit(unitId); if (!u) return;
   const ok = await confirmDialog('Clear defect', `Mark ${u.serialNo} as repaired and available again?`, 'Clear', false, 'fa-check');
   if (!ok) return;
-  u.status = 'AVAILABLE';
-  u.condition = 'GOOD';
-  u.notes = '';
-  u.lastInspectionMs = now();
+  u.status = 'AVAILABLE'; u.condition = 'GOOD'; u.notes = ''; u.lastInspectionMs = now();
   state.inspections.push({ inspectionId: 'INSP-'+Date.now(), unitId, skuId: u.skuId, date: now(), inspector: session.register || '', condition: 'GOOD', passed: true, note:'cleared defect' });
   saveAndPublish('units','inspections');
   renderAll();
@@ -2053,23 +1986,16 @@ async function clearDefect(unitId) {
 let pendingRegPhoto = null;
 function openStudentRegModal() {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
-  $('regStudentNo').value = '';
-  $('regStudentName').value = '';
-  $('regStudentDob').value = '';
+  $('regStudentNo').value = ''; $('regStudentName').value = ''; $('regStudentDob').value = '';
   pendingRegPhoto = null;
   $('regStudentPhotoPreview').classList.add('hidden');
   $('regStudentError').classList.add('hidden');
   openModal('mStudentReg');
   setTimeout(() => $('regStudentNo').focus(), 120);
 }
-function clearRegPhoto() {
-  pendingRegPhoto = null;
-  const p = $('regStudentPhotoPreview');
-  p.src = ''; p.classList.add('hidden');
-}
+function clearRegPhoto() { pendingRegPhoto = null; const p = $('regStudentPhotoPreview'); p.src = ''; p.classList.add('hidden'); }
 function handleRegPhoto(ev) {
-  const file = ev.target.files && ev.target.files[0];
-  ev.target.value = '';
+  const file = ev.target.files && ev.target.files[0]; ev.target.value = '';
   if (!file) return;
   if (!/^image\//.test(file.type)) { toast('Please choose an image.', 'error'); return; }
   if (file.size > 5 * 1024 * 1024) { toast('Max 5 MB.', 'error'); return; }
@@ -2086,8 +2012,7 @@ function handleRegPhoto(ev) {
         const c = document.createElement('canvas'); c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
         pendingRegPhoto = c.toDataURL('image/jpeg', 0.75);
-        const p = $('regStudentPhotoPreview');
-        p.src = pendingRegPhoto; p.classList.remove('hidden');
+        const p = $('regStudentPhotoPreview'); p.src = pendingRegPhoto; p.classList.remove('hidden');
       } catch { pendingRegPhoto = raw; $('regStudentPhotoPreview').src = raw; $('regStudentPhotoPreview').classList.remove('hidden'); }
     };
     img.src = raw;
@@ -2108,15 +2033,7 @@ async function saveNewStudent() {
   const students = state.students || {};
   if (students[reg] && !students[reg].autoRegistered) { showErr(`Student "${reg}" already exists.`); return; }
   const hash = dob ? await hashPassword(dob) : '';
-  students[reg] = {
-    register: reg,
-    name: name || reg,
-    passwordHash: hash,
-    dob: dob || '',
-    idPhoto: pendingRegPhoto || '',
-    createdAt: Date.now(),
-    registeredBy: session.register || ''
-  };
+  students[reg] = { register: reg, name: name || reg, passwordHash: hash, dob: dob || '', idPhoto: pendingRegPhoto || '', createdAt: Date.now(), registeredBy: session.register || '' };
   state.students = students;
   logActivity('student-register', `${reg} registered by ${session.register}`);
   saveRegister(reg);
@@ -2132,11 +2049,7 @@ async function deleteStudent(reg) {
   if (!s) { toast('Student not found.', 'error'); return; }
   const activeLoans = state.loans.filter(l => idKey(l.borrowerId) === idKey(key));
   const warn = activeLoans.length ? `\n\nWarning: this student still has ${activeLoans.length} active loan(s).` : '';
-  const ok = await confirmDialog(
-    'Remove student',
-    `Remove "${key}" from the registered students list? They will need to register again to log in.${warn}`,
-    'Remove', true, 'fa-user-minus'
-  );
+  const ok = await confirmDialog('Remove student', `Remove "${key}" from the registered students list? They will need to register again to log in.${warn}`, 'Remove', true, 'fa-user-minus');
   if (!ok) return;
   delete state.students[key];
   logActivity('student-remove', `${key} removed by ${session.register}`);
@@ -2160,10 +2073,7 @@ function renderStudentsList() {
   const students = Object.values(state.students || {}).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
   const badge = $('studentCountBadge'); if (badge) badge.textContent = students.length;
   const list = $('studentsList'); if (!list) return;
-  if (!students.length) {
-    list.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students yet. Use “Add Student” to register one.</div>`;
-    return;
-  }
+  if (!students.length) { list.innerHTML = `<div class="rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-center text-xs text-slate-500">No students yet. Use “Add Student” to register one.</div>`; return; }
   const canBulk = isSuperAdmin();
   list.innerHTML = students.map(s => {
     const reg = esc(s.register);
@@ -2191,17 +2101,8 @@ function applyTheme(theme) {
   currentTheme = theme === 'light' ? 'light' : 'dark';
   const icon = $('themeIcon'); const sw = $('themeSwitch');
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (currentTheme === 'light') {
-    document.body.classList.add('theme-light');
-    if (icon) icon.className = 'fa-solid fa-moon';
-    if (sw) sw.classList.add('light');
-    if (meta) meta.setAttribute('content', '#f5f7fc');
-  } else {
-    document.body.classList.remove('theme-light');
-    if (icon) icon.className = 'fa-solid fa-sun';
-    if (sw) sw.classList.remove('light');
-    if (meta) meta.setAttribute('content', '#05080f');
-  }
+  if (currentTheme === 'light') { document.body.classList.add('theme-light'); if (icon) icon.className = 'fa-solid fa-moon'; if (sw) sw.classList.add('light'); if (meta) meta.setAttribute('content', '#f5f7fc'); }
+  else { document.body.classList.remove('theme-light'); if (icon) icon.className = 'fa-solid fa-sun'; if (sw) sw.classList.remove('light'); if (meta) meta.setAttribute('content', '#05080f'); }
   try { localStorage.setItem(THEME_KEY, currentTheme); } catch {}
 }
 function toggleTheme() { applyTheme(currentTheme === 'light' ? 'dark' : 'light'); toast(`Switched to ${currentTheme} mode.`, 'info', 1500); }
@@ -2280,14 +2181,18 @@ function loanMs() { return state.settings.loanDurationMinutes * 60000; }
 function isOverdue(l, t=now()) { return t > l.dueTimeMs; }
 function isDueSoon(l, t=now()) { const r = l.dueTimeMs - t; return r > 0 && r < 15*60000; }
 function newLoanId() { return 'TXN-' + Math.floor(100000 + Math.random()*900000); }
+
+/* Validate cart: drop units that no longer exist or are no longer available */
 function sanitizeCart() {
-  Object.keys(state.cart).forEach(id => {
-    const it = findItem(id);
-    const q = Number(state.cart[id])||0;
-    if (!it || q <= 0) { delete state.cart[id]; return; }
-    const max = availableQty(id);
-    if (q > max) { max <= 0 ? delete state.cart[id] : state.cart[id] = max; }
+  const next = {};
+  Object.values(state.cart || {}).forEach(c => {
+    if (!c || !c.unitId) return;
+    const u = findUnit(c.unitId);
+    if (!u) return;
+    if (u.status !== 'AVAILABLE') return;
+    next[c.unitId] = c;
   });
+  state.cart = next;
 }
 function logActivity(type, message) {
   state.activity.unshift({ id: Date.now() + Math.random(), type, message, timestamp: now() });
@@ -2296,8 +2201,7 @@ function logActivity(type, message) {
 function idKey(s) { return String(s || '').trim().toUpperCase(); }
 function isMyLoan(l) {
   if (session.role !== 'user' || !session.register) return false;
-  const myKey = idKey(session.register);
-  return idKey(l.borrowerId) === myKey;
+  return idKey(l.borrowerId) === idKey(session.register);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2349,11 +2253,7 @@ function switchLoginTab(tab) {
     sh.classList.remove('hidden'); ah.classList.add('hidden');
     ts.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-bajaj-700 bg-white border-b-2 border-bajaj-500';
     ta.className = 'tab-pill flex-1 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:bg-slate-100';
-    setTimeout(() => {
-      const inp = $('loginRegister');
-      inp.focus();
-      if (!inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
-    }, 100);
+    setTimeout(() => { const inp = $('loginRegister'); inp.focus(); if (!inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; } }, 100);
   } else {
     sf.classList.add('hidden'); af.classList.remove('hidden');
     sh.classList.add('hidden'); ah.classList.remove('hidden');
@@ -2362,6 +2262,7 @@ function switchLoginTab(tab) {
     setTimeout(() => $('adminUserInput').focus(), 100);
   }
 }
+let loginTab = 'student';
 
 /* ═══════════════════════════════════════════════════════════════════════
    SETUP
@@ -2471,13 +2372,8 @@ async function attemptStudentLogin() {
     }
     saveRegister(reg);
     showLabPicker('user', reg, reg);
-  } catch (e) {
-    console.error(e);
-    showLoginError('Login error.');
-  } finally {
-    btn.disabled = false;
-    btnTxt.textContent = 'Enter Catalog';
-  }
+  } catch (e) { console.error(e); showLoginError('Login error.'); }
+  finally { btn.disabled = false; btnTxt.textContent = 'Enter Catalog'; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2518,6 +2414,8 @@ function enterApp(role, register, name, activeLabId) {
   $('app').classList.remove('hidden');
   if (role === 'user' && session.activeLabId) catalogLabFilter = session.activeLabId;
   ensureAllUnits();
+  migrateUnitsInspection();
+  sanitizeCart();
   applyRoleUI(); renderAll(); tick();
   checkOverdueForCurrentUser(true);
 }
@@ -2550,12 +2448,8 @@ function applyRoleUI() {
     }
     const labList = $('menuLabList');
     if (labList) {
-      if (isAdminUser) {
-        const ids = myLabIds();
-        labList.innerHTML = ids.length ? ids.map(id => labChip(id)).join('') : '<span class="text-[10px] text-slate-500">No labs assigned</span>';
-      } else {
-        labList.innerHTML = session.activeLabId ? labChip(session.activeLabId) : '<span class="text-[10px] text-slate-500">No lab</span>';
-      }
+      if (isAdminUser) { const ids = myLabIds(); labList.innerHTML = ids.length ? ids.map(id => labChip(id)).join('') : '<span class="text-[10px] text-slate-500">No labs assigned</span>'; }
+      else { labList.innerHTML = session.activeLabId ? labChip(session.activeLabId) : '<span class="text-[10px] text-slate-500">No lab</span>'; }
     }
   }
   go('overview');
@@ -2655,24 +2549,14 @@ function migrateInventoryLabs() {
   const validIds = new Set(state.labs.map(l => l.id));
   const fallback = state.labs[0].id;
   state.inventory.forEach(i => { if (!i.labId || !validIds.has(i.labId)) i.labId = fallback; });
-  state.loans.forEach(l => {
-    if (!l.labId || !validIds.has(l.labId)) {
-      const it = state.inventory.find(i => i.id === l.itemId);
-      l.labId = it ? it.labId : fallback;
-    }
-  });
-  state.history.forEach(h => {
-    if (!h.labId || !validIds.has(h.labId)) {
-      const it = state.inventory.find(i => i.id === h.itemId);
-      h.labId = it ? it.labId : fallback;
-    }
-  });
+  state.loans.forEach(l => { if (!l.labId || !validIds.has(l.labId)) { const it = state.inventory.find(i => i.id === l.itemId); l.labId = it ? it.labId : fallback; } });
+  state.history.forEach(h => { if (!h.labId || !validIds.has(h.labId)) { const it = state.inventory.find(i => i.id === h.itemId); h.labId = it ? it.labId : fallback; } });
 }
 function applyRemoteKey(key, val) {
   if (key === 'labs') { if (Array.isArray(val) && val.length) state.labs = val; }
   else if (key === 'settings') { if (val) state.settings = { ...DEFAULT_SETTINGS, ...val }; }
   else if (key === 'inventory') { if (Array.isArray(val) && val.length) state.inventory = val; }
-  else if (key === 'units') { if (Array.isArray(val)) state.units = val; }
+  else if (key === 'units') { if (Array.isArray(val)) state.units = val; migrateUnitsInspection(); }
   else if (key === 'loans') state.loans = Array.isArray(val) ? val : [];
   else if (key === 'history') state.history = Array.isArray(val) ? val : [];
   else if (key === 'activity') state.activity = Array.isArray(val) ? val : [];
@@ -2685,9 +2569,7 @@ function applyRemoteKey(key, val) {
     migrateInventoryLabs();
     if (session.role === 'user' && session.activeLabId && !labById(session.activeLabId)) {
       session.activeLabId = null;
-      setTimeout(() => {
-        if (state.labs.length) showLabPicker(session.role, session.register, session.name);
-      }, 300);
+      setTimeout(() => { if (state.labs.length) showLabPicker(session.role, session.register, session.name); }, 300);
     }
   }
 }
@@ -2709,7 +2591,7 @@ function connectStation() {
   stationRef.child('labs').once('value').then(snap => {
     const val = snap.val();
     if (!val || !Array.isArray(val) || !val.length) {
-      setTimeout(() => { ensureAllUnits(); publishKey('labs'); publishKey('inventory'); publishKey('units'); publishKey('settings'); }, 700);
+      setTimeout(() => { ensureAllUnits(); migrateUnitsInspection(); publishKey('labs'); publishKey('inventory'); publishKey('units'); publishKey('settings'); }, 700);
     }
   });
   if (window._pollTimer) clearInterval(window._pollTimer);
@@ -2723,14 +2605,8 @@ function updateAuthScreen() {
   if (pendingSession) return;
   const hasAdmin = getAdmins().length > 0;
   const setupEl = $('setupScreen'); const loginEl = $('loginScreen');
-  if (hasAdmin) {
-    setupEl.classList.add('hidden'); setupEl.classList.remove('flex');
-    loginEl.classList.remove('hidden'); loginEl.classList.add('flex');
-  } else if (connected) {
-    loginEl.classList.add('hidden'); loginEl.classList.remove('flex');
-    setupEl.classList.remove('hidden'); setupEl.classList.add('flex');
-    setTimeout(() => $('setupTeacherNo').focus(), 150);
-  }
+  if (hasAdmin) { setupEl.classList.add('hidden'); setupEl.classList.remove('flex'); loginEl.classList.remove('hidden'); loginEl.classList.add('flex'); }
+  else if (connected) { loginEl.classList.add('hidden'); loginEl.classList.remove('flex'); setupEl.classList.remove('hidden'); setupEl.classList.add('flex'); setTimeout(() => $('setupTeacherNo').focus(), 150); }
 }
 function publishKey(key) {
   if (!stationRef) return;
@@ -2796,9 +2672,30 @@ function loadLocal() {
       defects: Array.isArray(s.defects) ? s.defects : []
     };
     migrateInventoryLabs();
+    migrateUnitsInspection();
+    migrateCart();
     sanitizeCart();
     ensureAllUnits();
   } catch {}
+}
+/* Convert old cart format { skuId: qty } → new format { unitId: snapshot } */
+function migrateCart() {
+  const old = state.cart || {};
+  const next = {};
+  Object.entries(old).forEach(([key, val]) => {
+    if (val && typeof val === 'object' && val.unitId) {
+      next[val.unitId] = val; // already new format
+    } else if (typeof val === 'number' && val > 0) {
+      // old format: assign next available units
+      const avail = availableUnitsForSku(key);
+      for (let i = 0; i < val && i < avail.length; i++) {
+        const u = avail[i];
+        const it = findItem(u.skuId) || {};
+        next[u.unitId] = { unitId: u.unitId, skuId: u.skuId, serialNo: u.serialNo, itemName: it.name || u.skuId, labId: it.labId || '', addedAt: Date.now() + i };
+      }
+    }
+  });
+  state.cart = next;
 }
 function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
 
@@ -2806,17 +2703,12 @@ function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(pu
    OVERDUE
    ═══════════════════════════════════════════════════════════════════════ */
 function checkOverdueForCurrentUser() {
-  if (!session || !session.register || session.role === 'admin') {
-    const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden');
-    return;
-  }
+  if (!session || !session.register || session.role === 'admin') { const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden'); return; }
   const myOverdue = state.loans.filter(l => isMyLoan(l) && isOverdue(l, now()));
   const banner = $('overdueAlertBanner');
   if (banner) {
-    if (myOverdue.length) {
-      banner.classList.remove('hidden');
-      $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due`;
-    } else banner.classList.add('hidden');
+    if (myOverdue.length) { banner.classList.remove('hidden'); $('overdueAlertDetail').textContent = `${myOverdue.length} item${myOverdue.length===1?'':'s'} past due`; }
+    else banner.classList.add('hidden');
   }
   let notified = {};
   try { notified = JSON.parse(sessionStorage.getItem(OVERDUE_NOTIFIED_KEY) || '{}'); } catch {}
@@ -2910,7 +2802,7 @@ function renderCatalog() {
     const avail = availableQty(item.id);
     const availUnits = unitsForSku(item.id).filter(u => u.status === 'AVAILABLE').length;
     const totalUnits = unitsForSku(item.id).length;
-    const inCart = state.cart[item.id] || 0;
+    const inCart = cartQtyForSku(item.id);
     const canAdd = selectableQty(item.id) > 0;
     const isLow = avail > 0 && avail <= low;
     const pct = totalUnits ? (availUnits/totalUnits)*100 : 0;
@@ -2942,14 +2834,26 @@ function renderCatalog() {
     </article>`;
   }).join('');
 }
-function changeQty(id, delta) {
-  const item = findItem(id); if (!item) return;
-  const cur = state.cart[id] || 0;
-  const next = cur + delta;
-  if (next <= 0) delete state.cart[id];
-  else if (next <= availableQty(id)) state.cart[id] = next;
-  else { toast(`Only ${availableQty(id)} available.`, 'warn', 2500); return; }
+
+/* Add a whole unit to the cart, or remove one of that SKU.
+   delta > 0: pick the first AVAILABLE unit of that SKU not already in cart.
+   delta < 0: remove the most recently added cart unit of that SKU. */
+function changeQty(skuId, delta) {
+  const item = findItem(skuId); if (!item) return;
+  if (delta > 0) {
+    const inCartIds = new Set(Object.keys(state.cart || {}));
+    const next = availableUnitsForSku(skuId).find(u => !inCartIds.has(u.unitId));
+    if (!next) { toast(`No more units of ${item.name} available.`, 'warn', 2500); return; }
+    state.cart[next.unitId] = {
+      unitId: next.unitId, skuId: next.skuId, serialNo: next.serialNo,
+      itemName: item.name, labId: item.labId, addedAt: Date.now()
+    };
+  } else {
+    const matches = Object.values(state.cart || {}).filter(c => c && c.skuId === skuId).sort((a,b) => (b.addedAt||0) - (a.addedAt||0));
+    if (matches.length) delete state.cart[matches[0].unitId];
+  }
   renderCatalog(); renderCart(); updateBadges();
+  saveLocal();
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2976,84 +2880,73 @@ function openCart() {
 function closeCart() { $('cartDrawer').classList.add('hidden'); document.body.style.overflow = ''; }
 function renderCart() {
   const box = $('cartItems');
-  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
-  const total = entries.reduce((s,[,q]) => s + q, 0);
-  $('cartSummary').textContent = entries.length ? `${entries.length} item${entries.length===1?'':'s'} · ${total} unit${total===1?'':'s'}` : 'Empty';
+  const entries = Object.values(state.cart || {}).filter(c => c && c.unitId).sort((a,b) => (a.addedAt||0) - (b.addedAt||0));
+  const total = entries.length;
+  $('cartSummary').textContent = total ? `${total} unit${total===1?'':'s'} (each a specific board)` : 'Empty';
   if (!entries.length) {
-    box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p></div>`;
+    box.innerHTML = `<div class="flex h-full flex-col items-center justify-center py-16 text-center"><div class="grid h-14 w-14 place-items-center rounded-2xl bg-ink-800 text-slate-600"><i class="fa-solid fa-cart-shopping text-xl"></i></div><p class="mt-4 text-sm text-slate-400">Cart is empty</p><p class="mt-1 text-[11px] text-slate-500">Scan a component barcode or press Add.</p></div>`;
     return;
   }
-  box.innerHTML = entries.map(([id, qty]) => {
-    const item = findItem(id); if (!item) return '';
-    const maxed = selectableQty(id) <= 0;
-    return `<div class="flex items-center gap-3 rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-850/80 to-ink-900/80 p-3">
-      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-500/15 text-brand-300"><i class="fa-solid fa-microchip text-xs"></i></div>
+  box.innerHTML = entries.map(c => {
+    const item = findItem(c.skuId) || { name: c.itemName || c.skuId, labId: c.labId || '' };
+    return `<div class="flex items-center gap-3 rounded-xl border border-brand-500/40 bg-gradient-to-br from-brand-500/10 to-ink-900/80 p-3">
+      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-500/20 text-brand-300"><i class="fa-solid fa-microchip text-xs"></i></div>
       <div class="min-w-0 flex-1">
         <h4 class="line-clamp-1 text-xs font-bold text-white">${esc(item.name)}</h4>
-        <div class="mt-0.5 flex items-center gap-1.5 flex-wrap"><span class="mono text-[10px] text-slate-600">${esc(item.id)}</span>${labChip(item.labId)}</div>
+        <div class="mono text-[10px] text-brand-300 mt-0.5">${esc(c.serialNo)}</div>
+        <div class="mt-0.5 flex items-center gap-1.5 flex-wrap"><span class="mono text-[10px] text-slate-600">${esc(c.skuId)}</span>${labChip(c.labId)}</div>
       </div>
-      <div class="flex shrink-0 items-center gap-1.5">
-        <button onclick="changeQty('${id}',-1)" class="grid h-7 w-7 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700"><i class="fa-solid fa-minus text-[9px]"></i></button>
-        <span class="mono w-5 text-center text-xs font-bold text-brand-300">${qty}</span>
-        <button onclick="changeQty('${id}',1)" ${maxed?'disabled':''} class="grid h-7 w-7 place-items-center rounded-md bg-ink-800 text-slate-300 hover:bg-ink-700 disabled:opacity-30"><i class="fa-solid fa-plus text-[9px]"></i></button>
-      </div>
+      <button onclick="removeCartUnit('${esc(c.unitId)}')" class="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-ink-800 text-rose-300 hover:bg-rose-500/20" title="Remove unit"><i class="fa-solid fa-xmark text-[11px]"></i></button>
     </div>`;
   }).join('');
 }
-function addUnitToCart(unitBarcode) {
-  const u = findUnit(unitBarcode);
-  if (!u) { toast('Unit not found: ' + unitBarcode, 'error'); return; }
-  if (u.status === 'ON_LOAN') { toast('That unit is already on loan.', 'warn'); return; }
-  if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { toast('That unit is not available.', 'warn'); return; }
-  if (isInspectionDue(u)) { toast('That unit is due for inspection. Please inspect first.', 'warn'); return; }
-  const cur = state.cart[u.skuId] || 0;
-  if (cur + 1 > availableQty(u.skuId)) { toast(`Only ${availableQty(u.skuId)} of ${findItem(u.skuId)?.name||''} available.`, 'warn'); return; }
-  state.cart[u.skuId] = cur + 1;
-  renderCart(); renderCatalog(); updateBadges();
-  toast(`Added ${findItem(u.skuId)?.name||u.skuId} (${u.serialNo}) to cart.`, 'success', 2500);
+function removeCartUnit(unitId) {
+  if (state.cart[unitId]) { delete state.cart[unitId]; renderCart(); renderCatalog(); updateBadges(); saveLocal(); }
 }
 
 function checkoutCart() {
   const isStudent = session.role === 'user';
   const name = isStudent ? (session.register || '') : $('borrowerName').value.trim();
   let idRef = isStudent ? (session.register || '') : $('borrowerId').value.trim();
-  const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
-  if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
+  const cartUnits = Object.values(state.cart || {}).filter(c => c && c.unitId);
+  if (!cartUnits.length) { toast('Cart is empty.', 'warn'); return; }
   if (!idRef) { toast('Register No required.', 'warn'); return; }
   const borrowName = name || idRef;
-  for (const [itemId, qty] of entries) {
-    const item = findItem(itemId);
-    if (!item) { toast('Component no longer exists.', 'error'); return; }
-    if (availableUnitsForSku(itemId).length < qty) { toast(`Only ${availableUnitsForSku(itemId).length} of ${item.name} available.`, 'error'); sanitizeCart(); renderAll(); return; }
+
+  // Verify all units still available
+  for (const c of cartUnits) {
+    const u = findUnit(c.unitId);
+    if (!u) { toast('Unit ' + c.serialNo + ' no longer exists.', 'error'); sanitizeCart(); renderAll(); return; }
+    if (u.status !== 'AVAILABLE') { toast('Unit ' + c.serialNo + ' is no longer available.', 'error'); sanitizeCart(); renderAll(); return; }
   }
+
   const t = now(); const due = t + loanMs();
-  const unitCount = entries.reduce((s,[,q]) => s + q, 0);
-  entries.forEach(([itemId, qty]) => {
-    const item = findItem(itemId);
-    const avail = availableUnitsForSku(itemId).slice(0, qty);
-    avail.forEach(u => {
-      const record = {
-        loanId: newLoanId() + (qty > 1 ? '-' + u.serialNo.slice(-4) : ''),
-        itemId, itemName: item.name, category: item.category, labId: item.labId,
-        unitId: u.unitId, serialNo: u.serialNo,
-        quantity: 1,
-        borrowerName: borrowName, borrowerId: idRef,
-        borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
-        dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
-        status: 'ACTIVE'
-      };
-      state.loans.unshift(record);
-      state.history.unshift({ ...record });
-      setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
-    });
+  cartUnits.forEach(c => {
+    const u = findUnit(c.unitId); if (!u) return;
+    const item = findItem(u.skuId) || {};
+    const record = {
+      loanId: newLoanId() + '-' + u.serialNo.slice(-4),
+      itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '',
+      labId: item.labId || '',
+      unitId: u.unitId, serialNo: u.serialNo,
+      quantity: 1,
+      borrowerName: borrowName, borrowerId: idRef,
+      borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
+      dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
+      status: 'ACTIVE'
+    };
+    state.loans.unshift(record);
+    state.history.unshift({ ...record });
+    setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
   });
+
   state.cart = {};
   fastScanSeen = new Set();
   state.borrower = { name: borrowName, id: idRef };
-  logActivity('checkout', `${idRef} borrowed ${unitCount} unit${unitCount===1?'':'s'}`);
+  logActivity('checkout', `${idRef} borrowed ${cartUnits.length} unit${cartUnits.length===1?'':'s'}`);
   saveAndPublish('loans', 'history', 'activity', 'units');
   renderAll(); closeCart();
-  toast(`Checkout complete — due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
+  toast(`Checkout complete — ${cartUnits.length} unit${cartUnits.length===1?'':'s'} · due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
   go('loans');
 }
 
@@ -3061,10 +2954,7 @@ function checkoutCart() {
    LOANS VIEW
    ═══════════════════════════════════════════════════════════════════════ */
 function visibleLoans() {
-  if (session.role === 'admin') {
-    const mine = myLabIds();
-    return state.loans.filter(l => mine.includes(l.labId));
-  }
+  if (session.role === 'admin') { const mine = myLabIds(); return state.loans.filter(l => mine.includes(l.labId)); }
   return state.loans.filter(l => isMyLoan(l));
 }
 function renderLoans() {
@@ -3087,15 +2977,9 @@ function renderLoans() {
     let cCls='border-ink-700/60 bg-ink-850/50', pCls='border-emerald-500/40 bg-emerald-500/15 text-emerald-300', pTxt='Active', bCls='from-brand-500 to-brand-400', tCls='text-emerald-400', tLbl='Remaining';
     if (overdue) { cCls='border-rose-500/50 bg-gradient-to-br from-rose-950/40 to-ink-850/50 overdue-pulse'; pCls='bg-gradient-to-br from-rose-500 to-rose-700 text-white border-transparent'; pTxt='Overdue'; bCls='from-rose-500 to-rose-600'; tCls='text-rose-400'; tLbl='Overdue by'; }
     else if (dueSoon) { cCls='border-amber-500/50 bg-gradient-to-br from-amber-950/20 to-ink-850/50'; pCls='border-amber-500/40 bg-amber-500/15 text-amber-300'; pTxt='Due soon'; bCls='from-amber-500 to-amber-600'; tCls='text-amber-400'; }
-
     let actionHtml = '';
-    if (isAdminUser) {
-      actionHtml = `<button onclick="openReturnVerify('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-semibold text-white"><i class="fa-solid fa-clipboard-check text-[11px]"></i> Verify return &amp; condition</button>`;
-    } else {
-      actionHtml = `<div class="rounded-xl border border-ink-700/60 bg-ink-950/40 p-3 text-center">
-        <div class="text-[11px] font-semibold text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Hand the item to a teacher in <b class="text-slate-200">${esc(labName(loan.labId))}</b>.</div>
-      </div>`;
-    }
+    if (isAdminUser) actionHtml = `<button onclick="openReturnVerify('${loan.loanId}')" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 py-2.5 text-xs font-semibold text-white"><i class="fa-solid fa-clipboard-check text-[11px]"></i> Verify return &amp; condition</button>`;
+    else actionHtml = `<div class="rounded-xl border border-ink-700/60 bg-ink-950/40 p-3 text-center"><div class="text-[11px] font-semibold text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Hand the item to a teacher in <b class="text-slate-200">${esc(labName(loan.labId))}</b>.</div></div>`;
     return `<article class="fade-up flex flex-col gap-4 rounded-2xl border p-4 sm:p-5 ${cCls}">
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
@@ -3132,18 +3016,13 @@ function openReturnVerify(loanId) {
   const overdue = isOverdue(loan, now());
   const u = loan.unitId ? findUnit(loan.unitId) : null;
   $('returnVerifyInfo').innerHTML = `
-    <div class="flex flex-wrap items-center gap-2 mb-1.5">
-      ${labChip(loan.labId)}
-      ${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}
-    </div>
+    <div class="flex flex-wrap items-center gap-2 mb-1.5">${labChip(loan.labId)}${overdue ? '<span class="rounded-full bg-gradient-to-br from-rose-500 to-rose-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white">Overdue</span>' : ''}</div>
     <div><b class="text-white">${esc(loan.itemName)}</b></div>
     <div class="mt-1">Unit barcode: <span class="mono text-brand-300">${esc(loan.serialNo || u?.serialNo || '—')}</span></div>
     <div class="mt-1">Register No: <b class="mono text-slate-200">${esc(loan.borrowerId)}</b></div>
     <div class="mt-1">Borrowed: ${esc(loan.borrowTimeFormatted)} · Due ${esc(loan.dueTimeFormatted)}</div>
   `;
-  $('returnCondition').value = 'GOOD';
-  $('returnNotes').value = '';
-  $('returnNeedsInspection').checked = false;
+  $('returnCondition').value = 'GOOD'; $('returnNotes').value = ''; $('returnNeedsInspection').checked = false;
   openModal('mReturnVerify');
 }
 async function confirmReturnVerify() {
@@ -3163,41 +3042,18 @@ async function confirmReturnVerify() {
   if (loan.unitId) {
     const u = findUnit(loan.unitId);
     if (u) {
-      u.condition = condition;
-      u.notes = notes;
-      u.currentLoanId = null;
-      u.lastBorrowerId = loan.borrowerId;
-      u.lastBorrowerName = loan.borrowerId;
+      u.condition = condition; u.notes = notes; u.currentLoanId = null;
+      u.lastBorrowerId = loan.borrowerId; u.lastBorrowerName = loan.borrowerId;
       if (condition === 'DAMAGED' || sendToMaintenance) {
         u.status = 'DEFECTIVE';
         if (condition === 'DAMAGED') {
-          state.defects.push({
-            defectId: 'DEF-' + Date.now(),
-            unitId: u.unitId, skuId: u.skuId,
-            reportedBy: session.register || '',
-            reportedAt: t,
-            notes: notes || 'Returned damaged',
-            severity: 'HIGH',
-            reportedByUser: loan.borrowerId,
-            reportedByUserName: loan.borrowerId
-          });
+          state.defects.push({ defectId: 'DEF-' + Date.now(), unitId: u.unitId, skuId: u.skuId, reportedBy: session.register || '', reportedAt: t, notes: notes || 'Returned damaged', severity: 'HIGH', reportedByUser: loan.borrowerId, reportedByUserName: loan.borrowerId });
         }
-      } else {
-        u.status = 'AVAILABLE';
-      }
+      } else { u.status = 'AVAILABLE'; }
     }
   }
   const h = state.history.find(x => x.loanId === loan.loanId);
-  if (h) {
-    h.status = 'RETURNED';
-    h.returnTimeMs = t;
-    h.returnTimeFormatted = fmtDateTime(t);
-    h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1);
-    h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO';
-    h.verifiedBy = session.register;
-    h.condition = condition;
-    h.notes = notes;
-  }
+  if (h) { h.status = 'RETURNED'; h.returnTimeMs = t; h.returnTimeFormatted = fmtDateTime(t); h.elapsedMinutes = ((t - loan.borrowTimeMs)/60000).toFixed(1); h.overdueFlag = t > loan.dueTimeMs ? 'YES' : 'NO'; h.verifiedBy = session.register; h.condition = condition; h.notes = notes; }
   state.loans.splice(idx, 1);
   logActivity('return', `${loan.borrowerId} returned ${loan.itemName} (${loan.serialNo || ''}) — ${condition}`);
   saveAndPublish('loans', 'history', 'activity', 'units', 'defects');
@@ -3246,10 +3102,8 @@ function renderDashboard() {
   const inspectDue = scopedUnits.filter(u => isInspectionDue(u)).length;
   const banner = $('inspectionDueBanner');
   if (banner) {
-    if (inspectDue > 0) {
-      banner.classList.remove('hidden');
-      $('inspectionDueDetail').textContent = `${inspectDue} unit(s) need inspection — click to open.`;
-    } else banner.classList.add('hidden');
+    if (inspectDue > 0) { banner.classList.remove('hidden'); $('inspectionDueDetail').textContent = `${inspectDue} unit(s) need inspection — click to open.`; }
+    else banner.classList.add('hidden');
   }
 }
 function renderLedger(loans, t) {
@@ -3292,13 +3146,11 @@ function renderInventoryTable(items) {
       <td class="mono px-3 py-3 font-bold text-emerald-400">${availUnits}</td>
       <td class="mono px-3 py-3 font-bold text-amber-400">${onLoanUnits}</td>
       <td class="mono px-3 py-3 font-bold text-rose-400">${defectUnits}</td>
-      <td class="px-3 py-3">
-        <div class="flex justify-end gap-2">
-          <button onclick="openUnitLabelPrint('${item.id}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/60"><i class="fa-solid fa-barcode text-[10px]"></i> Labels</button>
-          <button onclick="openComponentModal('${item.id}')" class="text-[11px] font-semibold text-brand-400">Edit</button>
-          <button onclick="deleteComponent('${item.id}')" class="text-[11px] font-semibold text-rose-400">Delete</button>
-        </div>
-      </td>
+      <td class="px-3 py-3"><div class="flex justify-end gap-2">
+        <button onclick="openUnitLabelPrint('${item.id}')" class="rounded-lg border border-ink-600/70 bg-ink-800/60 px-2 py-1 text-[10px] text-slate-300 hover:border-brand-500/60"><i class="fa-solid fa-barcode text-[10px]"></i> Labels</button>
+        <button onclick="openComponentModal('${item.id}')" class="text-[11px] font-semibold text-brand-400">Edit</button>
+        <button onclick="deleteComponent('${item.id}')" class="text-[11px] font-semibold text-rose-400">Delete</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -3315,10 +3167,7 @@ function renderDefectLog(units) {
         <span class="mono text-[10px] text-brand-300">${esc(d.unitId)}</span>
       </div>
       <div class="mt-1 text-[11px] text-slate-400">${esc(d.notes || '')}</div>
-      <div class="mt-0.5 text-[10px] text-slate-500">
-        Reported by ${esc(d.reportedBy || '—')} · ${fmtDateTime(d.reportedAt)}
-        ${d.reportedByUserName ? `· Last with <b class="text-rose-300">${esc(d.reportedByUser||'')}</b>` : ''}
-      </div>
+      <div class="mt-0.5 text-[10px] text-slate-500">Reported by ${esc(d.reportedBy || '—')} · ${fmtDateTime(d.reportedAt)}</div>
     </div>`;
   }).join('');
 }
@@ -3495,28 +3344,17 @@ async function removeTeacher(username) {
   renderTeachersList();
   toast(`Removed.`, 'success');
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   TEACHER ROLE SWAP
-   ═══════════════════════════════════════════════════════════════════════ */
 async function promoteTeacher(username) {
   if (!isSuperAdmin()) { toast('Only head teacher can promote.', 'warn'); return; }
   const target = findAdminByUsername(username);
   if (!target) { toast('Teacher not found.', 'error'); return; }
   if (target.isSuper) { toast('Already a head teacher.', 'info'); return; }
-
-  const ok = await confirmDialog(
-    'Promote to Head Teacher',
-    `Give "${username}" full access to every lab and head-teacher powers (add/remove teachers, promote/demote, edit all labs)?`,
-    'Make Head Teacher', false, 'fa-crown'
-  );
+  const ok = await confirmDialog('Promote to Head Teacher', `Give "${username}" full access to every lab and head-teacher powers?`, 'Make Head Teacher', false, 'fa-crown');
   if (!ok) return;
-
   const admins = getAdmins();
   const idx = admins.findIndex(a => a.username === username);
   if (idx === -1) { toast('Teacher not found.', 'error'); return; }
-  admins[idx].isSuper = true;
-  admins[idx].labIds = [];
+  admins[idx].isSuper = true; admins[idx].labIds = [];
   state.adminConfig = { ...(state.adminConfig || {}), admins };
   publishKey('adminConfig');
   logActivity('teacher-promote', `${username} promoted to head teacher by ${session.register}`);
@@ -3524,21 +3362,14 @@ async function promoteTeacher(username) {
   renderTeachersList();
   toast(`"${username}" is now a Head Teacher.`, 'success', 4000);
 }
-
 async function demoteTeacher(username) {
   if (!isSuperAdmin()) { toast('Only head teacher can demote.', 'warn'); return; }
   if (username === session.register) { toast('You cannot demote yourself.', 'warn'); return; }
   const target = findAdminByUsername(username);
   if (!target) { toast('Teacher not found.', 'error'); return; }
   if (!target.isSuper) { toast('Already a regular teacher.', 'info'); return; }
-
-  const ok = await confirmDialog(
-    'Demote to Teacher',
-    `Remove head-teacher powers from "${username}"? They will keep access to all labs as a regular teacher, but lose the ability to manage other teachers.`,
-    'Demote to Teacher', true, 'fa-user-shield'
-  );
+  const ok = await confirmDialog('Demote to Teacher', `Remove head-teacher powers from "${username}"? They keep access to all labs as a regular teacher.`, 'Demote to Teacher', true, 'fa-user-shield');
   if (!ok) return;
-
   const admins = getAdmins();
   const idx = admins.findIndex(a => a.username === username);
   if (idx === -1) { toast('Teacher not found.', 'error'); return; }
@@ -3662,7 +3493,7 @@ function clearHistory() {
    RENDER ALL / TICK
    ═══════════════════════════════════════════════════════════════════════ */
 function updateBadges() {
-  const cartUnits = Object.values(state.cart).reduce((s,q) => s+q, 0);
+  const cartUnits = Object.values(state.cart || {}).filter(c => c && c.unitId).length;
   const badge = $('cartCount');
   if (badge) { badge.textContent = cartUnits; badge.classList.toggle('hidden', cartUnits === 0); }
 }
@@ -3723,17 +3554,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saved && saved.role && saved.register) {
       if (saved.role === 'user') {
         if (saved.activeLabId && labById(saved.activeLabId)) {
-          session = saved;
-          $('app').classList.remove('hidden');
+          session = saved; $('app').classList.remove('hidden');
           catalogLabFilter = saved.activeLabId;
           applyRoleUI();
         } else if (state.labs.length) {
           setTimeout(() => showLabPicker('user', saved.register, saved.register), 100);
         }
       } else {
-        session = saved;
-        $('app').classList.remove('hidden');
-        applyRoleUI();
+        session = saved; $('app').classList.remove('hidden'); applyRoleUI();
       }
     }
   } catch {}
@@ -3802,9 +3630,9 @@ window.reportDefect = reportDefect;
 window.clearDefect = clearDefect;
 window.renderUnitsView = renderUnitsView;
 window.renderDashboard = renderDashboard;
-window.addUnitToCart = addUnitToCart;
 window.updateLabelSize = updateLabelSize;
 window.resetLabelSize = resetLabelSize;
+window.removeCartUnit = removeCartUnit;
 </script>
 </body>
 </html>
