@@ -122,7 +122,7 @@
   .unit-label { width: 260px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #0f172a; text-align: center; font-family: Inter, sans-serif; page-break-inside: avoid; }
   .unit-label .unit-title { font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em; }
   .unit-label .unit-sku { font-size: 9px; color: #475569; margin-bottom: 4px; }
-  .unit-label svg { display: block; margin: 0 auto; }
+  .unit-label svg, .unit-label img.unit-bc-img { display: block; margin: 0 auto; max-width: 100%; }
   .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; margin-top: 3px; letter-spacing: .06em; }
   .unit-label .unit-lab { font-size: 8px; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: .08em; }
 
@@ -203,7 +203,7 @@
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Teacher Login</h1>
       </div>
 
-      <!-- STUDENT FORM: no password, no captcha -->
+      <!-- STUDENT FORM: scan-only, no password, no captcha -->
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="rounded-lg border border-bajaj-200 bg-bajaj-50/70 p-3 text-center text-[11px] font-medium text-bajaj-800">
           <i class="fa-solid fa-id-card mr-1"></i> Students: no password needed — just scan your ID card barcode.
@@ -467,10 +467,10 @@
           <h1 class="text-base sm:text-lg font-bold text-white">Component Catalog</h1>
           <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Loan period <span id="loanPeriodLabel" class="font-semibold text-brand-300">2 hours</span> · <span id="catalogResultCount">0 items</span></p>
         </div>
-        <div class="relative w-full sm:w-56">
-          <i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-500"></i>
-          <input id="skuInput" type="text" onkeydown="if(event.key==='Enter'){quickAdd();}" placeholder="Scan / type SKU" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder:text-slate-600" />
-        </div>
+        <!-- FAST BARCODE SCAN BUTTON -->
+        <button onclick="openCatalogFastScan()" class="focus-ring flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-600/30 hover:from-emerald-600 hover:to-emerald-800 transition">
+          <i class="fa-solid fa-barcode text-sm"></i> Scan component barcode
+        </button>
       </div>
       <div>
         <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-building-columns mr-1"></i> Lab</div>
@@ -485,6 +485,10 @@
         <label class="flex cursor-pointer select-none items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-400">
           <input id="catalogInStock" type="checkbox" onchange="renderCatalog()" class="h-3.5 w-3.5 accent-brand-500" /> In stock
         </label>
+      </div>
+      <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-[11px] text-emerald-200 flex items-start gap-2">
+        <i class="fa-solid fa-circle-info mt-0.5"></i>
+        <span>Tap <b>Scan component barcode</b> to open the fast scanner. It stays open — scan each physical board's barcode and it drops straight into your cart. Only valid component barcodes are accepted.</span>
       </div>
     </div>
   </div>
@@ -517,7 +521,7 @@
     </div>
     <div class="flex flex-wrap gap-2">
       <button onclick="openScanner('unitsAdmin')" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20"><i class="fa-solid fa-camera"></i> Scan a unit</button>
-      <button onclick="printAllLabelsForVisible()" class="focus-ring flex items-center gap-2 rounded-xl border border-ink-600/70 bg-ink-800/60 px-3.5 py-2 text-xs font-semibold text-slate-300"><i class="fa-solid fa-print"></i> Print visible</button>
+      <button onclick="printAllLabelsForVisible()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-brand-600/20"><i class="fa-solid fa-print"></i> Print visible labels</button>
     </div>
   </div>
 
@@ -607,7 +611,6 @@
     </div>
   </div>
 
-  <!-- Inspection due banner -->
   <div id="inspectionDueBanner" class="hidden rounded-2xl border-2 border-orange-500 bg-orange-950/30 p-4">
     <div class="flex flex-col sm:flex-row sm:items-center gap-3">
       <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 text-white"><i class="fa-solid fa-clipboard-list"></i></div>
@@ -668,13 +671,11 @@
     </div>
   </div>
 
-  <!-- Defect log -->
   <div class="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/20 to-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-triangle-exclamation text-xs text-rose-400"></i> Defect Log</h3>
     <div id="defectLogList" class="space-y-2 max-h-72 overflow-y-auto"></div>
   </div>
 
-  <!-- Branding -->
   <div class="rounded-2xl border border-bajaj-500/30 bg-gradient-to-br from-bajaj-500/5 to-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div>
@@ -696,7 +697,6 @@
     </div>
   </div>
 
-  <!-- Settings -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-sliders text-xs text-brand-400"></i> Settings</h3>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -718,7 +718,6 @@
     </div>
   </div>
 
-  <!-- Teachers -->
   <div class="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/20 to-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-users text-xs text-rose-400"></i> Manage Teachers <span id="teacherCountBadge" class="rounded-full border border-rose-500/30 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300">0</span></h3>
@@ -727,7 +726,6 @@
     <div id="teachersList" class="space-y-2"></div>
   </div>
 
-  <!-- Registered students -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-graduation-cap text-xs text-brand-400"></i> Registered Students <span id="studentCountBadge" class="rounded-full border border-brand-500/30 bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold text-brand-300">0</span></h3>
@@ -824,7 +822,9 @@
     <div id="cartItems" class="flex-1 space-y-3 overflow-y-auto p-4"></div>
     <div class="space-y-3 border-t border-ink-700/60 p-4">
       <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Borrower details</h4>
-      <input id="borrowerName" type="text" placeholder="Full name" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      <div id="borrowerNameRow">
+        <input id="borrowerName" type="text" placeholder="Full name" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
+      </div>
       <div class="flex gap-2">
         <input id="borrowerId" type="text" placeholder="Register No" class="focus-ring flex-1 rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white placeholder:text-slate-600" />
         <button type="button" onclick="openScanner('borrowerId')" class="shrink-0 rounded-xl bg-brand-600 px-3 text-white" title="Scan student ID"><i class="fa-solid fa-barcode"></i></button>
@@ -837,7 +837,6 @@
 
 <!-- ============ MODALS ============ -->
 
-<!-- Component modal -->
 <div id="mComponent" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between"><h3 id="componentModalTitle" class="text-base font-bold text-white">Add component</h3><button onclick="closeModal('mComponent')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -863,7 +862,6 @@
   </div>
 </div>
 
-<!-- Add Teacher modal -->
 <div id="mAddTeacher" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-rose-700/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between"><h3 class="text-base font-bold text-white">Add New Teacher</h3><button onclick="closeModal('mAddTeacher')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -888,7 +886,6 @@
   </div>
 </div>
 
-<!-- Return verify (with condition check) -->
 <div id="mReturnVerify" class="fixed inset-0 z-[96] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border-2 border-emerald-500/60 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-start gap-3">
@@ -922,7 +919,6 @@
   </div>
 </div>
 
-<!-- QR modal -->
 <div id="mQr" class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-xs space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 text-center">
     <h3 id="qrTitle" class="text-sm font-bold text-white">Component QR</h3>
@@ -932,7 +928,6 @@
   </div>
 </div>
 
-<!-- Confirm -->
 <div id="mConfirm" class="fixed inset-0 z-[120] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-sm space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5">
     <div class="flex items-start gap-3.5">
@@ -946,7 +941,6 @@
   </div>
 </div>
 
-<!-- Change password -->
 <div id="mChangePassword" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-sm space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5">
     <div class="flex items-center justify-between"><h3 class="text-base font-bold text-white">Change password</h3><button onclick="closeModal('mChangePassword')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
@@ -963,7 +957,6 @@
   </div>
 </div>
 
-<!-- Overdue -->
 <div id="mOverdue" class="fixed inset-0 z-[97] hidden items-center justify-center bg-rose-950/70 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border-2 border-rose-500 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="text-center">
@@ -1054,11 +1047,10 @@
         <button onclick="closeModal('mUnitLabels')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
-    <div id="labelPrintArea" class="flex flex-wrap gap-3 rounded-xl border border-ink-700/60 bg-ink-950/40 p-3"></div>
+    <div id="labelPrintArea" class="flex flex-wrap gap-3 rounded-xl border border-ink-700/60 bg-white p-3"></div>
   </div>
 </div>
 
-<!-- ══════════ UNIT DETAIL MODAL ══════════ -->
 <div id="mUnitDetail" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between">
@@ -1167,10 +1159,11 @@ let catalogLabFilter = 'ALL';
 let pendingReturnLoanId = null;
 
 /* scanner state */
-let scannerTarget = null;   // 'login' | 'studentReg' | 'borrowerId' | 'unitsAdmin' | 'checkoutUnit' | 'returnUnit' | 'adminLogin' | 'newTeacher' | 'setupTeacher'
+let scannerTarget = null;
 let html5QrScanner = null;
 let lastScanValue = '';
 let lastScanTime = 0;
+let fastScanSeen = new Set();       // unit IDs already added during the current fast-scan session
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
@@ -1261,17 +1254,16 @@ function renderSavedRegisters() {
       list.slice(0, 6).map(r => `<button type="button" class="saved-reg-chip" onclick="useSavedRegister('${esc(r)}')" oncontextmenu="event.preventDefault();removeSavedRegister('${esc(r)}')"><i class="fa-solid fa-id-badge"></i>${esc(r)}<span class="opacity-50" onclick="event.stopPropagation();removeSavedRegister('${esc(r)}')">×</span></button>`).join('')
     : '';
 }
-function useSavedRegister(reg) { const inp = $('loginRegister'); if (inp) { inp.value = reg; inp.focus(); } attemptStudentLogin(); }
+function useSavedRegister(reg) { const inp = $('loginRegister'); if (inp) { inp.value = reg; } attemptStudentLogin(); }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE SCANNER  (fast: 30 fps + native BarcodeDetector when available)
+   BARCODE SCANNER
    ═══════════════════════════════════════════════════════════════════════ */
 function createScannerInstance() {
   const opts = { verbose: false };
   opts.experimentalFeatures = { useBarCodeDetectorIfSupported: true };
   html5QrScanner = new Html5Qrcode('scannerReader', opts);
 }
-
 function supportedFormats() {
   const F = window.Html5QrcodeSupportedFormats;
   if (!F) return undefined;
@@ -1279,14 +1271,13 @@ function supportedFormats() {
   const list = wanted.filter(v => typeof v !== 'undefined' && v !== null);
   return list.length ? list : undefined;
 }
-
 function buildScannerConfig() {
   const cfg = {
-    fps: 30,
+    fps: 40,
     disableFlip: true,
     qrbox: function(vw, vh) {
       const w = Math.max(120, Math.floor(vw * 0.96));
-      const h = Math.max(90, Math.floor(Math.min(vh * 0.6, vw * 0.42)));
+      const h = Math.max(80, Math.floor(Math.min(vh * 0.55, vw * 0.40)));
       return { width: w, height: h };
     }
   };
@@ -1308,7 +1299,8 @@ function openScanner(target, hintText) {
     returnUnit: 'Scan unit barcode',
     adminLogin: 'Scan Teacher ID card',
     newTeacher: 'Scan Teacher ID card',
-    setupTeacher: 'Scan Teacher ID card'
+    setupTeacher: 'Scan Teacher ID card',
+    catalogFast: 'Fast Component Scanner'
   };
   const hints = {
     login: 'Point the camera at the barcode on the student ID card.',
@@ -1319,7 +1311,8 @@ function openScanner(target, hintText) {
     returnUnit: 'Scan the barcode on the unit being returned.',
     adminLogin: 'Point the camera at the barcode on your teacher ID card.',
     newTeacher: 'Point the camera at the barcode on the new teacher ID card.',
-    setupTeacher: 'Point the camera at the barcode on your teacher ID card.'
+    setupTeacher: 'Point the camera at the barcode on your teacher ID card.',
+    catalogFast: 'Scan a component barcode — it will be added to your cart instantly. Only component barcodes are accepted.'
   };
   $('scannerTitle').textContent = titles[target] || 'Scan barcode';
   $('scannerHint').textContent = hintText || hints[target] || 'Point the camera at the barcode.';
@@ -1331,7 +1324,14 @@ function openScanner(target, hintText) {
     showScannerStatus('Camera library not loaded. Use manual entry below.', 'error');
     return;
   }
-  setTimeout(startCameraScanner, 120);
+  setTimeout(startCameraScanner, 100);
+}
+
+/* Dedicated entry point for the fast catalog scanner */
+function openCatalogFastScan() {
+  if (session.role !== 'user' && session.role !== 'admin') { toast('Please sign in first.', 'warn'); return; }
+  fastScanSeen = new Set();
+  openScanner('catalogFast');
 }
 
 function startCameraScanner() {
@@ -1339,12 +1339,9 @@ function startCameraScanner() {
   const reader = $('scannerReader');
   if (!reader) return;
   reader.innerHTML = '';
-
   try { createScannerInstance(); }
   catch (e) { console.warn(e); showScannerStatus('Scanner init failed. Use manual entry.', 'error'); return; }
-
   const config = buildScannerConfig();
-
   html5QrScanner
     .start({ facingMode: 'environment' }, config, onScanSuccess, () => {})
     .then(() => showScannerStatus('Scanning… hold the barcode inside the box.', 'info'))
@@ -1395,28 +1392,73 @@ function onScanSuccess(decodedText) {
   const clean = String(decodedText || '').trim();
   if (!clean) return;
   const ts = Date.now();
-  if (clean === lastScanValue && (ts - lastScanTime) < 2000) return;
+  const debounceMs = scannerTarget === 'catalogFast' ? 700 : 1500;
+  if (clean === lastScanValue && (ts - lastScanTime) < debounceMs) return;
   lastScanValue = clean; lastScanTime = ts;
-
   if (navigator.vibrate) { try { navigator.vibrate(60); } catch {} }
-  showScannerStatus('Scanned: ' + clean, 'success');
 
+  /* ---- FAST CATALOG SCAN: keep camera running, no modal close ---- */
+  if (scannerTarget === 'catalogFast') {
+    handleCatalogFastScan(clean);
+    return;
+  }
+
+  showScannerStatus('Scanned: ' + clean, 'success');
   destroyScanner();
 
-  // For the student login, skip the intermediate modal entirely — go straight in.
   if (scannerTarget === 'login') {
     closeScanner();
     $('loginRegister').value = clean.toUpperCase();
     setTimeout(() => attemptStudentLogin(), 60);
     return;
   }
-
   handleScannedCode(clean);
+}
+
+/* Only accepts valid component barcodes. Anything else is rejected. */
+function handleCatalogFastScan(code) {
+  const clean = String(code || '').trim().toUpperCase();
+  if (!clean) return;
+
+  // STRICT: must be an exact, existing unit serial. Nothing else is accepted.
+  const u = findUnit(clean);
+  if (!u) {
+    showScannerStatus('✗ Not a component barcode — only component labels are accepted.', 'error');
+    if (navigator.vibrate) { try { navigator.vibrate([80, 60, 80]); } catch {} }
+    return;
+  }
+  if (fastScanSeen.has(u.unitId)) {
+    showScannerStatus('✗ ' + u.serialNo + ' is already in this session.', 'error');
+    return;
+  }
+  if (u.status === 'ON_LOAN') { showScannerStatus('✗ ' + u.serialNo + ' is already on loan.', 'error'); return; }
+  if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { showScannerStatus('✗ ' + u.serialNo + ' is not available.', 'error'); return; }
+  if (isInspectionDue(u)) { showScannerStatus('✗ ' + u.serialNo + ' needs inspection first.', 'error'); return; }
+
+  const cur = state.cart[u.skuId] || 0;
+  if (cur + 1 > availableQty(u.skuId)) {
+    showScannerStatus('✗ No more units of ' + (findItem(u.skuId)?.name || u.skuId) + ' available.', 'error');
+    return;
+  }
+
+  state.cart[u.skuId] = cur + 1;
+  fastScanSeen.add(u.unitId);
+  renderCart(); renderCatalog(); updateBadges();
+
+  const item = findItem(u.skuId) || { name: u.skuId };
+  showScannerStatus('✓ Added ' + item.name + ' · ' + u.serialNo, 'success');
+  if (navigator.vibrate) { try { navigator.vibrate(35); } catch {} }
 }
 
 function scannerManualSubmit() {
   const v = $('scannerManual').value.trim();
   if (!v) return;
+  if (scannerTarget === 'catalogFast') {
+    handleCatalogFastScan(v);
+    $('scannerManual').value = '';
+    $('scannerManual').focus();
+    return;
+  }
   if (scannerTarget === 'login') {
     $('loginRegister').value = v.toUpperCase();
     closeScanner();
@@ -1490,24 +1532,22 @@ function closeScanner() {
   destroyScanner();
   scannerTarget = null;
   lastScanValue = ''; lastScanTime = 0;
+  fastScanSeen = new Set();
   closeModal('mScanner');
   const rd = $('scannerReader'); if (rd) rd.innerHTML = '';
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   UNITS (per-physical-item serial numbers)
+   UNITS
    ═══════════════════════════════════════════════════════════════════════ */
 function findUnit(unitId) { return state.units.find(u => u.unitId === unitId || u.serialNo === unitId); }
-function findUnitByBarcode(code) { return findUnit(code); }
 function unitsForSku(skuId) { return state.units.filter(u => u.skuId === skuId); }
 function availableUnitsForSku(skuId) { return state.units.filter(u => u.skuId === skuId && u.status === 'AVAILABLE'); }
 function borrowedQty(id) { return state.loans.reduce((s,l) => l.itemId === id ? s + l.quantity : s, 0); }
 function availableQty(id) { const it = findItem(id); return it ? Math.max(0, it.totalStock - borrowedQty(id)) : 0; }
 function selectableQty(id) { return Math.max(0, availableQty(id) - (state.cart[id]||0)); }
 
-function generateSerial(skuId, index) {
-  return skuId + '-' + String(index).padStart(4, '0');
-}
+function generateSerial(skuId, index) { return skuId + '-' + String(index).padStart(4, '0'); }
 
 function ensureUnitsForSku(skuId) {
   const item = findItem(skuId); if (!item) return;
@@ -1545,17 +1585,12 @@ function ensureUnitsForSku(skuId) {
     });
   }
 }
-
-function ensureAllUnits() {
-  state.inventory.forEach(i => ensureUnitsForSku(i.id));
-}
-
+function ensureAllUnits() { state.inventory.forEach(i => ensureUnitsForSku(i.id)); }
 function setUnitStatus(unitId, status, extra = {}) {
   const u = findUnit(unitId); if (!u) return;
   u.status = status;
   Object.assign(u, extra);
 }
-
 function unitStatusPill(u) {
   const map = {
     AVAILABLE:   ['sp-available', 'Available'],
@@ -1567,7 +1602,6 @@ function unitStatusPill(u) {
   const [cls, txt] = map[u.status] || ['sp-available', u.status];
   return `<span class="status-pill ${cls}">${txt}</span>`;
 }
-
 function isInspectionDue(u) {
   const days = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
   const cutoff = now() - days * 24 * 3600 * 1000;
@@ -1575,16 +1609,39 @@ function isInspectionDue(u) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL PRINTING (JsBarcode)
+   BARCODE LABEL RENDERING + PRINTING (canvas-based, reliable printing)
    ═══════════════════════════════════════════════════════════════════════ */
+function generateBarcodeDataURL(text, w = 1.6, h = 46) {
+  try {
+    if (!window.JsBarcode) return '';
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, String(text), {
+      format: 'CODE128',
+      width: w,
+      height: h,
+      displayValue: false,
+      margin: 0,
+      background: '#ffffff',
+      lineColor: '#000000'
+    });
+    return canvas.toDataURL('image/png');
+  } catch (e) {
+    console.warn('barcode gen failed', e);
+    return '';
+  }
+}
+
 function buildUnitLabelHtml(u) {
   const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
   const lab = labName(item.labId);
-  const safeSvgId = 'bc-' + u.unitId.replace(/[^A-Za-z0-9_-]/g, '_');
+  const bc = generateBarcodeDataURL(u.serialNo);
+  const bcHtml = bc
+    ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />`
+    : `<div style="height:50px;line-height:50px;color:#999;font-size:10px;">barcode unavailable</div>`;
   return `<div class="unit-label" data-serial="${esc(u.serialNo)}">
     <div class="unit-title">${esc(item.name)}</div>
     <div class="unit-sku">${esc(u.skuId)}</div>
-    <svg id="${safeSvgId}" class="unit-bc-svg"></svg>
+    ${bcHtml}
     <div class="unit-serial">${esc(u.serialNo)}</div>
     <div class="unit-lab">${esc(lab)}</div>
   </div>`;
@@ -1597,12 +1654,10 @@ function openUnitLabelPrintAll() {
   if (!skus.length) { toast('No components.', 'warn'); return; }
   renderUnitLabelsForSkus(skus.map(s => s.id));
 }
-
 function openUnitLabelPrint(skuId) {
   if (!skuId) return;
   renderUnitLabelsForSkus([skuId]);
 }
-
 function printAllLabelsForVisible() {
   const sel = $('unitsLabFilter'); const statusSel = $('unitsStatusFilter');
   const lab = sel ? sel.value : 'ALL';
@@ -1619,43 +1674,63 @@ function printAllLabelsForVisible() {
   if (!units.length) { toast('No units to print.', 'warn'); return; }
   renderUnitLabelsForUnits(units);
 }
-
 function renderUnitLabelsForSkus(skuIds) {
   const all = [];
-  skuIds.forEach(id => {
-    ensureUnitsForSku(id);
-    all.push(...unitsForSku(id));
-  });
+  skuIds.forEach(id => { ensureUnitsForSku(id); all.push(...unitsForSku(id)); });
   renderUnitLabelsForUnits(all);
 }
-
 function renderUnitLabelsForUnits(units) {
   const area = $('labelPrintArea');
   $('labelSubtitle').textContent = units.length + ' unit label(s) — unique barcode per physical board.';
+  if (!window.JsBarcode) { setTimeout(() => renderUnitLabelsForUnits(units), 300); return; }
   area.innerHTML = units.map(buildUnitLabelHtml).join('');
   openModal('mUnitLabels');
-  requestAnimationFrame(() => {
-    units.forEach(u => {
-      const svgId = 'bc-' + u.unitId.replace(/[^A-Za-z0-9_-]/g, '_');
-      const el = document.getElementById(svgId);
-      if (el && window.JsBarcode) {
-        try { JsBarcode(el, u.serialNo, { format: 'CODE128', width: 1.5, height: 42, fontSize: 12, margin: 2, displayValue: false }); }
-        catch (e) { console.warn('barcode fail', e); }
-      }
-    });
-  });
 }
-
 function printUnitLabels() {
   const area = $('labelPrintArea');
   if (!area) return;
-  const w = window.open('', '_blank', 'width=800,height=600');
+  const html = area.innerHTML;
+  if (!html.trim()) { toast('No labels to print.', 'warn'); return; }
+  const w = window.open('', '_blank');
+  if (!w) { toast('Please allow pop-ups to print labels.', 'warn', 4000); return; }
   const styles = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('');
-  w.document.write(`<!DOCTYPE html><html><head><title>Print Labels</title>${styles}
-    <style>body{padding:10px;background:#fff;} .unit-label{margin:6px;display:inline-block;} @media print { .unit-label{page-break-inside:avoid;} }</style>
-    </head><body>${area.innerHTML}</body></html>`);
+  w.document.open();
+  w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Print Unit Labels</title>
+${styles}
+<style>
+  body { padding: 12px; background: #fff; margin: 0; font-family: Inter, Arial, sans-serif; }
+  .unit-label { margin: 6px; display: inline-block; page-break-inside: avoid; vertical-align: top; }
+  .unit-bc-img { display: block; margin: 0 auto; max-width: 100%; }
+  .unit-label svg { display: block; margin: 0 auto; }
+  @media print {
+    body { padding: 0; }
+    .unit-label { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>${html}</body>
+</html>`);
   w.document.close();
-  setTimeout(() => { w.focus(); w.print(); setTimeout(() => w.close(), 500); }, 400);
+  const imgs = w.document.images;
+  let loaded = 0;
+  const total = imgs.length;
+  let fired = false;
+  const fire = () => {
+    if (fired) return;
+    fired = true;
+    try { w.focus(); w.print(); } catch (e) { console.warn(e); }
+    setTimeout(() => { try { w.close(); } catch {} }, 1200);
+  };
+  if (total === 0) { setTimeout(fire, 300); return; }
+  for (let i = 0; i < total; i++) {
+    if (imgs[i].complete) { loaded++; if (loaded === total) setTimeout(fire, 200); }
+    else imgs[i].onload = imgs[i].onerror = () => { loaded++; if (loaded === total) setTimeout(fire, 200); };
+  }
+  setTimeout(fire, 2500);   // safety fallback
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1669,7 +1744,6 @@ function populateUnitsLabFilter() {
   sel.innerHTML = '<option value="ALL">All my labs</option>' + labs.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
   sel.value = labs.some(l => l.id === cur) || cur === 'ALL' ? cur : 'ALL';
 }
-
 function renderUnitsView() {
   if (session.role !== 'admin') return;
   populateUnitsLabFilter();
@@ -1677,7 +1751,6 @@ function renderUnitsView() {
   const lab = $('unitsLabFilter').value;
   const stat = $('unitsStatusFilter').value;
   const q = ($('unitsSearch').value || '').trim().toLowerCase();
-
   let units = state.units.filter(u => mine.includes((findItem(u.skuId)||{}).labId));
   if (lab !== 'ALL') units = units.filter(u => (findItem(u.skuId)||{}).labId === lab);
   if (stat !== 'ALL') {
@@ -1703,7 +1776,6 @@ function renderUnitsView() {
     const ib = isInspectionDue(b) ? -1 : order[b.status];
     return ia - ib || a.serialNo.localeCompare(b.serialNo);
   });
-
   grid.innerHTML = units.map(u => {
     const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
     const lastUse = u.lastBorrowerName ? `<div class="mt-1 text-[10px] text-slate-500">Last used by <b class="text-slate-400">${esc(u.lastBorrowerName)}</b> (${esc(u.lastBorrowerId||'')})</div>` : '';
@@ -1735,16 +1807,14 @@ function openUnitDetail(unitId) {
   const u = findUnit(unitId); if (!u) return;
   const item = findItem(u.skuId) || { name: u.skuId };
   $('unitDetailTitle').textContent = item.name + ' · ' + u.serialNo;
-
   const body = $('unitDetailBody');
-  const svgId = 'bc-detail-' + Date.now();
+  const bcImg = generateBarcodeDataURL(u.serialNo, 2, 50);
   const loanHistory = state.history.filter(h => h.unitId === u.unitId).slice(-10).reverse();
   const defectsForUnit = state.defects.filter(d => d.unitId === u.unitId).slice().reverse();
   const inspectionsForUnit = state.inspections.filter(i => i.unitId === u.unitId).slice().reverse();
-
   body.innerHTML = `
     <div class="rounded-xl border border-ink-700/60 bg-white p-3 text-center">
-      <svg id="${svgId}" class="mx-auto"></svg>
+      ${bcImg ? `<img src="${bcImg}" alt="${esc(u.serialNo)}" class="mx-auto block" />` : ''}
       <div class="mono mt-2 text-sm font-bold text-slate-900">${esc(u.serialNo)}</div>
       <div class="mt-0.5 text-[10px] text-slate-500">${esc(u.skuId)}</div>
     </div>
@@ -1752,13 +1822,13 @@ function openUnitDetail(unitId) {
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Status</div><div class="mt-1 text-xs font-bold text-white">${esc(u.status)}</div></div>
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Condition</div><div class="mt-1 text-xs font-bold text-white">${esc(u.condition||'GOOD')}</div></div>
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last inspection</div><div class="mt-1 text-xs font-bold text-white">${u.lastInspectionMs ? fmtDateTime(u.lastInspectionMs) : 'never'}</div></div>
-      <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last borrower</div><div class="mt-1 text-xs font-bold text-white">${esc(u.lastBorrowerName || '—')}</div></div>
+      <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last borrower</div><div class="mt-1 text-xs font-bold text-white">${esc(u.lastBorrowerId || '—')}</div></div>
     </div>
     ${u.notes ? `<div class="rounded-lg border border-amber-500/40 bg-amber-500/5 p-2.5 text-[11px] text-amber-200"><b>Notes:</b> ${esc(u.notes)}</div>` : ''}
     <div>
       <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Recent loans</div>
       ${loanHistory.length ? loanHistory.map(h => `<div class="rounded-lg border border-ink-700/60 bg-ink-950/40 px-3 py-2 mb-1">
-        <div class="text-[11px] text-slate-200 font-semibold">${esc(h.borrowerName)} <span class="mono text-slate-500">· ${esc(h.borrowerId)}</span></div>
+        <div class="text-[11px] text-slate-200 font-semibold"><span class="mono">${esc(h.borrowerId)}</span></div>
         <div class="text-[10px] text-slate-500">${esc(h.borrowTimeFormatted)} → ${h.status==='RETURNED' ? esc(h.returnTimeFormatted||'') : 'still on loan'}</div>
       </div>`).join('') : `<div class="text-[11px] text-slate-500">No history.</div>`}
     </div>
@@ -1783,10 +1853,6 @@ function openUnitDetail(unitId) {
     </div>
   `;
   openModal('mUnitDetail');
-  requestAnimationFrame(() => {
-    const el = document.getElementById(svgId);
-    if (el && window.JsBarcode) try { JsBarcode(el, u.serialNo, { format:'CODE128', width:2, height:50, displayValue:false, margin:0 }); } catch {}
-  });
 }
 
 async function recordInspectionFor(unitId) {
@@ -1851,10 +1917,9 @@ async function clearDefect(unitId) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT REGISTRATION (by admin)
+   STUDENT REGISTRATION / REMOVAL (by admin)
    ═══════════════════════════════════════════════════════════════════════ */
 let pendingRegPhoto = null;
-
 function openStudentRegModal() {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   $('regStudentNo').value = '';
@@ -1866,13 +1931,11 @@ function openStudentRegModal() {
   openModal('mStudentReg');
   setTimeout(() => $('regStudentNo').focus(), 120);
 }
-
 function clearRegPhoto() {
   pendingRegPhoto = null;
   const p = $('regStudentPhotoPreview');
   p.src = ''; p.classList.add('hidden');
 }
-
 function handleRegPhoto(ev) {
   const file = ev.target.files && ev.target.files[0];
   ev.target.value = '';
@@ -1900,7 +1963,6 @@ function handleRegPhoto(ev) {
   };
   reader.readAsDataURL(file);
 }
-
 async function saveNewStudent() {
   if (session.role !== 'admin') return;
   const reg = $('regStudentNo').value.trim().toUpperCase();
@@ -1909,20 +1971,15 @@ async function saveNewStudent() {
   const err = $('regStudentError');
   const showErr = m => { err.textContent = m; err.classList.remove('hidden'); };
   err.classList.add('hidden');
-
   if (!reg || reg.length < 3) { showErr('Register No must be at least 3 characters.'); return; }
   if (!/^[A-Z0-9-]+$/.test(reg)) { showErr('Register No may only contain A-Z, 0-9 and "-".'); return; }
   if (dob && !/^\d{8}$/.test(dob)) { showErr('DOB must be ddmmyyyy (8 digits) or leave blank.'); return; }
-
   const students = state.students || {};
-  if (students[reg] && !students[reg].autoRegistered) {
-    showErr(`Student "${reg}" already exists.`);
-    return;
-  }
+  if (students[reg] && !students[reg].autoRegistered) { showErr(`Student "${reg}" already exists.`); return; }
   const hash = dob ? await hashPassword(dob) : '';
   students[reg] = {
     register: reg,
-    name: name || ('Student ' + reg),
+    name: name || reg,
     passwordHash: hash,
     dob: dob || '',
     idPhoto: pendingRegPhoto || '',
@@ -1937,35 +1994,25 @@ async function saveNewStudent() {
   renderDashboard();
   toast(`Student "${reg}" registered.`, 'success', 4000);
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   STUDENT REMOVAL
-   ═══════════════════════════════════════════════════════════════════════ */
 async function deleteStudent(reg) {
   if (session.role !== 'admin') { toast('Teacher access required.', 'warn'); return; }
   const key = String(reg || '').trim().toUpperCase();
   const s = (state.students || {})[key];
   if (!s) { toast('Student not found.', 'error'); return; }
-
   const activeLoans = state.loans.filter(l => idKey(l.borrowerId) === idKey(key));
-  const warn = activeLoans.length
-    ? `\n\nWarning: this student still has ${activeLoans.length} active loan(s).`
-    : '';
-
+  const warn = activeLoans.length ? `\n\nWarning: this student still has ${activeLoans.length} active loan(s).` : '';
   const ok = await confirmDialog(
     'Remove student',
-    `Remove "${key}" (${s.name || key}) from the registered students list? They will need to register again to log in.${warn}`,
+    `Remove "${key}" from the registered students list? They will need to register again to log in.${warn}`,
     'Remove', true, 'fa-user-minus'
   );
   if (!ok) return;
-
   delete state.students[key];
   logActivity('student-remove', `${key} removed by ${session.register}`);
   saveAndPublish('students', 'activity');
   renderStudentsList(); renderDashboard();
   toast(`Student "${key}" removed.`, 'success');
 }
-
 async function deleteAllStudents() {
   if (session.role !== 'admin') return;
   if (!isSuperAdmin()) { toast('Only the head teacher can do this.', 'warn'); return; }
@@ -1978,7 +2025,6 @@ async function deleteAllStudents() {
   renderStudentsList(); renderDashboard();
   toast('All students removed.', 'success');
 }
-
 function renderStudentsList() {
   const students = Object.values(state.students || {}).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
   const badge = $('studentCountBadge'); if (badge) badge.textContent = students.length;
@@ -1995,7 +2041,7 @@ function renderStudentsList() {
         ${s.idPhoto ? `<img src="${s.idPhoto}" class="h-10 w-10 rounded object-cover border border-ink-700" alt="ID" />` : `<div class="grid h-10 w-10 place-items-center rounded bg-ink-800 text-slate-500"><i class="fa-solid fa-id-card"></i></div>`}
         <div class="min-w-0">
           <div class="mono text-xs font-bold text-slate-200">${reg}</div>
-          <div class="text-[10px] text-slate-500">${esc(s.name || s.register)} · joined ${relTime(s.createdAt||Date.now())}</div>
+          <div class="text-[10px] text-slate-500">joined ${relTime(s.createdAt||Date.now())}</div>
         </div>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
@@ -2120,7 +2166,7 @@ function idKey(s) { return String(s || '').trim().toUpperCase(); }
 function isMyLoan(l) {
   if (session.role !== 'user' || !session.register) return false;
   const myKey = idKey(session.register);
-  return idKey(l.borrowerId) === myKey || idKey(l.borrowerName) === myKey;
+  return idKey(l.borrowerId) === myKey;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2157,21 +2203,11 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CAPTCHA (kept for compatibility — not used by student login anymore)
+   CAPTCHA (no longer used by student login; kept for compatibility)
    ═══════════════════════════════════════════════════════════════════════ */
 function generateCaptcha() {
   const canvas = $('captchaCanvas'); if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  captchaCode = '';
-  for (let i = 0; i < 5; i++) captchaCode += chars[Math.floor(Math.random()*chars.length)];
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, '#f1f5f9'); grad.addColorStop(1, '#e2e8f0');
-  ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < 5; i++) { ctx.strokeStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`; ctx.beginPath(); ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height); ctx.stroke(); }
-  for (let i = 0; i < 40; i++) { ctx.fillStyle = `rgba(${Math.random()*150+50}, ${Math.random()*150+50}, ${Math.random()*150+50}, 0.5)`; ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1.5, 1.5); }
-  for (let i = 0; i < captchaCode.length; i++) { ctx.save(); ctx.translate(16 + i * 26, 32); ctx.rotate((Math.random() - 0.5) * 0.6); ctx.font = `bold ${22 + Math.random()*4}px Georgia, serif`; ctx.fillStyle = `rgb(${Math.random()*40+20}, ${Math.random()*40+20}, ${Math.random()*40+60})`; ctx.fillText(captchaCode[i], 0, 0); ctx.restore(); }
+  captchaCode = 'AAAAA';
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2227,7 +2263,7 @@ async function completeSetup() {
     saveLocal(); publishKey('adminConfig'); publishKey('labs'); publishKey('units');
     $('setupScreen').classList.add('hidden'); $('setupScreen').classList.remove('flex');
     $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-    generateCaptcha(); switchLoginTab('admin');
+    switchLoginTab('admin');
     $('adminUserInput').value = teacherNo;
     setTimeout(() => $('adminPassInput').focus(), 200);
     toast(`Head teacher "${teacherNo}" created.`, 'success', 5000);
@@ -2280,11 +2316,9 @@ function cancelLabPick() {
   pendingSession = null;
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  const pwEl = $('loginPassword'); if (pwEl) pwEl.value = '';
-  const cpEl = $('loginCaptchaInput'); if (cpEl) cpEl.value = '';
   const inp = $('loginRegister');
   if (inp && !inp.value) { const saved = getSavedRegisters(); if (saved.length) inp.value = saved[0]; }
-  clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
+  clearLoginMessages(); switchLoginTab('student');
 }
 function switchLab() {
   if (session.role !== 'user') { toast('Only students switch labs.', 'info'); return; }
@@ -2292,39 +2326,28 @@ function switchLab() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT LOGIN — no password, no captcha.
-   Scan barcode → straight to lab picker → catalog.
+   STUDENT LOGIN — scan → catalog
    ═══════════════════════════════════════════════════════════════════════ */
 async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
   const btn = $('loginSubmitBtn'); const btnTxt = $('loginSubmitText');
   clearLoginMessages();
-
   if (!reg || reg.length < 3) { showLoginError('Please scan or enter your Register No.'); return; }
   if (!/^[A-Z0-9-]+$/.test(reg)) { showLoginError('Register No may only contain A-Z, 0-9 and "-".'); return; }
-
   btn.disabled = true; btnTxt.textContent = 'Opening catalog…';
   try {
     const students = state.students || {};
     let existing = students[reg];
-
-    // First-time scan → auto-register so the student can go straight in.
     if (!existing) {
-      existing = {
-        register: reg,
-        name: reg,
-        createdAt: Date.now(),
-        autoRegistered: true
-      };
+      existing = { register: reg, name: reg, createdAt: Date.now(), autoRegistered: true };
       students[reg] = existing;
       state.students = students;
       publishKey('students');
       logActivity('student-register', `${reg} auto-registered via barcode scan`);
       publishKey('activity');
     }
-
     saveRegister(reg);
-    showLabPicker('user', reg, existing.name || reg);
+    showLabPicker('user', reg, reg);
   } catch (e) {
     console.error(e);
     showLoginError('Login error.');
@@ -2363,7 +2386,7 @@ async function attemptAdminLogin() {
    ENTER APP
    ═══════════════════════════════════════════════════════════════════════ */
 function enterApp(role, register, name, activeLabId) {
-  session = { role, register, name, activeLabId: activeLabId || null };
+  session = { role, register, name: register, activeLabId: activeLabId || null };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
   if (role === 'user') { saveRegister(register); }
   $('loginScreen').classList.add('hidden'); $('loginScreen').classList.remove('flex');
@@ -2422,12 +2445,10 @@ function logout() {
   $('app').classList.add('hidden');
   $('labPickerScreen').classList.add('hidden'); $('labPickerScreen').classList.remove('flex');
   $('loginScreen').classList.remove('hidden'); $('loginScreen').classList.add('flex');
-  const pwEl = $('loginPassword'); if (pwEl) pwEl.value = '';
-  const cpEl = $('loginCaptchaInput'); if (cpEl) cpEl.value = '';
   $('adminUserInput').value = ''; $('adminPassInput').value = '';
   const saved = getSavedRegisters();
   $('loginRegister').value = saved.length ? saved[0] : '';
-  clearLoginMessages(); generateCaptcha(); switchLoginTab('student');
+  clearLoginMessages(); switchLoginTab('student');
 }
 
 function toggleUserMenu() { $('userMenu').classList.toggle('hidden'); }
@@ -2467,7 +2488,6 @@ async function saveNewPassword() {
   }
   setTimeout(() => closeModal('mChangePassword'), 1200);
 }
-function showForgotHelp() { showLoginInfo('Students: just scan your ID card — no password needed. Teachers: ask the head teacher to reset.'); }
 
 /* ═══════════════════════════════════════════════════════════════════════
    NAV
@@ -2708,7 +2728,6 @@ function renderOverview() {
   const defective = units.filter(u => u.status === 'DEFECTIVE').length;
   const inspectDue = units.filter(u => isInspectionDue(u)).length;
   const overdue = loans.filter(l => isOverdue(l, t)).length;
-
   $('heroAvailable').textContent = avail;
   $('heroOnLoan').textContent = onLoan;
   $('heroDefective').textContent = defective;
@@ -2809,28 +2828,24 @@ function changeQty(id, delta) {
   else { toast(`Only ${availableQty(id)} available.`, 'warn', 2500); return; }
   renderCatalog(); renderCart(); updateBadges();
 }
-function quickAdd() {
-  const input = $('skuInput');
-  const q = input.value.trim().toUpperCase(); if (!q) return;
-  const pool = state.inventory.filter(i => catalogLabFilter === 'ALL' || i.labId === catalogLabFilter);
-  const item = pool.find(i => i.id.toUpperCase() === q) || pool.find(i => i.name.toUpperCase().includes(q));
-  if (!item) { toast(`No component for "${q}"`, 'error'); return; }
-  if (selectableQty(item.id) <= 0) { toast(`${item.name} fully reserved.`, 'warn'); return; }
-  changeQty(item.id, 1);
-  toast(`Added ${item.name}.`, 'success', 2000);
-  input.value = ''; input.focus();
-}
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CART (with unit assignment)
+   CART
    ═══════════════════════════════════════════════════════════════════════ */
 function openCart() {
-  $('borrowerName').value = state.borrower.name || (session.name || '');
-  const idField = $('borrowerId');
   const isStudent = session.role === 'user';
-  idField.value = isStudent ? (session.register || '') : (state.borrower.id || (session.register || ''));
-  idField.readOnly = isStudent;
-  idField.classList.toggle('opacity-60', isStudent);
+  const nameRow = $('borrowerNameRow');
+  const nameField = $('borrowerName');
+  const idField = $('borrowerId');
+  if (isStudent) {
+    if (nameRow) nameRow.style.display = 'none';
+    if (nameField) nameField.value = session.register || '';
+    if (idField) { idField.value = session.register || ''; idField.readOnly = true; idField.classList.add('opacity-60'); }
+  } else {
+    if (nameRow) nameRow.style.display = '';
+    if (nameField) nameField.value = state.borrower.name || (session.name || '');
+    if (idField) { idField.value = state.borrower.id || (session.register || ''); idField.readOnly = false; idField.classList.remove('opacity-60'); }
+  }
   $('cartDrawer').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   renderCart();
@@ -2876,13 +2891,14 @@ function addUnitToCart(unitBarcode) {
 }
 
 function checkoutCart() {
-  const name = $('borrowerName').value.trim();
-  let idRef = $('borrowerId').value.trim();
-  if (session.role === 'user' && session.register) idRef = session.register;
+  const isStudent = session.role === 'user';
+  const name = isStudent ? (session.register || '') : $('borrowerName').value.trim();
+  let idRef = isStudent ? (session.register || '') : $('borrowerId').value.trim();
+  if (!name && idRef) { /* fallback */ }
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
-  if (!name) { toast('Borrower name required.', 'warn'); return; }
   if (!idRef) { toast('Register No required.', 'warn'); return; }
+  const borrowName = name || idRef;
   for (const [itemId, qty] of entries) {
     const item = findItem(itemId);
     if (!item) { toast('Component no longer exists.', 'error'); return; }
@@ -2899,19 +2915,20 @@ function checkoutCart() {
         itemId, itemName: item.name, category: item.category, labId: item.labId,
         unitId: u.unitId, serialNo: u.serialNo,
         quantity: 1,
-        borrowerName: name, borrowerId: idRef,
+        borrowerName: borrowName, borrowerId: idRef,
         borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t),
         dueTimeMs: due, dueTimeFormatted: fmtDateTime(due),
         status: 'ACTIVE'
       };
       state.loans.unshift(record);
       state.history.unshift({ ...record });
-      setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: name });
+      setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
     });
   });
   state.cart = {};
-  state.borrower = { name, id: idRef };
-  logActivity('checkout', `${name} borrowed ${unitCount} unit${unitCount===1?'':'s'}`);
+  fastScanSeen = new Set();
+  state.borrower = { name: borrowName, id: idRef };
+  logActivity('checkout', `${idRef} borrowed ${unitCount} unit${unitCount===1?'':'s'}`);
   saveAndPublish('loans', 'history', 'activity', 'units');
   renderAll(); closeCart();
   toast(`Checkout complete — due in ${fmtDurShort(loanMs())}.`, 'success', 4000);
@@ -2919,7 +2936,7 @@ function checkoutCart() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LOANS VIEW
+   LOANS VIEW (only register ID shown — no names)
    ═══════════════════════════════════════════════════════════════════════ */
 function visibleLoans() {
   if (session.role === 'admin') {
@@ -2932,10 +2949,8 @@ function renderLoans() {
   const box = $('loanList'); if (!box) return;
   const t = now();
   const isAdminUser = session.role === 'admin';
-
   $('loansHeading').textContent = isAdminUser ? 'Borrowed Items (your labs)' : 'My Borrowed Items';
   $('loansSubheading').textContent = isAdminUser ? 'Each row is a specific unit barcode.' : `All loans for register ${session.register || '—'}`;
-
   const loans = visibleLoans().slice().sort((a,b) => a.dueTimeMs - b.dueTimeMs);
   if (!loans.length) {
     box.innerHTML = `<div class="col-span-full rounded-2xl border border-ink-700/60 bg-ink-850/40 py-16 text-center"><i class="fa-solid fa-inbox mb-4 text-3xl text-ink-600"></i><p class="text-sm text-slate-400">No active loans.</p></div>`;
@@ -2966,7 +2981,7 @@ function renderLoans() {
           <div class="mt-1.5">${labChip(loan.labId)}</div>
           <h3 class="mt-1.5 text-sm font-bold text-white line-clamp-2">${esc(loan.itemName)}</h3>
           ${loan.serialNo ? `<div class="mono mt-1 text-[11px] text-brand-300"><i class="fa-solid fa-barcode mr-1"></i>${esc(loan.serialNo)}</div>` : ''}
-          <p class="mt-1 text-[11px] text-slate-500 line-clamp-1">${esc(loan.borrowerName)} · <span class="mono">${esc(loan.borrowerId)}</span></p>
+          <p class="mono mt-1 text-[11px] text-slate-500">${esc(loan.borrowerId)}</p>
         </div>
         <span class="shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${pCls}">${pTxt}</span>
       </div>
@@ -3001,7 +3016,7 @@ function openReturnVerify(loanId) {
     </div>
     <div><b class="text-white">${esc(loan.itemName)}</b></div>
     <div class="mt-1">Unit barcode: <span class="mono text-brand-300">${esc(loan.serialNo || u?.serialNo || '—')}</span></div>
-    <div class="mt-1">Borrower: <b class="text-slate-200">${esc(loan.borrowerName)}</b> (<span class="mono">${esc(loan.borrowerId)}</span>)</div>
+    <div class="mt-1">Register No: <b class="mono text-slate-200">${esc(loan.borrowerId)}</b></div>
     <div class="mt-1">Borrowed: ${esc(loan.borrowTimeFormatted)} · Due ${esc(loan.dueTimeFormatted)}</div>
   `;
   $('returnCondition').value = 'GOOD';
@@ -3014,19 +3029,15 @@ async function confirmReturnVerify() {
   const loan = state.loans.find(l => l.loanId === pendingReturnLoanId);
   if (!loan) { closeModal('mReturnVerify'); return; }
   if (!canManageLab(loan.labId)) { toast('You do not manage that lab.', 'error'); return; }
-
   const condition = $('returnCondition').value;
   const notes = $('returnNotes').value.trim();
   const sendToMaintenance = $('returnNeedsInspection').checked;
-
   pendingReturnLoanId = null;
   closeModal('mReturnVerify');
   await new Promise(r => setTimeout(r, 80));
-
   const t = now();
   const idx = state.loans.findIndex(l => l.loanId === loan.loanId);
   if (idx === -1) return;
-
   if (loan.unitId) {
     const u = findUnit(loan.unitId);
     if (u) {
@@ -3034,7 +3045,7 @@ async function confirmReturnVerify() {
       u.notes = notes;
       u.currentLoanId = null;
       u.lastBorrowerId = loan.borrowerId;
-      u.lastBorrowerName = loan.borrowerName;
+      u.lastBorrowerName = loan.borrowerId;
       if (condition === 'DAMAGED' || sendToMaintenance) {
         u.status = 'DEFECTIVE';
         if (condition === 'DAMAGED') {
@@ -3046,7 +3057,7 @@ async function confirmReturnVerify() {
             notes: notes || 'Returned damaged',
             severity: 'HIGH',
             reportedByUser: loan.borrowerId,
-            reportedByUserName: loan.borrowerName
+            reportedByUserName: loan.borrowerId
           });
         }
       } else {
@@ -3054,7 +3065,6 @@ async function confirmReturnVerify() {
       }
     }
   }
-
   const h = state.history.find(x => x.loanId === loan.loanId);
   if (h) {
     h.status = 'RETURNED';
@@ -3067,8 +3077,7 @@ async function confirmReturnVerify() {
     h.notes = notes;
   }
   state.loans.splice(idx, 1);
-
-  logActivity('return', `${loan.borrowerName} returned ${loan.itemName} (${loan.serialNo || ''}) — ${condition}`);
+  logActivity('return', `${loan.borrowerId} returned ${loan.itemName} (${loan.serialNo || ''}) — ${condition}`);
   saveAndPublish('loans', 'history', 'activity', 'units', 'defects');
   renderAll(); checkOverdueForCurrentUser(false);
   toast(`Return recorded — condition: ${condition}${sendToMaintenance ? ' (sent to maintenance)' : ''}`, condition === 'DAMAGED' ? 'warn' : 'success', 4000);
@@ -3112,7 +3121,6 @@ function renderDashboard() {
   $('setInspectDays').value = state.settings.inspectDays || DEFAULT_INSPECT_DAYS;
   renderTeachersList(); renderStudentsList(); renderDefectLog(scopedUnits);
   renderLogos();
-
   const inspectDue = scopedUnits.filter(u => isInspectionDue(u)).length;
   const banner = $('inspectionDueBanner');
   if (banner) {
@@ -3135,7 +3143,7 @@ function renderLedger(loans, t) {
     return `<tr class="${overdue?'bg-rose-950/20':''} hover:bg-ink-800/40 transition">
       <td class="mono whitespace-nowrap px-3 py-3 text-[11px] font-semibold text-brand-400">${esc(loan.loanId)}</td>
       <td class="px-3 py-3 whitespace-nowrap">${labChip(loan.labId)}</td>
-      <td class="px-3 py-3 font-semibold text-white">${esc(loan.borrowerName)}</td>
+      <td class="mono px-3 py-3 text-slate-200">${esc(loan.borrowerId)}</td>
       <td class="mono px-3 py-3 text-[11px] text-slate-500">${esc(loan.borrowerId)}</td>
       <td class="px-3 py-3"><div class="text-slate-200">${esc(loan.itemName)}</div><div class="mono text-[10px] text-slate-600">${esc(loan.itemId)}</div></td>
       <td class="mono px-3 py-3 text-[11px] text-brand-300">${esc(loan.serialNo || '—')}</td>
@@ -3187,7 +3195,7 @@ function renderDefectLog(units) {
       <div class="mt-1 text-[11px] text-slate-400">${esc(d.notes || '')}</div>
       <div class="mt-0.5 text-[10px] text-slate-500">
         Reported by ${esc(d.reportedBy || '—')} · ${fmtDateTime(d.reportedAt)}
-        ${d.reportedByUserName ? `· Unit was last with <b class="text-rose-300">${esc(d.reportedByUserName)}</b> (${esc(d.reportedByUser||'')})` : ''}
+        ${d.reportedByUserName ? `· Last with <b class="text-rose-300">${esc(d.reportedByUser||'')}</b>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -3224,15 +3232,6 @@ function saveSettings() {
   state.settings.inspectDays = Math.max(7, parseInt($('setInspectDays').value, 10) || DEFAULT_INSPECT_DAYS);
   publishKey('settings'); renderAll();
   toast('Settings saved.', 'success');
-}
-async function resetStudentPassword(reg) {
-  if (session.role !== 'admin') return;
-  const s = (state.students || {})[reg]; if (!s) return;
-  const ok = await confirmDialog('Reset password', `Reset ${reg}'s password? They will need to log in with their DOB again.`, 'Reset');
-  if (!ok) return;
-  delete state.students[reg];
-  publishKey('students'); renderDashboard();
-  toast(`Password reset for ${reg}.`, 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3425,7 +3424,7 @@ function exportExcel() {
   const units = state.units.filter(u => mine.includes((findItem(u.skuId)||{}).labId));
   if (!hist.length && !inv.length) { toast('Nothing to export.', 'warn'); return; }
   const loanRows = hist.map(h => ({
-    'Lab': labName(h.labId), 'Transaction ID': h.loanId, 'Borrower Name': h.borrowerName, 'Register': h.borrowerId,
+    'Lab': labName(h.labId), 'Transaction ID': h.loanId, 'Register': h.borrowerId,
     'Component SKU': h.itemId, 'Component Name': h.itemName, 'Unit Barcode': h.serialNo || '',
     'Borrowed At': h.borrowTimeFormatted, 'Due At': h.dueTimeFormatted,
     'Returned At': h.status === 'ACTIVE' ? 'STILL BORROWED' : (h.returnTimeFormatted || ''),
@@ -3449,12 +3448,12 @@ function exportExcel() {
       'Lab': labName(it.labId||''), 'SKU': u.skuId, 'Component': it.name||u.skuId,
       'Unit Barcode': u.serialNo, 'Status': u.status, 'Condition': u.condition || 'GOOD',
       'Last Inspection': u.lastInspectionMs ? fmtDateTime(u.lastInspectionMs) : 'never',
-      'Last Borrower': u.lastBorrowerName || '', 'Last Borrower ID': u.lastBorrowerId || '',
+      'Last Borrower ID': u.lastBorrowerId || '',
       'Notes': u.notes || ''
     };
   });
   const studentRows = Object.values(state.students || {}).map(s => ({
-    'Register No': s.register, 'Name': s.name || '', 'Registered At': s.createdAt ? fmtDateTime(s.createdAt) : '',
+    'Register No': s.register, 'Registered At': s.createdAt ? fmtDateTime(s.createdAt) : '',
     'Registered By': s.registeredBy || ''
   }));
   const wb = XLSX.utils.book_new();
@@ -3530,7 +3529,6 @@ function tick() {
 document.addEventListener('DOMContentLoaded', () => {
   loadLocal(); loadTheme();
   deployUrl = localStorage.getItem('bajaj.deployUrl') || '';
-  generateCaptcha();
   renderLogos();
   renderSavedRegisters();
   const savedRegs = getSavedRegisters();
@@ -3546,7 +3544,7 @@ document.addEventListener('DOMContentLoaded', () => {
           catalogLabFilter = saved.activeLabId;
           applyRoleUI();
         } else if (state.labs.length) {
-          setTimeout(() => showLabPicker('user', saved.register, saved.name || saved.register), 100);
+          setTimeout(() => showLabPicker('user', saved.register, saved.register), 100);
         }
       } else {
         session = saved;
@@ -3569,7 +3567,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ═══════════════════════════════════════════════════════════════════════
    EXPORTS
    ═══════════════════════════════════════════════════════════════════════ */
-window.go = go; window.changeQty = changeQty; window.quickAdd = quickAdd;
+window.go = go; window.changeQty = changeQty;
 window.openCart = openCart; window.closeCart = closeCart; window.checkoutCart = checkoutCart;
 window.openReturnVerify = openReturnVerify; window.confirmReturnVerify = confirmReturnVerify;
 window.renderCatalog = renderCatalog; window.setCatalogLab = setCatalogLab;
@@ -3580,13 +3578,11 @@ window.clearHistory = clearHistory;
 window.switchLoginTab = switchLoginTab;
 window.attemptStudentLogin = attemptStudentLogin;
 window.attemptAdminLogin = attemptAdminLogin;
-window.resetStudentPassword = resetStudentPassword;
 window.completeSetup = completeSetup;
 window.logout = logout;
 window.toggleUserMenu = toggleUserMenu;
 window.openChangePassword = openChangePassword;
 window.saveNewPassword = saveNewPassword;
-window.showForgotHelp = showForgotHelp;
 window.forceSync = forceSync;
 window.copyJoinUrl = copyJoinUrl;
 window.exportExcel = exportExcel;
@@ -3598,12 +3594,11 @@ window.removeTeacher = removeTeacher;
 window.pickLab = pickLab; window.cancelLabPick = cancelLabPick; window.switchLab = switchLab;
 window.handleLogoUpload = handleLogoUpload; window.resetLogo = resetLogo;
 window.useSavedRegister = useSavedRegister; window.removeSavedRegister = removeSavedRegister;
-/* SCANNER */
 window.openScanner = openScanner;
+window.openCatalogFastScan = openCatalogFastScan;
 window.closeScanner = closeScanner;
 window.scannerManualSubmit = scannerManualSubmit;
 window.handleScannedCode = handleScannedCode;
-/* STUDENTS */
 window.openStudentRegModal = openStudentRegModal;
 window.saveNewStudent = saveNewStudent;
 window.handleRegPhoto = handleRegPhoto;
@@ -3611,7 +3606,6 @@ window.clearRegPhoto = clearRegPhoto;
 window.deleteStudent = deleteStudent;
 window.deleteAllStudents = deleteAllStudents;
 window.renderStudentsList = renderStudentsList;
-/* UNITS */
 window.openUnitLabelPrint = openUnitLabelPrint;
 window.openUnitLabelPrintAll = openUnitLabelPrintAll;
 window.printAllLabelsForVisible = printAllLabelsForVisible;
