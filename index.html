@@ -117,12 +117,29 @@
   .scan-frame::before { content:''; position:absolute; left:5%; right:5%; top:50%; height:2px; transform:translateY(-50%); background: linear-gradient(90deg, transparent, rgba(34,211,238,.9), transparent); pointer-events:none; z-index:5; animation: scanLine 2s ease-in-out infinite; }
   @keyframes scanLine { 0%,100% { opacity:.25; } 50% { opacity:1; } }
 
-  .unit-label { width: 260px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #0f172a; text-align: center; font-family: Inter, sans-serif; page-break-inside: avoid; }
-  .unit-label .unit-title { font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em; }
-  .unit-label .unit-sku { font-size: 9px; color: #475569; margin-bottom: 4px; }
-  .unit-label svg, .unit-label img.unit-bc-img { display: block; margin: 0 auto; max-width: 100%; }
-  .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; margin-top: 3px; letter-spacing: .06em; }
-  .unit-label .unit-lab { font-size: 8px; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: .08em; }
+  /* Unit label — dimensions set dynamically via JS (cm / mm) */
+  .unit-label {
+    padding: 2mm;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    background: #fff;
+    color: #0f172a;
+    text-align: center;
+    font-family: Inter, Arial, sans-serif;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1mm;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .unit-label .unit-title { font-size: 8pt; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; }
+  .unit-label .unit-sku { font-size: 6pt; color: #475569; line-height: 1; }
+  .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
+  .unit-label .unit-serial { font-family: 'JetBrains Mono', monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .unit-label .unit-lab { font-size: 5pt; color: #64748b; text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
 
   .status-pill { display:inline-flex; align-items:center; gap:.3rem; border-radius:999px; padding:.15rem .55rem; font-size:9px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
   .sp-available { background:#dcfce7; color:#166534; border:1px solid #86efac; }
@@ -712,6 +729,9 @@
       <h3 class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-users text-xs text-rose-400"></i> Manage Teachers <span id="teacherCountBadge" class="rounded-full border border-rose-500/30 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300">0</span></h3>
       <button onclick="openAddTeacherModal()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 px-4 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-user-plus text-[11px]"></i> Add Teacher</button>
     </div>
+    <div class="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-[11px] text-amber-200 mb-3">
+      <i class="fa-solid fa-crown mr-1"></i> As head teacher, you can <b>promote</b> any teacher to head teacher or <b>demote</b> an existing head teacher back to a regular teacher.
+    </div>
     <div id="teachersList" class="space-y-2"></div>
   </div>
 
@@ -1022,7 +1042,7 @@
 </div>
 
 <div id="mUnitLabels" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
-  <div class="scale-in w-full max-w-4xl space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[92vh] overflow-y-auto">
+  <div class="scale-in w-full max-w-5xl space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[92vh] overflow-y-auto">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h3 class="text-base font-bold text-white"><i class="fa-solid fa-barcode mr-2 text-brand-400"></i>Print Unit Barcode Labels</h3>
@@ -1033,7 +1053,38 @@
         <button onclick="closeModal('mUnitLabels')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
-    <div id="labelPrintArea" class="flex flex-wrap gap-3 rounded-xl border border-ink-700/60 bg-white p-3"></div>
+
+    <!-- SIZE CONTROLS -->
+    <div class="rounded-xl border border-brand-500/40 bg-gradient-to-br from-brand-500/10 to-ink-850/60 p-3.5">
+      <div class="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-200">
+        <i class="fa-solid fa-ruler-combined text-[10px]"></i> Exact label size
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <label class="block">
+          <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Label width (cm)</span>
+          <input id="labelWidthCm" type="number" min="2" max="30" step="0.1" value="5" oninput="updateLabelSize()" onchange="updateLabelSize()" class="focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-2.5 py-2 text-xs text-white" />
+        </label>
+        <label class="block">
+          <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Label height (cm)</span>
+          <input id="labelHeightCm" type="number" min="1" max="30" step="0.1" value="3" oninput="updateLabelSize()" onchange="updateLabelSize()" class="focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-2.5 py-2 text-xs text-white" />
+        </label>
+        <label class="block">
+          <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Barcode height (mm)</span>
+          <input id="labelBcHeightMm" type="number" min="5" max="40" step="1" value="15" oninput="updateLabelSize()" onchange="updateLabelSize()" class="focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-2.5 py-2 text-xs text-white" />
+        </label>
+        <div class="flex items-end">
+          <button type="button" onclick="resetLabelSize()" class="w-full rounded-lg border border-ink-600/70 bg-ink-800/60 py-2 text-[11px] font-semibold text-slate-300 hover:border-brand-500/60 transition">
+            <i class="fa-solid fa-rotate-left mr-1 text-[10px]"></i> Reset (5×3 cm)
+          </button>
+        </div>
+      </div>
+      <p class="mt-2 text-[10px] text-slate-400">
+        <i class="fa-solid fa-circle-info mr-1"></i>
+        These are <b>physical print dimensions</b>. When you print from Chrome, choose <b>Scale: 100 %</b> (or "Actual size") and disable "Fit to page" for exact cm measurements.
+      </p>
+    </div>
+
+    <div id="labelPrintArea" class="flex flex-wrap gap-3 rounded-xl border border-ink-700/60 bg-white p-3 min-h-[120px]"></div>
   </div>
 </div>
 
@@ -1111,7 +1162,10 @@ const DEFAULT_SETTINGS = {
   loanDurationMinutes: 120, lowStockThreshold: 3, inspectDays: DEFAULT_INSPECT_DAYS,
   posterTitle: 'BEST Component Lending Station',
   posterSubtitle: 'Bajaj Engineering Skills Training',
-  posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.'
+  posterInstructions: 'Scan this QR code with your phone to open the borrowing portal.',
+  labelWidthCm: 5,
+  labelHeightCm: 3,
+  labelBcHeightMm: 15
 };
 
 function defaultState() {
@@ -1584,7 +1638,7 @@ function isInspectionDue(u) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL RENDERING + PRINTING (iframe-based, isolated)
+   BARCODE LABEL RENDERING + PRINTING (iframe-based, isolated, cm-accurate)
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
@@ -1609,14 +1663,17 @@ function generateBarcodeDataURL(text, w = 1.6, h = 46) {
 function buildUnitLabelHtml(u) {
   const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
   const lab = labName(item.labId);
-  const bc = generateBarcodeDataURL(u.serialNo);
+  const bc = generateBarcodeDataURL(u.serialNo, 3, 60); // high-res source
   const bcHtml = bc
     ? `<img class="unit-bc-img" src="${bc}" alt="${esc(u.serialNo)}" />`
     : `<div style="height:50px;line-height:50px;color:#999;font-size:10px;">barcode unavailable</div>`;
-  return `<div class="unit-label" data-serial="${esc(u.serialNo)}">
+  const W = state.settings.labelWidthCm || 5;
+  const H = state.settings.labelHeightCm || 3;
+  const BCH = state.settings.labelBcHeightMm || 15;
+  return `<div class="unit-label" data-serial="${esc(u.serialNo)}" style="width:${W}cm;height:${H}cm;">
     <div class="unit-title">${esc(item.name)}</div>
     <div class="unit-sku">${esc(u.skuId)}</div>
-    ${bcHtml}
+    ${bcHtml.replace('<img class="unit-bc-img"', `<img class="unit-bc-img" style="width:100%;height:${BCH}mm;"`)}
     <div class="unit-serial">${esc(u.serialNo)}</div>
     <div class="unit-lab">${esc(lab)}</div>
   </div>`;
@@ -1654,19 +1711,53 @@ function renderUnitLabelsForSkus(skuIds) {
   skuIds.forEach(id => { ensureUnitsForSku(id); all.push(...unitsForSku(id)); });
   renderUnitLabelsForUnits(all);
 }
+
+function syncLabelSizeInputs() {
+  const w = $('labelWidthCm'); const h = $('labelHeightCm'); const b = $('labelBcHeightMm');
+  if (w) w.value = state.settings.labelWidthCm || 5;
+  if (h) h.value = state.settings.labelHeightCm || 3;
+  if (b) b.value = state.settings.labelBcHeightMm || 15;
+}
+
 function renderUnitLabelsForUnits(units) {
   const area = $('labelPrintArea');
   $('labelSubtitle').textContent = units.length + ' unit label(s) — unique barcode per physical board.';
   if (!window.JsBarcode) { setTimeout(() => renderUnitLabelsForUnits(units), 300); return; }
+  syncLabelSizeInputs();
   area.innerHTML = units.map(buildUnitLabelHtml).join('');
   openModal('mUnitLabels');
 }
 
+function updateLabelSize() {
+  const w = Math.max(2, Math.min(30, parseFloat($('labelWidthCm').value) || 5));
+  const h = Math.max(1, Math.min(30, parseFloat($('labelHeightCm').value) || 3));
+  const bch = Math.max(5, Math.min(40, parseFloat($('labelBcHeightMm').value) || 15));
+  state.settings.labelWidthCm = w;
+  state.settings.labelHeightCm = h;
+  state.settings.labelBcHeightMm = bch;
+  saveLocal(); publishKey('settings');
+  document.querySelectorAll('#labelPrintArea .unit-label').forEach(el => {
+    el.style.width = w + 'cm';
+    el.style.height = h + 'cm';
+  });
+  document.querySelectorAll('#labelPrintArea .unit-bc-img').forEach(el => {
+    el.style.width = '100%';
+    el.style.height = bch + 'mm';
+  });
+}
+
+function resetLabelSize() {
+  state.settings.labelWidthCm = 5;
+  state.settings.labelHeightCm = 3;
+  state.settings.labelBcHeightMm = 15;
+  syncLabelSizeInputs();
+  updateLabelSize();
+}
+
 /**
- * Print unit labels using a HIDDEN IFRAME.
+ * Print unit labels using a HIDDEN IFRAME, size-accurate in cm/mm.
  * The parent page contains `@media print { body * { visibility:hidden } }`
  * which would hide every label if we printed the main document directly.
- * An isolated iframe avoids that entirely.
  */
 function printUnitLabels() {
   const area = $('labelPrintArea');
@@ -1694,53 +1785,42 @@ function printUnitLabels() {
 <meta charset="utf-8">
 <title>Print Unit Labels</title>
 <style>
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body {
     margin: 0;
-    padding: 12px;
+    padding: 8mm;
     background: #ffffff;
     color: #0f172a;
     font-family: Inter, Arial, Helvetica, sans-serif;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
   .unit-label {
-    width: 260px;
-    padding: 10px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    padding: 2mm;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
     background: #ffffff;
     color: #0f172a;
     text-align: center;
-    margin: 6px;
-    display: inline-block;
-    vertical-align: top;
+    margin: 2mm;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1mm;
+    overflow: hidden;
     page-break-inside: avoid;
     break-inside: avoid;
+    vertical-align: top;
   }
-  .unit-label .unit-title {
-    font-size: 11px; font-weight: 800; color: #0f172a;
-    margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em;
-  }
-  .unit-label .unit-sku { font-size: 9px; color: #475569; margin-bottom: 4px; }
-  .unit-label .unit-bc-img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
-  .unit-label .unit-serial {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px; font-weight: 700;
-    margin-top: 3px; letter-spacing: .06em;
-  }
-  .unit-label .unit-lab {
-    font-size: 8px; color: #64748b; margin-top: 3px;
-    text-transform: uppercase; letter-spacing: .08em;
-  }
-  @page { margin: 10mm; }
+  .unit-label .unit-title { font-size: 8pt; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; }
+  .unit-label .unit-sku { font-size: 6pt; color: #475569; line-height: 1; }
+  .unit-label .unit-bc-img { display: block; margin: 0 auto; object-fit: fill; }
+  .unit-label .unit-serial { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .unit-label .unit-lab { font-size: 5pt; color: #64748b; text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
+
+  /* Exact size — 0 page margin so cm/mm dimensions are respected */
+  @page { margin: 0; size: auto; }
   @media print {
-    html, body { padding: 0; background: #ffffff !important; }
-    .unit-label {
-      page-break-inside: avoid;
-      break-inside: avoid;
-      background: #ffffff !important;
-    }
+    html, body { padding: 4mm; background: #ffffff !important; }
+    .unit-label { background: #ffffff !important; }
   }
 </style>
 </head>
@@ -1779,7 +1859,6 @@ function printUnitLabels() {
       im.addEventListener('error', maybeReady, { once: true });
     }
   }
-  // Safety net: never get stuck if some image never fires load/error.
   setTimeout(() => { if (!fired) { fired = true; doPrint(); } }, 3000);
 }
 
@@ -3250,19 +3329,24 @@ function renderTeachersList() {
   list.innerHTML = admins.map(a => {
     const isMe = a.username === session.register;
     const labIds = a.isSuper ? state.labs.map(l => l.id) : (a.labIds || []);
-    return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/25 bg-gradient-to-br from-ink-900/60 to-rose-950/10 p-3">
+    const canAct = !isMe && superAdmin;
+    return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border ${a.isSuper ? 'border-amber-500/40 bg-gradient-to-br from-amber-950/20 to-ink-900/60' : 'border-rose-500/25 bg-gradient-to-br from-ink-900/60 to-rose-950/10'} p-3">
       <div class="flex items-center gap-3 min-w-0">
-        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-rose-500 to-rose-700 text-xs font-bold text-white">${esc(a.username.slice(0,1))}</div>
+        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg ${a.isSuper ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-rose-500 to-rose-700'} text-xs font-bold text-white">${esc(a.username.slice(0,1))}</div>
         <div class="min-w-0">
           <div class="mono text-xs font-bold text-white flex items-center gap-2 flex-wrap">
             ${esc(a.username)}
-            ${a.isSuper ? '<span class="rounded-full border border-amber-500/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-300">Head</span>' : ''}
+            ${a.isSuper ? '<span class="rounded-full border border-amber-500/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-300"><i class="fa-solid fa-crown mr-1 text-[8px]"></i>Head</span>' : '<span class="rounded-full border border-rose-500/40 bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-rose-300">Teacher</span>'}
             ${isMe ? '<span class="rounded-full border border-emerald-500/40 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-300">You</span>' : ''}
           </div>
           <div class="mt-1 flex flex-wrap gap-1">${labIds.length ? labIds.map(id => labChip(id)).join('') : '<span class="text-[10px] text-slate-500">No lab</span>'}</div>
         </div>
       </div>
-      ${(!isMe && superAdmin) ? `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>` : ''}
+      <div class="flex shrink-0 items-center gap-1.5">
+        ${canAct && !a.isSuper ? `<button onclick="promoteTeacher('${esc(a.username)}')" class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20 transition" title="Promote to head teacher"><i class="fa-solid fa-crown mr-1 text-[10px]"></i>Make Head</button>` : ''}
+        ${canAct && a.isSuper ? `<button onclick="demoteTeacher('${esc(a.username)}')" class="rounded-lg border border-slate-500/40 bg-slate-500/10 px-2.5 py-1 text-[10px] font-bold text-slate-300 hover:bg-slate-500/20 transition" title="Demote to regular teacher"><i class="fa-solid fa-arrow-down mr-1 text-[10px]"></i>Demote</button>` : ''}
+        ${canAct ? `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[10px] font-semibold text-rose-300 hover:bg-rose-500/20 transition" title="Remove teacher"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -3408,6 +3492,62 @@ async function removeTeacher(username) {
   publishKey('adminConfig');
   renderTeachersList();
   toast(`Removed.`, 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TEACHER ROLE SWAP — promote / demote
+   ═══════════════════════════════════════════════════════════════════════ */
+async function promoteTeacher(username) {
+  if (!isSuperAdmin()) { toast('Only head teacher can promote.', 'warn'); return; }
+  const target = findAdminByUsername(username);
+  if (!target) { toast('Teacher not found.', 'error'); return; }
+  if (target.isSuper) { toast('Already a head teacher.', 'info'); return; }
+
+  const ok = await confirmDialog(
+    'Promote to Head Teacher',
+    `Give "${username}" full access to every lab and head-teacher powers (add/remove teachers, promote/demote, edit all labs)?`,
+    'Make Head Teacher', false, 'fa-crown'
+  );
+  if (!ok) return;
+
+  const admins = getAdmins();
+  const idx = admins.findIndex(a => a.username === username);
+  if (idx === -1) { toast('Teacher not found.', 'error'); return; }
+  admins[idx].isSuper = true;
+  admins[idx].labIds = [];
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  logActivity('teacher-promote', `${username} promoted to head teacher by ${session.register}`);
+  publishKey('activity');
+  renderTeachersList();
+  toast(`"${username}" is now a Head Teacher.`, 'success', 4000);
+}
+
+async function demoteTeacher(username) {
+  if (!isSuperAdmin()) { toast('Only head teacher can demote.', 'warn'); return; }
+  if (username === session.register) { toast('You cannot demote yourself.', 'warn'); return; }
+  const target = findAdminByUsername(username);
+  if (!target) { toast('Teacher not found.', 'error'); return; }
+  if (!target.isSuper) { toast('Already a regular teacher.', 'info'); return; }
+
+  const ok = await confirmDialog(
+    'Demote to Teacher',
+    `Remove head-teacher powers from "${username}"? They will keep access to all labs as a regular teacher, but lose the ability to manage other teachers.`,
+    'Demote to Teacher', true, 'fa-user-shield'
+  );
+  if (!ok) return;
+
+  const admins = getAdmins();
+  const idx = admins.findIndex(a => a.username === username);
+  if (idx === -1) { toast('Teacher not found.', 'error'); return; }
+  admins[idx].isSuper = false;
+  admins[idx].labIds = state.labs.map(l => l.id);
+  state.adminConfig = { ...(state.adminConfig || {}), admins };
+  publishKey('adminConfig');
+  logActivity('teacher-demote', `${username} demoted by ${session.register}`);
+  publishKey('activity');
+  renderTeachersList();
+  toast(`"${username}" is now a regular teacher.`, 'success', 4000);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3632,6 +3772,8 @@ window.toggleTheme = toggleTheme;
 window.openAddTeacherModal = openAddTeacherModal;
 window.saveNewTeacher = saveNewTeacher;
 window.removeTeacher = removeTeacher;
+window.promoteTeacher = promoteTeacher;
+window.demoteTeacher = demoteTeacher;
 window.pickLab = pickLab; window.cancelLabPick = cancelLabPick; window.switchLab = switchLab;
 window.handleLogoUpload = handleLogoUpload; window.resetLogo = resetLogo;
 window.useSavedRegister = useSavedRegister; window.removeSavedRegister = removeSavedRegister;
@@ -3658,6 +3800,8 @@ window.clearDefect = clearDefect;
 window.renderUnitsView = renderUnitsView;
 window.renderDashboard = renderDashboard;
 window.addUnitToCart = addUnitToCart;
+window.updateLabelSize = updateLabelSize;
+window.resetLabelSize = resetLabelSize;
 </script>
 </body>
 </html>
