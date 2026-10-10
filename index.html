@@ -110,7 +110,6 @@
   .saved-reg-chip { display:inline-flex; align-items:center; gap:.35rem; border-radius:999px; border:1px solid #d6dfec; background:#f8fafd; padding:.15rem .5rem; font-size:10px; font-weight:700; color:#3d4f6b; cursor:pointer; }
   .saved-reg-chip:hover { border-color:#3b62f6; color:#1d33d8; background:#eef4ff; }
 
-  /* Barcode scanner */
   #scannerReader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 240px; }
   #scannerReader video { width: 100% !important; height: auto !important; display:block !important; }
   .scan-frame { position: relative; }
@@ -118,7 +117,6 @@
   .scan-frame::before { content:''; position:absolute; left:5%; right:5%; top:50%; height:2px; transform:translateY(-50%); background: linear-gradient(90deg, transparent, rgba(34,211,238,.9), transparent); pointer-events:none; z-index:5; animation: scanLine 2s ease-in-out infinite; }
   @keyframes scanLine { 0%,100% { opacity:.25; } 50% { opacity:1; } }
 
-  /* Unit label for printing */
   .unit-label { width: 260px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #0f172a; text-align: center; font-family: Inter, sans-serif; page-break-inside: avoid; }
   .unit-label .unit-title { font-size: 11px; font-weight: 800; color: #0f172a; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em; }
   .unit-label .unit-sku { font-size: 9px; color: #475569; margin-bottom: 4px; }
@@ -203,12 +201,10 @@
         <h1 class="text-[11px] sm:text-sm font-extrabold uppercase tracking-[.15em] sm:tracking-[.2em] text-white px-3">Teacher Login</h1>
       </div>
 
-      <!-- STUDENT FORM: scan-only, no password, no captcha -->
       <div id="studentForm" class="p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="rounded-lg border border-bajaj-200 bg-bajaj-50/70 p-3 text-center text-[11px] font-medium text-bajaj-800">
           <i class="fa-solid fa-id-card mr-1"></i> Students: no password needed — just scan your ID card barcode.
         </div>
-
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Register No</label>
           <div class="w-full sm:flex-1">
@@ -227,19 +223,16 @@
             <div id="savedRegistersRow" class="mt-2 flex flex-wrap gap-1.5"></div>
           </div>
         </div>
-
         <button id="loginSubmitBtn" onclick="attemptStudentLogin()"
           class="focus-ring flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-bajaj-500 to-bajaj-700 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-bajaj-500/30 transition hover:from-bajaj-600 hover:to-bajaj-800 disabled:opacity-60">
           <i class="fa-solid fa-right-to-bracket text-xs"></i><span id="loginSubmitText">Enter Catalog</span>
         </button>
-
         <div class="border-t border-slate-200 pt-4 text-center text-[11px] leading-relaxed text-slate-500">
           <p><i class="fa-solid fa-barcode mr-1"></i> Scan the barcode on your ID card — you'll go straight to the lab catalog.</p>
           <p class="mt-1">No password. No captcha. Just scan and borrow.</p>
         </div>
       </div>
 
-      <!-- TEACHER FORM: keeps password -->
       <div id="adminForm" class="hidden p-5 sm:p-7 space-y-4 sm:space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           <label class="text-sm font-semibold text-slate-700 sm:w-32 shrink-0">Teacher No</label>
@@ -467,7 +460,6 @@
           <h1 class="text-base sm:text-lg font-bold text-white">Component Catalog</h1>
           <p class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Loan period <span id="loanPeriodLabel" class="font-semibold text-brand-300">2 hours</span> · <span id="catalogResultCount">0 items</span></p>
         </div>
-        <!-- FAST BARCODE SCAN BUTTON -->
         <button onclick="openCatalogFastScan()" class="focus-ring flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-600/30 hover:from-emerald-600 hover:to-emerald-800 transition">
           <i class="fa-solid fa-barcode text-sm"></i> Scan component barcode
         </button>
@@ -579,7 +571,6 @@
     </div>
   </div>
 
-  <!-- Student registration quick card -->
   <div class="rounded-2xl border border-bajaj-500/40 bg-gradient-to-br from-bajaj-500/5 to-ink-850/50 p-4 sm:p-5">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -622,7 +613,6 @@
     </div>
   </div>
 
-  <!-- Live borrowed -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
       <div>
@@ -648,7 +638,6 @@
     </div>
   </div>
 
-  <!-- Master inventory -->
   <div class="rounded-2xl border border-ink-700/60 bg-ink-850/50 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-700/60 px-4 sm:px-5 py-4">
       <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-warehouse text-amber-400 text-xs"></i> Master Inventory (SKUs)</h3>
@@ -972,7 +961,6 @@
   </div>
 </div>
 
-<!-- ══════════ BARCODE SCANNER MODAL ══════════ -->
 <div id="mScanner" class="fixed inset-0 z-[400] hidden items-center justify-center bg-ink-950/95 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5">
     <div class="flex items-center justify-between">
@@ -992,7 +980,6 @@
   </div>
 </div>
 
-<!-- ══════════ STUDENT REGISTRATION MODAL ══════════ -->
 <div id="mStudentReg" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/80 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-lg space-y-4 rounded-2xl border border-bajaj-500/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between">
@@ -1034,7 +1021,6 @@
   </div>
 </div>
 
-<!-- ══════════ UNIT LABELS PRINT MODAL ══════════ -->
 <div id="mUnitLabels" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
   <div class="scale-in w-full max-w-4xl space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[92vh] overflow-y-auto">
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -1152,18 +1138,15 @@ let deployUrl = '';
 let serverClockOffsetMs = 0;
 let fbApp = null, fbDb = null, stationRef = null, connected = false;
 let lastSentAt = 0, lastRecvAt = 0;
-let captchaCode = '';
-let loginTab = 'student';
 let currentTheme = 'dark';
 let catalogLabFilter = 'ALL';
 let pendingReturnLoanId = null;
 
-/* scanner state */
 let scannerTarget = null;
 let html5QrScanner = null;
 let lastScanValue = '';
 let lastScanTime = 0;
-let fastScanSeen = new Set();       // unit IDs already added during the current fast-scan session
+let fastScanSeen = new Set();
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
@@ -1327,7 +1310,6 @@ function openScanner(target, hintText) {
   setTimeout(startCameraScanner, 100);
 }
 
-/* Dedicated entry point for the fast catalog scanner */
 function openCatalogFastScan() {
   if (session.role !== 'user' && session.role !== 'admin') { toast('Please sign in first.', 'warn'); return; }
   fastScanSeen = new Set();
@@ -1397,7 +1379,6 @@ function onScanSuccess(decodedText) {
   lastScanValue = clean; lastScanTime = ts;
   if (navigator.vibrate) { try { navigator.vibrate(60); } catch {} }
 
-  /* ---- FAST CATALOG SCAN: keep camera running, no modal close ---- */
   if (scannerTarget === 'catalogFast') {
     handleCatalogFastScan(clean);
     return;
@@ -1415,12 +1396,9 @@ function onScanSuccess(decodedText) {
   handleScannedCode(clean);
 }
 
-/* Only accepts valid component barcodes. Anything else is rejected. */
 function handleCatalogFastScan(code) {
   const clean = String(code || '').trim().toUpperCase();
   if (!clean) return;
-
-  // STRICT: must be an exact, existing unit serial. Nothing else is accepted.
   const u = findUnit(clean);
   if (!u) {
     showScannerStatus('✗ Not a component barcode — only component labels are accepted.', 'error');
@@ -1434,17 +1412,14 @@ function handleCatalogFastScan(code) {
   if (u.status === 'ON_LOAN') { showScannerStatus('✗ ' + u.serialNo + ' is already on loan.', 'error'); return; }
   if (u.status === 'DEFECTIVE' || u.status === 'MAINTENANCE') { showScannerStatus('✗ ' + u.serialNo + ' is not available.', 'error'); return; }
   if (isInspectionDue(u)) { showScannerStatus('✗ ' + u.serialNo + ' needs inspection first.', 'error'); return; }
-
   const cur = state.cart[u.skuId] || 0;
   if (cur + 1 > availableQty(u.skuId)) {
     showScannerStatus('✗ No more units of ' + (findItem(u.skuId)?.name || u.skuId) + ' available.', 'error');
     return;
   }
-
   state.cart[u.skuId] = cur + 1;
   fastScanSeen.add(u.unitId);
   renderCart(); renderCatalog(); updateBadges();
-
   const item = findItem(u.skuId) || { name: u.skuId };
   showScannerStatus('✓ Added ' + item.name + ' · ' + u.serialNo, 'success');
   if (navigator.vibrate) { try { navigator.vibrate(35); } catch {} }
@@ -1609,7 +1584,7 @@ function isInspectionDue(u) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BARCODE LABEL RENDERING + PRINTING (canvas-based, reliable printing)
+   BARCODE LABEL RENDERING + PRINTING
    ═══════════════════════════════════════════════════════════════════════ */
 function generateBarcodeDataURL(text, w = 1.6, h = 46) {
   try {
@@ -1691,46 +1666,102 @@ function printUnitLabels() {
   if (!area) return;
   const html = area.innerHTML;
   if (!html.trim()) { toast('No labels to print.', 'warn'); return; }
+
   const w = window.open('', '_blank');
   if (!w) { toast('Please allow pop-ups to print labels.', 'warn', 4000); return; }
-  const styles = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('');
+
+  // ⚠️ Do NOT copy the parent <style> blocks — they contain
+  // `@media print { body * { visibility:hidden } }` which would hide every label.
+  // Use self-contained CSS for the print window instead.
   w.document.open();
   w.document.write(`<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <title>Print Unit Labels</title>
-${styles}
 <style>
-  body { padding: 12px; background: #fff; margin: 0; font-family: Inter, Arial, sans-serif; }
-  .unit-label { margin: 6px; display: inline-block; page-break-inside: avoid; vertical-align: top; }
-  .unit-bc-img { display: block; margin: 0 auto; max-width: 100%; }
-  .unit-label svg { display: block; margin: 0 auto; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 10px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .unit-label {
+    width: 260px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    text-align: center;
+    margin: 6px;
+    display: inline-block;
+    vertical-align: top;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .unit-label .unit-title {
+    font-size: 11px; font-weight: 800; color: #0f172a;
+    margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .unit-label .unit-sku { font-size: 9px; color: #475569; margin-bottom: 4px; }
+  .unit-label .unit-bc-img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .unit-label .unit-serial {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; font-weight: 700;
+    margin-top: 3px; letter-spacing: .06em;
+  }
+  .unit-label .unit-lab {
+    font-size: 8px; color: #64748b; margin-top: 3px;
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  @page { margin: 10mm; }
   @media print {
-    body { padding: 0; }
-    .unit-label { page-break-inside: avoid; }
+    html, body { padding: 0; background: #ffffff !important; }
+    .unit-label {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      background: #ffffff !important;
+    }
   }
 </style>
 </head>
 <body>${html}</body>
 </html>`);
   w.document.close();
-  const imgs = w.document.images;
-  let loaded = 0;
-  const total = imgs.length;
-  let fired = false;
+
   const fire = () => {
-    if (fired) return;
-    fired = true;
-    try { w.focus(); w.print(); } catch (e) { console.warn(e); }
-    setTimeout(() => { try { w.close(); } catch {} }, 1200);
+    try { w.focus(); w.print(); } catch (e) { console.warn('[print]', e); }
+    setTimeout(() => { try { w.close(); } catch {} }, 1500);
   };
-  if (total === 0) { setTimeout(fire, 300); return; }
-  for (let i = 0; i < total; i++) {
-    if (imgs[i].complete) { loaded++; if (loaded === total) setTimeout(fire, 200); }
-    else imgs[i].onload = imgs[i].onerror = () => { loaded++; if (loaded === total) setTimeout(fire, 200); };
-  }
-  setTimeout(fire, 2500);   // safety fallback
+
+  const waitForImages = () => {
+    const imgs = w.document.images;
+    const total = imgs.length;
+    if (!total) { setTimeout(fire, 250); return; }
+    let done = 0;
+    let fired = false;
+    const ready = () => {
+      if (fired) return;
+      fired = true;
+      setTimeout(fire, 200);
+    };
+    for (let i = 0; i < total; i++) {
+      if (imgs[i].complete && imgs[i].naturalWidth > 0) {
+        if (++done === total) ready();
+      } else {
+        imgs[i].addEventListener('load',  () => { if (++done === total) ready(); });
+        imgs[i].addEventListener('error', () => { if (++done === total) ready(); });
+      }
+    }
+    setTimeout(ready, 2500);
+  };
+
+  setTimeout(waitForImages, 100);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1778,7 +1809,7 @@ function renderUnitsView() {
   });
   grid.innerHTML = units.map(u => {
     const item = findItem(u.skuId) || { name: u.skuId, labId: '' };
-    const lastUse = u.lastBorrowerName ? `<div class="mt-1 text-[10px] text-slate-500">Last used by <b class="text-slate-400">${esc(u.lastBorrowerName)}</b> (${esc(u.lastBorrowerId||'')})</div>` : '';
+    const lastUse = u.lastBorrowerId ? `<div class="mt-1 text-[10px] text-slate-500">Last used by <b class="mono text-slate-400">${esc(u.lastBorrowerId)}</b></div>` : '';
     const insp = u.lastInspectionMs ? relTime(u.lastInspectionMs) : 'never';
     return `<div class="rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-900/70 to-ink-850/50 p-3.5">
       <div class="flex items-start justify-between gap-2">
@@ -1822,13 +1853,13 @@ function openUnitDetail(unitId) {
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Status</div><div class="mt-1 text-xs font-bold text-white">${esc(u.status)}</div></div>
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Condition</div><div class="mt-1 text-xs font-bold text-white">${esc(u.condition||'GOOD')}</div></div>
       <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last inspection</div><div class="mt-1 text-xs font-bold text-white">${u.lastInspectionMs ? fmtDateTime(u.lastInspectionMs) : 'never'}</div></div>
-      <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last borrower</div><div class="mt-1 text-xs font-bold text-white">${esc(u.lastBorrowerId || '—')}</div></div>
+      <div class="rounded-lg border border-ink-700/60 bg-ink-950/50 p-2"><div class="text-[10px] uppercase text-slate-500">Last borrower</div><div class="mt-1 text-xs font-bold text-white mono">${esc(u.lastBorrowerId || '—')}</div></div>
     </div>
     ${u.notes ? `<div class="rounded-lg border border-amber-500/40 bg-amber-500/5 p-2.5 text-[11px] text-amber-200"><b>Notes:</b> ${esc(u.notes)}</div>` : ''}
     <div>
       <div class="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Recent loans</div>
       ${loanHistory.length ? loanHistory.map(h => `<div class="rounded-lg border border-ink-700/60 bg-ink-950/40 px-3 py-2 mb-1">
-        <div class="text-[11px] text-slate-200 font-semibold"><span class="mono">${esc(h.borrowerId)}</span></div>
+        <div class="text-[11px] text-slate-200 font-semibold mono">${esc(h.borrowerId)}</div>
         <div class="text-[10px] text-slate-500">${esc(h.borrowTimeFormatted)} → ${h.status==='RETURNED' ? esc(h.returnTimeFormatted||'') : 'still on loan'}</div>
       </div>`).join('') : `<div class="text-[11px] text-slate-500">No history.</div>`}
     </div>
@@ -1917,7 +1948,7 @@ async function clearDefect(unitId) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT REGISTRATION / REMOVAL (by admin)
+   STUDENT REGISTRATION / REMOVAL
    ═══════════════════════════════════════════════════════════════════════ */
 let pendingRegPhoto = null;
 function openStudentRegModal() {
@@ -2203,14 +2234,6 @@ function confirmDialog(title, message, okText='Confirm', danger=true, icon='fa-t
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CAPTCHA (no longer used by student login; kept for compatibility)
-   ═══════════════════════════════════════════════════════════════════════ */
-function generateCaptcha() {
-  const canvas = $('captchaCanvas'); if (!canvas) return;
-  captchaCode = 'AAAAA';
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
    LOGIN GLUE
    ═══════════════════════════════════════════════════════════════════════ */
 function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.remove('hidden'); $('loginInfo').classList.add('hidden'); }
@@ -2326,7 +2349,7 @@ function switchLab() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   STUDENT LOGIN — scan → catalog
+   STUDENT LOGIN
    ═══════════════════════════════════════════════════════════════════════ */
 async function attemptStudentLogin() {
   const reg = $('loginRegister').value.trim().toUpperCase();
@@ -2894,7 +2917,6 @@ function checkoutCart() {
   const isStudent = session.role === 'user';
   const name = isStudent ? (session.register || '') : $('borrowerName').value.trim();
   let idRef = isStudent ? (session.register || '') : $('borrowerId').value.trim();
-  if (!name && idRef) { /* fallback */ }
   const entries = Object.entries(state.cart).filter(([,q]) => q > 0);
   if (!entries.length) { toast('Cart is empty.', 'warn'); return; }
   if (!idRef) { toast('Register No required.', 'warn'); return; }
@@ -2936,7 +2958,7 @@ function checkoutCart() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LOANS VIEW (only register ID shown — no names)
+   LOANS VIEW
    ═══════════════════════════════════════════════════════════════════════ */
 function visibleLoans() {
   if (session.role === 'admin') {
