@@ -486,7 +486,12 @@
 <section id="view-loans" class="hidden space-y-4 sm:space-y-5">
   <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
     <div><h1 id="loansHeading" class="text-base sm:text-lg font-bold text-white">Active Borrowed Items</h1><p id="loansSubheading" class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · each unit tracked by barcode</p></div>
-    <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden"><i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span></button>
+    <div class="flex flex-wrap gap-2">
+      <button id="testStudentEmailBtn" onclick="openTestStudentEmailModal()" class="focus-ring hidden items-center justify-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-3.5 py-2 text-xs font-medium text-brand-300 hover:bg-brand-500/20 transition w-full sm:w-auto">
+        <i class="fa-solid fa-envelope-circle-check text-[11px]"></i> Test student email
+      </button>
+      <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden"><i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span></button>
+    </div>
   </div>
   <div id="myStatsStrip" class="mb-3"></div>
   <div id="myReservationsStrip" class="mb-3"></div>
@@ -1062,6 +1067,49 @@
   <div class="scale-in w-full max-w-lg space-y-4 rounded-2xl border border-ink-700/70 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
     <div class="flex items-center justify-between"><h3 id="unitDetailTitle" class="text-base font-bold text-white">Unit details</h3><button onclick="closeModal('mUnitDetail')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button></div>
     <div id="unitDetailBody" class="space-y-3 text-xs"></div>
+  </div>
+</div>
+
+<div id="mTestStudentEmail" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
+  <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-start gap-3">
+      <div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white"><i class="fa-solid fa-envelope"></i></div>
+      <div class="flex-1">
+        <h3 class="text-base font-bold text-white">Send test email</h3>
+        <p class="mt-0.5 text-[11px] text-brand-300/80">Sends a real email to the student's SASTRA address.</p>
+      </div>
+      <button onclick="closeModal('mTestStudentEmail')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="rounded-xl border border-ink-700/60 bg-ink-950/50 p-3 space-y-2 text-xs">
+      <div>
+        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Register No</label>
+        <input id="testEmailReg" type="text" placeholder="e.g. 2212345"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);updateTestEmailPreview()"
+               class="mono focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs tracking-[.15em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
+      </div>
+      <div id="testEmailPreview" class="rounded-lg border border-brand-500/30 bg-brand-500/5 px-3 py-2 text-[11px] text-brand-200">
+        Recipient will appear here…
+      </div>
+      <div>
+        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Template</label>
+        <select id="testEmailKind" onchange="document.getElementById('testEmailCustomWrap').classList.toggle('hidden', this.value !== 'CUSTOM')" class="focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs text-white">
+          <option value="DUE_SOON">Due soon</option>
+          <option value="OVERDUE">Overdue</option>
+          <option value="RESERVATION">Reservation ready</option>
+          <option value="CUSTOM">Custom message</option>
+        </select>
+      </div>
+      <div id="testEmailCustomWrap" class="hidden">
+        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Custom message</label>
+        <textarea id="testEmailCustomText" rows="3" class="focus-ring w-full resize-none rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs text-white" placeholder="Type a message…"></textarea>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeModal('mTestStudentEmail')" class="w-1/3 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
+      <button id="testEmailSendBtn" onclick="sendTestStudentEmail()" class="flex-1 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-bold text-white">
+        <i class="fa-solid fa-paper-plane mr-1 text-[11px]"></i> Send test email
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1967,13 +2015,27 @@ function renderMyReservationsStrip() {
 function registerToEmail(reg) { return `${String(reg).toLowerCase()}@sastra.ac.in`; }
 
 async function sendEmail({ to, subject, body }) {
-  if (!EMAILJS.enabled || typeof emailjs === 'undefined') return false;
+  if (!EMAILJS.enabled) { console.warn('[email] disabled — set EMAILJS.enabled = true'); return false; }
+  if (typeof emailjs === 'undefined') { console.warn('[email] library not loaded'); return false; }
+  if (!to) { console.warn('[email] no recipient'); return false; }
   try {
     emailjs.init({ publicKey: EMAILJS.publicKey });
-    await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, { to_email: to, subject, message: body });
+    console.log(`[email] → ${to} · "${subject}"`);
+    const res = await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
+      to_email: to,
+      subject,
+      message: body
+    });
+    console.log('[email] ✓ sent', res);
     addAudit('notify.email', to, subject);
     return true;
-  } catch (e) { console.warn('[email]', e); return false; }
+  } catch (e) {
+    console.error('[email] ✗ FAILED');
+    console.error('        status :', e?.status);
+    console.error('        text   :', e?.text);
+    console.error('        full   :', e);
+    return false;
+  }
 }
 async function requestPushPermission() {
   if (!('Notification' in window)) return false;
@@ -2004,6 +2066,69 @@ async function notifyReservationReadyFor(reg, itemName) {
   const body = `Your reserved item "${itemName}" is now available at the lab. Please collect within 24 hours.`;
   await sendEmail({ to, subject: 'BEST — reservation ready', body });
   pushLocal('Reservation ready', body);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TEST STUDENT EMAIL
+   ═══════════════════════════════════════════════════════════════════════ */
+function openTestStudentEmailModal() {
+  if (session.role !== 'admin') { toast('Staff only.', 'warn'); return; }
+  $('testEmailReg').value = '';
+  $('testEmailKind').value = 'DUE_SOON';
+  $('testEmailCustomWrap').classList.add('hidden');
+  $('testEmailCustomText').value = '';
+  updateTestEmailPreview();
+  openModal('mTestStudentEmail');
+  setTimeout(() => $('testEmailReg').focus(), 120);
+}
+function updateTestEmailPreview() {
+  const reg = ($('testEmailReg').value || '').trim().toUpperCase();
+  const el = $('testEmailPreview');
+  if (!reg) { el.textContent = 'Recipient will appear here…'; return; }
+  el.innerHTML = `Will send to: <span class="mono font-bold">${esc(registerToEmail(reg))}</span>`;
+}
+async function sendTestStudentEmail() {
+  if (session.role !== 'admin') { toast('Staff only.', 'warn'); return; }
+  const reg = ($('testEmailReg').value || '').trim().toUpperCase();
+  if (!reg || reg.length < 3) { toast('Enter a valid register no.', 'warn'); return; }
+  const kind = $('testEmailKind').value;
+  const to = registerToEmail(reg);
+  const t = now();
+  const studentLoans = state.loans.filter(l => idKey(l.borrowerId) === idKey(reg));
+
+  let subject, body;
+  if (kind === 'DUE_SOON') {
+    subject = 'BEST — component due soon (TEST)';
+    const sample = studentLoans[0];
+    body = sample
+      ? `${sample.itemName} (${sample.serialNo || ''}) is due at ${sample.dueTimeFormatted}.`
+      : `Test message: you have no active loans. Due-soon reminders will look like this.`;
+  } else if (kind === 'OVERDUE') {
+    subject = 'BEST — component OVERDUE (TEST)';
+    const sample = studentLoans.find(l => isOverdue(l, t)) || studentLoans[0];
+    body = sample
+      ? `${sample.itemName} (${sample.serialNo || ''}) is overdue. Please return it as soon as possible.`
+      : `Test message: you have no overdue loans. Overdue notices will look like this.`;
+  } else if (kind === 'RESERVATION') {
+    subject = 'BEST — reservation ready (TEST)';
+    const r = state.reservations.find(x => idKey(x.register) === idKey(reg) && ['WAITING','READY'].includes(x.status));
+    const it = r ? (findItem(r.skuId) || { name: r.skuId }) : { name: 'Sample component' };
+    body = `Your reserved item "${it.name}" is now available at the lab. Please collect within 24 hours.`;
+  } else {
+    subject = 'BEST — test';
+    body = $('testEmailCustomText').value.trim() || 'Test message.';
+  }
+
+  const btn = $('testEmailSendBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1 text-[11px]"></i> Sending…';
+  const ok = await sendEmail({ to, subject, body });
+  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1 text-[11px]"></i> Send test email';
+  if (ok) {
+    toast(`Test email sent to ${to}. Check the inbox (and spam).`, 'success', 6000);
+    closeModal('mTestStudentEmail');
+  } else {
+    toast('Send failed — open the browser console (F12) for the exact reason.', 'error', 7000);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2329,6 +2454,12 @@ function applyRoleUI() {
   showTab('navPosterMobile', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
   showTab('navSync', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
   showTab('navSyncMobile', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
+
+  const testBtn = $('testStudentEmailBtn');
+  if (testBtn) {
+    if (isAdminUser) { testBtn.classList.remove('hidden'); testBtn.classList.add('flex'); }
+    else { testBtn.classList.add('hidden'); testBtn.classList.remove('flex'); }
+  }
 
   const stockBtns = $('stockActionBtns');
   if (stockBtns) {
@@ -4211,6 +4342,9 @@ window.exportBackup = exportBackup; window.openImportBackup = openImportBackup; 
 window.toggleFavorite = toggleFavorite; window.renderMyStats = renderMyStats;
 window.installPWA = installPWA;
 window.requestPushPermission = requestPushPermission;
+window.openTestStudentEmailModal = openTestStudentEmailModal;
+window.sendTestStudentEmail = sendTestStudentEmail;
+window.updateTestEmailPreview = updateTestEmailPreview;
 </script>
 </body>
 </html>
