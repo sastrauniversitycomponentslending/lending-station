@@ -524,6 +524,7 @@
       <div class="flex flex-wrap gap-2">
         <input id="auditSearch" type="text" oninput="renderAuditLog()" placeholder="Filter actor / action / target…" class="focus-ring rounded-xl border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600" />
         <button onclick="exportAuditCSV()" class="focus-ring flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 px-3.5 py-2 text-xs font-semibold text-white"><i class="fa-solid fa-file-excel text-[11px]"></i> CSV</button>
+        <button onclick="clearAuditLog()" class="focus-ring flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20"><i class="fa-solid fa-trash text-[11px]"></i> Clear</button>
       </div>
     </div>
     <div class="overflow-x-auto mobile-scroll-x">
@@ -1096,6 +1097,7 @@ const SESSION_KEY = 'bajaj.session.v13';
 const THEME_KEY = 'bajaj.theme.v2';
 const REGISTERS_KEY = 'bajaj.registers.v1';
 const OVERDUE_NOTIFIED_KEY = 'bajaj.overdue.notified';
+const OVERDUE_REMINDER_CACHE_KEY = 'bajaj.overdueReminders.v1';
 const MACHINE_INSPECT_NOTIFIED_KEY = 'bajaj.machineInspNotified';
 const MAX_ACTIVITY = 60;
 const SYNC_KEYS = ['labs','inventory','units','loans','history','settings','activity',
@@ -1110,6 +1112,7 @@ const MAX_TEACHERS = Infinity;
 const OVERDUE_BLOCK_HOURS = 2;
 const OVERDUE_BLOCK_MS = OVERDUE_BLOCK_HOURS * 3600 * 1000;
 const OVERDUE_EMAIL_INTERVAL_MS = 10 * 60 * 1000;
+const OVERDUE_CHECK_THROTTLE_MS = 30 * 1000;
 
 const ROLE = {
   HEAD_BAJAJ: 'HEAD_BAJAJ',
@@ -1231,6 +1234,15 @@ let lastScanValue = '';
 let lastScanTime = 0;
 let fastScanSeen = new Set();
 const scanMemory = new Map();
+
+// Overdue reminder cache — per device, immune to Firebase echo
+let _overdueReminderCache = (() => {
+  try { return JSON.parse(localStorage.getItem(OVERDUE_REMINDER_CACHE_KEY) || '{}'); } catch { return {}; }
+})();
+function _saveOverdueReminderCache() {
+  try { localStorage.setItem(OVERDUE_REMINDER_CACHE_KEY, JSON.stringify(_overdueReminderCache)); } catch {}
+}
+let _lastOverdueCheckAt = 0;
 
 const $ = id => document.getElementById(id);
 const pad2 = n => String(n).padStart(2, '0');
@@ -1858,7 +1870,8 @@ function decideExtension(extId, approve) {
     loan.dueTimeMs += ext.extraMinutes * 60000;
     loan.dueTimeFormatted = fmtDateTime(loan.dueTimeMs);
     loan.extensionCount = (loan.extensionCount || 0) + 1;
-    loan.lastOverdueEmailAt = 0;
+    // Clear the overdue reminder cache entry so the cycle restarts after new due time
+    if (_overdueReminderCache[loan.loanId]) { delete _overdueReminderCache[loan.loanId]; _saveOverdueReminderCache(); }
     const h = state.history.find(x => x.loanId === loan.loanId);
     if (h) { h.dueTimeMs = loan.dueTimeMs; h.dueTimeFormatted = loan.dueTimeFormatted; }
   }
@@ -1969,7 +1982,7 @@ function renderMyReservationsStrip() {
 function registerToEmail(reg) { return `${String(reg).toLowerCase()}@sastra.ac.in`; }
 
 async function sendEmail({ to, subject, body }) {
-  if (!EMAILJS.enabled) { console.warn('[email] disabled — set EMAILJS.enabled = true'); return false; }
+  if (!EMAILJS.enabled) { console.warn('[email] disabled'); return false; }
   if (typeof emailjs === 'undefined') { console.warn('[email] library not loaded'); return false; }
   if (!to) { console.warn('[email] no recipient'); return false; }
   try {
@@ -1984,10 +1997,7 @@ async function sendEmail({ to, subject, body }) {
     addAudit('notify.email', to, subject);
     return true;
   } catch (e) {
-    console.error('[email] ✗ FAILED');
-    console.error('        status :', e?.status);
-    console.error('        text   :', e?.text);
-    console.error('        full   :', e);
+    console.error('[email] ✗ FAILED', e?.status, e?.text);
     return false;
   }
 }
@@ -2007,7 +2017,6 @@ async function notifyDueSoon(loan) {
   const body = `${loan.itemName} (${loan.serialNo || ''}) is due at ${loan.dueTimeFormatted}.`;
   await sendEmail({ to, subject: 'BEST — component due soon', body });
   pushLocal('Component due soon', body);
-  toast(`Notified ${loan.borrowerId}: due soon.`, 'info', 4000);
 }
 async function notifyOverdue(loan) {
   const to = registerToEmail(loan.borrowerId);
@@ -2022,26 +2031,44 @@ async function notifyReservationReadyFor(reg, itemName) {
   pushLocal('Reservation ready', body);
 }
 
-/* Recurring overdue reminder — fires every 10 minutes while a loan is overdue */
+/* Recurring overdue reminder — every 10 minutes, per-device cache so Firebase
+   sync cannot reset the timestamp and cause a duplicate send loop. */
 function checkOverdueReminders() {
   if (!EMAILJS.enabled) return;
   if (!state.loans || !state.loans.length) return;
+
   const t = now();
-  let changed = false;
+
+  // Throttle: only evaluate the loop every 30 seconds (tick() runs every second)
+  if (t - _lastOverdueCheckAt < OVERDUE_CHECK_THROTTLE_MS) return;
+  _lastOverdueCheckAt = t;
+
+  let cacheChanged = false;
+
   state.loans.forEach(loan => {
+    // Not overdue → clear cached timestamp so next overdue starts a fresh cycle
     if (!isOverdue(loan, t)) {
-      if (loan.lastOverdueEmailAt) { loan.lastOverdueEmailAt = 0; changed = true; }
+      if (_overdueReminderCache[loan.loanId]) {
+        delete _overdueReminderCache[loan.loanId];
+        cacheChanged = true;
+      }
       return;
     }
-    const last = loan.lastOverdueEmailAt || 0;
-    if (last === 0 || (t - last) >= OVERDUE_EMAIL_INTERVAL_MS) {
-      loan.lastOverdueEmailAt = t;
-      changed = true;
+
+    const lastSent = _overdueReminderCache[loan.loanId] || 0;
+    const isFirstOverdue = lastSent === 0;
+    const intervalElapsed = (t - lastSent) >= OVERDUE_EMAIL_INTERVAL_MS;
+
+    if (isFirstOverdue || intervalElapsed) {
+      _overdueReminderCache[loan.loanId] = t;
+      cacheChanged = true;
+      const n = isFirstOverdue ? 1 : Math.floor((t - lastSent) / OVERDUE_EMAIL_INTERVAL_MS) + 1;
+      console.log(`[reminder] overdue email #${n} → ${loan.loanId} → ${registerToEmail(loan.borrowerId)}`);
       notifyOverdue(loan);
-      console.log('[reminder] overdue reminder sent for', loan.loanId, '→', registerToEmail(loan.borrowerId));
     }
   });
-  if (changed) saveAndPublish('loans');
+
+  if (cacheChanged) _saveOverdueReminderCache();
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2643,7 +2670,7 @@ function migrateCart() {
 function saveAndPublish(...keys) { saveLocal(); if (keys.length) keys.forEach(publishKey); }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   OVERDUE NOTICE
+   OVERDUE NOTICE (UI banner)
    ═══════════════════════════════════════════════════════════════════════ */
 function checkOverdueForCurrentUser() {
   if (!session || !session.register || session.role === 'admin') { const banner = $('overdueAlertBanner'); if (banner) banner.classList.add('hidden'); return; }
@@ -2896,7 +2923,7 @@ function checkoutCart() {
   cartUnits.forEach(c => {
     const u = findUnit(c.unitId); if (!u) return;
     const item = findItem(u.skuId) || {};
-    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE', extensionCount: 0, lastOverdueEmailAt: 0 };
+    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE', extensionCount: 0 };
     state.loans.unshift(record); state.history.unshift({ ...record });
     setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
   });
@@ -3002,6 +3029,8 @@ async function confirmReturnVerify() {
   state.loans.splice(idx, 1);
   logActivity('return', `${loan.borrowerId} returned ${loan.itemName} (${loan.serialNo || ''}) — ${condition}`);
   addAudit('loan.return', loan.loanId, `${loan.itemName} · ${loan.serialNo||''} · condition=${condition}`);
+  // Clear overdue reminder cache for this loan (returned)
+  if (_overdueReminderCache[loan.loanId]) { delete _overdueReminderCache[loan.loanId]; _saveOverdueReminderCache(); }
   if (loan.unitId) {
     const u = findUnit(loan.unitId);
     if (u && u.status === 'AVAILABLE') notifyReservationReady(loan.itemId);
@@ -3204,6 +3233,25 @@ function exportAuditCSV() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = `audit-${new Date().toISOString().slice(0,10)}.csv`; a.click();
   toast('Audit log exported.', 'success');
+}
+async function clearAuditLog() {
+  if (!isHeadOfBajaj()) { toast('Only Head of BAJAJ can clear the audit log.', 'warn'); return; }
+  const count = (state.auditLog || []).length;
+  if (!count) { toast('Audit log is already empty.', 'info'); return; }
+  const ok = await confirmDialog(
+    'Clear audit log',
+    `Permanently remove all ${count} audit entries? This cannot be undone.`,
+    'Clear all',
+    true,
+    'fa-trash'
+  );
+  if (!ok) return;
+  state.auditLog = [];
+  // Leave a single trace entry so the clear itself is auditable
+  addAudit('audit.clear', 'auditLog', `cleared ${count} entries by ${session.register}`);
+  saveAndPublish('auditLog');
+  renderAuditLog();
+  toast(`Cleared ${count} audit entries.`, 'success');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3925,7 +3973,6 @@ async function saveEditTeacherRole() {
   const admins = getAdmins(); const idx = admins.findIndex(a => a.username === username);
   if (idx === -1) { toast('Staff not found.', 'error'); return; }
 
-  // Warn if self-demoting from last Head of BAJAJ
   if (isMe && roleOfAdmin(admins[idx]) === ROLE.HEAD_BAJAJ && newRole !== ROLE.HEAD_BAJAJ) {
     const otherHeads = admins.filter(a => roleOfAdmin(a) === ROLE.HEAD_BAJAJ && a.username !== username).length;
     const ok = await confirmDialog(
@@ -3950,7 +3997,6 @@ async function saveEditTeacherRole() {
   toast(`"${username}" is now ${ROLE_LABELS[newRole]}.`, 'success');
 
   if (isMe) {
-    // Re-apply role-based UI on the fly
     setTimeout(() => { applyRoleUI(); renderAll(); }, 200);
   }
 }
@@ -4158,7 +4204,7 @@ function tick() {
   }
   if (isHeadOfBajaj()) checkMachineInspectionNotification();
 
-  // Recurring overdue reminders — every 10 minutes
+  // Recurring overdue email reminders — throttled internally to every 30s
   if (session.role) checkOverdueReminders();
 
   if (session.role === 'user') {
@@ -4270,7 +4316,7 @@ window.downloadSampleExcel = downloadSampleExcel;
 window.renderReports = renderReports;
 window.download30DayReportExcel = download30DayReportExcel;
 window.print30DayReport = print30DayReport;
-window.renderAuditLog = renderAuditLog; window.exportAuditCSV = exportAuditCSV;
+window.renderAuditLog = renderAuditLog; window.exportAuditCSV = exportAuditCSV; window.clearAuditLog = clearAuditLog;
 window.requestExtension = requestExtension; window.decideExtension = decideExtension; window.renderExtensionQueue = renderExtensionQueue;
 window.reserveItem = reserveItem; window.cancelReservation = cancelReservation; window.renderReservationQueue = renderReservationQueue;
 window.notifyDueSoon = notifyDueSoon; window.notifyOverdue = notifyOverdue; window.notifyReservationReadyFor = notifyReservationReadyFor;
