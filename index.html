@@ -486,12 +486,7 @@
 <section id="view-loans" class="hidden space-y-4 sm:space-y-5">
   <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-2xl border border-ink-700/60 bg-ink-850/50 p-3.5 sm:p-5">
     <div><h1 id="loansHeading" class="text-base sm:text-lg font-bold text-white">Active Borrowed Items</h1><p id="loansSubheading" class="mt-0.5 text-[11px] sm:text-xs text-slate-500">Live timers · each unit tracked by barcode</p></div>
-    <div class="flex flex-wrap gap-2">
-      <button id="testStudentEmailBtn" onclick="openTestStudentEmailModal()" class="focus-ring hidden items-center justify-center gap-2 rounded-xl border border-brand-500/40 bg-brand-500/10 px-3.5 py-2 text-xs font-medium text-brand-300 hover:bg-brand-500/20 transition w-full sm:w-auto">
-        <i class="fa-solid fa-envelope-circle-check text-[11px]"></i> Test student email
-      </button>
-      <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden"><i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span></button>
-    </div>
+    <button id="loansBulkBtn" onclick="loansBulkAction()" class="focus-ring flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition w-full sm:w-auto hidden"><i class="fa-solid fa-clipboard-check text-[11px]"></i> <span id="loansBulkBtnText">Force-return all</span></button>
   </div>
   <div id="myStatsStrip" class="mb-3"></div>
   <div id="myReservationsStrip" class="mb-3"></div>
@@ -956,6 +951,7 @@
       <label class="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">Role</label>
       <select id="editRoleSelect" class="focus-ring w-full rounded-xl border border-ink-600/70 bg-ink-950/80 p-2.5 text-xs text-white"></select>
     </div>
+    <div id="editRoleSelfWarning" class="hidden rounded-lg border border-amber-500/40 bg-amber-500/5 p-2.5 text-[11px] text-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i> <span id="editRoleSelfWarningText">You are changing your own role.</span></div>
     <div class="flex gap-2"><button onclick="closeModal('mEditTeacherRole')" class="w-1/3 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button><button onclick="saveEditTeacherRole()" class="flex-1 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 py-2.5 text-xs font-bold text-white"><i class="fa-solid fa-check mr-1 text-[11px]"></i> Save</button></div>
   </div>
 </div>
@@ -1070,49 +1066,6 @@
   </div>
 </div>
 
-<div id="mTestStudentEmail" class="fixed inset-0 z-[95] hidden items-center justify-center bg-ink-950/85 p-3 backdrop-blur-md">
-  <div class="scale-in w-full max-w-md space-y-4 rounded-2xl border border-brand-500/50 bg-ink-850 p-5 max-h-[90vh] overflow-y-auto">
-    <div class="flex items-start gap-3">
-      <div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white"><i class="fa-solid fa-envelope"></i></div>
-      <div class="flex-1">
-        <h3 class="text-base font-bold text-white">Send test email</h3>
-        <p class="mt-0.5 text-[11px] text-brand-300/80">Sends a real email to the student's SASTRA address.</p>
-      </div>
-      <button onclick="closeModal('mTestStudentEmail')" class="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-ink-800"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="rounded-xl border border-ink-700/60 bg-ink-950/50 p-3 space-y-2 text-xs">
-      <div>
-        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Register No</label>
-        <input id="testEmailReg" type="text" placeholder="e.g. 2212345"
-               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);updateTestEmailPreview()"
-               class="mono focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs tracking-[.15em] text-white placeholder:tracking-normal placeholder:text-slate-600" />
-      </div>
-      <div id="testEmailPreview" class="rounded-lg border border-brand-500/30 bg-brand-500/5 px-3 py-2 text-[11px] text-brand-200">
-        Recipient will appear here…
-      </div>
-      <div>
-        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Template</label>
-        <select id="testEmailKind" onchange="document.getElementById('testEmailCustomWrap').classList.toggle('hidden', this.value !== 'CUSTOM')" class="focus-ring w-full rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs text-white">
-          <option value="DUE_SOON">Due soon</option>
-          <option value="OVERDUE">Overdue</option>
-          <option value="RESERVATION">Reservation ready</option>
-          <option value="CUSTOM">Custom message</option>
-        </select>
-      </div>
-      <div id="testEmailCustomWrap" class="hidden">
-        <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Custom message</label>
-        <textarea id="testEmailCustomText" rows="3" class="focus-ring w-full resize-none rounded-lg border border-ink-600/70 bg-ink-950/80 px-3 py-2 text-xs text-white" placeholder="Type a message…"></textarea>
-      </div>
-    </div>
-    <div class="flex gap-2">
-      <button onclick="closeModal('mTestStudentEmail')" class="w-1/3 rounded-xl border border-ink-600/70 bg-ink-800/60 py-2.5 text-xs font-semibold text-slate-300">Cancel</button>
-      <button id="testEmailSendBtn" onclick="sendTestStudentEmail()" class="flex-1 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-xs font-bold text-white">
-        <i class="fa-solid fa-paper-plane mr-1 text-[11px]"></i> Send test email
-      </button>
-    </div>
-  </div>
-</div>
-
 <div id="toasts" class="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[130] flex w-auto sm:w-[340px] max-w-[calc(100vw-2rem)] flex-col gap-2"></div>
 
 <script>
@@ -1130,10 +1083,9 @@ const BUILTIN_FIREBASE = {
   measurementId: "G-DP20GNZX7X"
 };
 
-/* EmailJS — configured with your credentials */
 const EMAILJS = {
   serviceId:  'service_w6orscj',
-  templateId: 'template_woiy5ll',    // ✅ real ID
+  templateId: 'template_woiy5ll',
   publicKey:  'gHvEcCIzAebBltKS7',
   enabled: true
 };
@@ -1157,6 +1109,7 @@ const DEFAULT_MACHINE_INSPECT_DAYS = 30;
 const MAX_TEACHERS = Infinity;
 const OVERDUE_BLOCK_HOURS = 2;
 const OVERDUE_BLOCK_MS = OVERDUE_BLOCK_HOURS * 3600 * 1000;
+const OVERDUE_EMAIL_INTERVAL_MS = 10 * 60 * 1000;
 
 const ROLE = {
   HEAD_BAJAJ: 'HEAD_BAJAJ',
@@ -1905,6 +1858,7 @@ function decideExtension(extId, approve) {
     loan.dueTimeMs += ext.extraMinutes * 60000;
     loan.dueTimeFormatted = fmtDateTime(loan.dueTimeMs);
     loan.extensionCount = (loan.extensionCount || 0) + 1;
+    loan.lastOverdueEmailAt = 0;
     const h = state.history.find(x => x.loanId === loan.loanId);
     if (h) { h.dueTimeMs = loan.dueTimeMs; h.dueTimeFormatted = loan.dueTimeFormatted; }
   }
@@ -2068,67 +2022,26 @@ async function notifyReservationReadyFor(reg, itemName) {
   pushLocal('Reservation ready', body);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   TEST STUDENT EMAIL
-   ═══════════════════════════════════════════════════════════════════════ */
-function openTestStudentEmailModal() {
-  if (session.role !== 'admin') { toast('Staff only.', 'warn'); return; }
-  $('testEmailReg').value = '';
-  $('testEmailKind').value = 'DUE_SOON';
-  $('testEmailCustomWrap').classList.add('hidden');
-  $('testEmailCustomText').value = '';
-  updateTestEmailPreview();
-  openModal('mTestStudentEmail');
-  setTimeout(() => $('testEmailReg').focus(), 120);
-}
-function updateTestEmailPreview() {
-  const reg = ($('testEmailReg').value || '').trim().toUpperCase();
-  const el = $('testEmailPreview');
-  if (!reg) { el.textContent = 'Recipient will appear here…'; return; }
-  el.innerHTML = `Will send to: <span class="mono font-bold">${esc(registerToEmail(reg))}</span>`;
-}
-async function sendTestStudentEmail() {
-  if (session.role !== 'admin') { toast('Staff only.', 'warn'); return; }
-  const reg = ($('testEmailReg').value || '').trim().toUpperCase();
-  if (!reg || reg.length < 3) { toast('Enter a valid register no.', 'warn'); return; }
-  const kind = $('testEmailKind').value;
-  const to = registerToEmail(reg);
+/* Recurring overdue reminder — fires every 10 minutes while a loan is overdue */
+function checkOverdueReminders() {
+  if (!EMAILJS.enabled) return;
+  if (!state.loans || !state.loans.length) return;
   const t = now();
-  const studentLoans = state.loans.filter(l => idKey(l.borrowerId) === idKey(reg));
-
-  let subject, body;
-  if (kind === 'DUE_SOON') {
-    subject = 'BEST — component due soon (TEST)';
-    const sample = studentLoans[0];
-    body = sample
-      ? `${sample.itemName} (${sample.serialNo || ''}) is due at ${sample.dueTimeFormatted}.`
-      : `Test message: you have no active loans. Due-soon reminders will look like this.`;
-  } else if (kind === 'OVERDUE') {
-    subject = 'BEST — component OVERDUE (TEST)';
-    const sample = studentLoans.find(l => isOverdue(l, t)) || studentLoans[0];
-    body = sample
-      ? `${sample.itemName} (${sample.serialNo || ''}) is overdue. Please return it as soon as possible.`
-      : `Test message: you have no overdue loans. Overdue notices will look like this.`;
-  } else if (kind === 'RESERVATION') {
-    subject = 'BEST — reservation ready (TEST)';
-    const r = state.reservations.find(x => idKey(x.register) === idKey(reg) && ['WAITING','READY'].includes(x.status));
-    const it = r ? (findItem(r.skuId) || { name: r.skuId }) : { name: 'Sample component' };
-    body = `Your reserved item "${it.name}" is now available at the lab. Please collect within 24 hours.`;
-  } else {
-    subject = 'BEST — test';
-    body = $('testEmailCustomText').value.trim() || 'Test message.';
-  }
-
-  const btn = $('testEmailSendBtn');
-  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1 text-[11px]"></i> Sending…';
-  const ok = await sendEmail({ to, subject, body });
-  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1 text-[11px]"></i> Send test email';
-  if (ok) {
-    toast(`Test email sent to ${to}. Check the inbox (and spam).`, 'success', 6000);
-    closeModal('mTestStudentEmail');
-  } else {
-    toast('Send failed — open the browser console (F12) for the exact reason.', 'error', 7000);
-  }
+  let changed = false;
+  state.loans.forEach(loan => {
+    if (!isOverdue(loan, t)) {
+      if (loan.lastOverdueEmailAt) { loan.lastOverdueEmailAt = 0; changed = true; }
+      return;
+    }
+    const last = loan.lastOverdueEmailAt || 0;
+    if (last === 0 || (t - last) >= OVERDUE_EMAIL_INTERVAL_MS) {
+      loan.lastOverdueEmailAt = t;
+      changed = true;
+      notifyOverdue(loan);
+      console.log('[reminder] overdue reminder sent for', loan.loanId, '→', registerToEmail(loan.borrowerId));
+    }
+  });
+  if (changed) saveAndPublish('loans');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2410,7 +2323,6 @@ async function attemptAdminLogin() {
       if (idx >= 0) { state.adminConfig.admins[idx].__lock = lock; saveLocal(); publishKey('adminConfig'); }
       showLoginError('Incorrect Teacher No or Password.'); return;
     }
-    // success — reset lock
     const idx = (state.adminConfig.admins || []).findIndex(a => a.username === teacherNo);
     if (idx >= 0) { state.adminConfig.admins[idx].__lock = { fails: 0, until: 0 }; saveLocal(); publishKey('adminConfig'); }
     enterApp('admin', teacherNo, admin.username, null);
@@ -2454,12 +2366,6 @@ function applyRoleUI() {
   showTab('navPosterMobile', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
   showTab('navSync', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
   showTab('navSyncMobile', isAdminUser && (isHeadOfBajaj() || isStocksHandler()));
-
-  const testBtn = $('testStudentEmailBtn');
-  if (testBtn) {
-    if (isAdminUser) { testBtn.classList.remove('hidden'); testBtn.classList.add('flex'); }
-    else { testBtn.classList.add('hidden'); testBtn.classList.remove('flex'); }
-  }
 
   const stockBtns = $('stockActionBtns');
   if (stockBtns) {
@@ -2763,13 +2669,6 @@ function checkOverdueForCurrentUser() {
     newOnes.forEach(l => { notified[l.loanId] = true; });
     try { sessionStorage.setItem(OVERDUE_NOTIFIED_KEY, JSON.stringify(notified)); } catch {}
   }
-  // Fire overdue emails (once per loan)
-  myOverdue.forEach(l => {
-    if (!l.__notifiedOverdue) {
-      l.__notifiedOverdue = true;
-      notifyOverdue(l);
-    }
-  });
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2997,7 +2896,7 @@ function checkoutCart() {
   cartUnits.forEach(c => {
     const u = findUnit(c.unitId); if (!u) return;
     const item = findItem(u.skuId) || {};
-    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE', extensionCount: 0 };
+    const record = { loanId: newLoanId() + '-' + u.serialNo.slice(-4), itemId: u.skuId, itemName: item.name || u.skuId, category: item.category || '', labId: item.labId || '', unitId: u.unitId, serialNo: u.serialNo, quantity: 1, borrowerName: borrowName, borrowerId: idRef, borrowTimeMs: t, borrowTimeFormatted: fmtDateTime(t), dueTimeMs: due, dueTimeFormatted: fmtDateTime(due), status: 'ACTIVE', extensionCount: 0, lastOverdueEmailAt: 0 };
     state.loans.unshift(record); state.history.unshift({ ...record });
     setUnitStatus(u.unitId, 'ON_LOAN', { currentLoanId: record.loanId, lastBorrowerId: idRef, lastBorrowerName: borrowName });
   });
@@ -3549,6 +3448,7 @@ function renderTeachersList() {
     const labIds = (role === ROLE.HEAD_BAJAJ || role === ROLE.STOCKS_HANDLER) ? state.labs.map(l => l.id) : (a.labIds || []);
     const canAct = !isMe && superAdmin;
     const canAssign = superAdmin && role !== ROLE.HEAD_BAJAJ && role !== ROLE.STOCKS_HANDLER && !isMe;
+    const canChangeOwnRole = isMe;
     return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-700/60 bg-gradient-to-br from-ink-900/60 to-ink-850/40 p-3">
       <div class="flex items-center gap-3 min-w-0">
         <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg ${ROLE_BADGE_CLASS[role]} text-xs font-bold text-white">${esc(a.username.slice(0,1))}</div>
@@ -3564,6 +3464,7 @@ function renderTeachersList() {
       <div class="flex shrink-0 items-center gap-1.5">
         ${canAssign ? `<button onclick="openEditTeacherLabs('${esc(a.username)}')" class="rounded-lg border border-brand-500/40 bg-brand-500/10 px-2.5 py-1 text-[10px] font-bold text-brand-300 hover:bg-brand-500/20"><i class="fa-solid fa-building-columns mr-1 text-[10px]"></i>Labs</button>` : ''}
         ${canAct ? `<button onclick="openEditTeacherRole('${esc(a.username)}')" class="rounded-lg border border-violet-500/40 bg-violet-500/10 px-2.5 py-1 text-[10px] font-bold text-violet-300 hover:bg-violet-500/20"><i class="fa-solid fa-user-tag mr-1 text-[10px]"></i>Role</button>` : ''}
+        ${canChangeOwnRole ? `<button onclick="openEditTeacherRole('${esc(a.username)}')" class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20"><i class="fa-solid fa-user-pen mr-1 text-[10px]"></i>Change my role</button>` : ''}
         ${canAct ? `<button onclick="removeTeacher('${esc(a.username)}')" class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[10px] font-semibold text-rose-300 hover:bg-rose-500/20"><i class="fa-solid fa-user-minus mr-1 text-[10px]"></i>Remove</button>` : ''}
       </div>
     </div>`;
@@ -3998,28 +3899,60 @@ async function saveEditTeacherLabs() {
   toast(`Labs updated for "${username}".`, 'success');
 }
 function openEditTeacherRole(username) {
-  if (!canManageTeachers()) { toast('Only Head of BAJAJ can change roles.', 'warn'); return; }
   const admin = findAdminByUsername(username); if (!admin) { toast('Staff not found.', 'error'); return; }
+  const isMe = username === session.register;
+  if (!isMe && !canManageTeachers()) { toast('Only Head of BAJAJ can change other staff roles.', 'warn'); return; }
   $('editRoleTeacherNo').textContent = admin.username; $('editRoleTeacherNo').dataset.username = admin.username;
   fillRoleSelect($('editRoleSelect'), roleOfAdmin(admin));
+  const warn = $('editRoleSelfWarning'); const warnTxt = $('editRoleSelfWarningText');
+  if (isMe) {
+    warn.classList.remove('hidden');
+    const otherHeads = getAdmins().filter(a => roleOfAdmin(a) === ROLE.HEAD_BAJAJ && a.username !== username).length;
+    warnTxt.textContent = otherHeads === 0
+      ? 'You are the only Head of BAJAJ. If you demote yourself, no one will be able to manage staff, machines, or the poster until another Head of BAJAJ is created. Only do this when the real Head of BAJAJ has arrived.'
+      : 'You are changing your own role. You will lose Head-only features immediately after saving.';
+  } else {
+    warn.classList.add('hidden');
+  }
   openModal('mEditTeacherRole');
 }
 async function saveEditTeacherRole() {
-  if (!canManageTeachers()) return;
   const username = $('editRoleTeacherNo').dataset.username;
   if (!username) return;
-  if (username === session.register) { toast('You cannot change your own role.', 'warn'); return; }
+  const isMe = username === session.register;
+  if (!isMe && !canManageTeachers()) { toast('Only Head of BAJAJ can change other staff roles.', 'warn'); return; }
   const newRole = $('editRoleSelect').value;
   const admins = getAdmins(); const idx = admins.findIndex(a => a.username === username);
   if (idx === -1) { toast('Staff not found.', 'error'); return; }
+
+  // Warn if self-demoting from last Head of BAJAJ
+  if (isMe && roleOfAdmin(admins[idx]) === ROLE.HEAD_BAJAJ && newRole !== ROLE.HEAD_BAJAJ) {
+    const otherHeads = admins.filter(a => roleOfAdmin(a) === ROLE.HEAD_BAJAJ && a.username !== username).length;
+    const ok = await confirmDialog(
+      'Demote yourself',
+      otherHeads === 0
+        ? 'You are the only Head of BAJAJ. After saving, nobody will be able to manage staff, machines or the poster until the real Head of BAJAJ is created. Continue?'
+        : `Change your own role to ${ROLE_LABELS[newRole]}? You will lose Head-only features immediately.`,
+      'Demote me',
+      true,
+      'fa-user-pen'
+    );
+    if (!ok) return;
+  }
+
   admins[idx].role = newRole;
   admins[idx].isSuper = newRole === ROLE.HEAD_BAJAJ;
   if (newRole === ROLE.HEAD_BAJAJ || newRole === ROLE.STOCKS_HANDLER) admins[idx].labIds = [];
   else if (!admins[idx].labIds || !admins[idx].labIds.length) admins[idx].labIds = state.labs.map(l => l.id);
   state.adminConfig = { ...(state.adminConfig || {}), admins };
-  addAudit('staff.role', username, `newRole=${newRole}`);
+  addAudit('staff.role', username, `newRole=${newRole}${isMe ? ' (self)' : ''}`);
   publishKey('adminConfig'); publishKey('auditLog'); closeModal('mEditTeacherRole'); renderTeachersList();
   toast(`"${username}" is now ${ROLE_LABELS[newRole]}.`, 'success');
+
+  if (isMe) {
+    // Re-apply role-based UI on the fly
+    setTimeout(() => { applyRoleUI(); renderAll(); }, 200);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -4225,6 +4158,9 @@ function tick() {
   }
   if (isHeadOfBajaj()) checkMachineInspectionNotification();
 
+  // Recurring overdue reminders — every 10 minutes
+  if (session.role) checkOverdueReminders();
+
   if (session.role === 'user') {
     visible.forEach(l => {
       if (isDueSoon(l, t) && !l.__notifiedDueSoon && idKey(l.borrowerId) === idKey(session.register)) {
@@ -4342,9 +4278,7 @@ window.exportBackup = exportBackup; window.openImportBackup = openImportBackup; 
 window.toggleFavorite = toggleFavorite; window.renderMyStats = renderMyStats;
 window.installPWA = installPWA;
 window.requestPushPermission = requestPushPermission;
-window.openTestStudentEmailModal = openTestStudentEmailModal;
-window.sendTestStudentEmail = sendTestStudentEmail;
-window.updateTestEmailPreview = updateTestEmailPreview;
+window.checkOverdueReminders = checkOverdueReminders;
 </script>
 </body>
 </html>
