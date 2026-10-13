@@ -1979,28 +1979,61 @@ function renderMyReservationsStrip() {
 /* ═══════════════════════════════════════════════════════════════════════
    NOTIFICATIONS
    ═══════════════════════════════════════════════════════════════════════ */
-function registerToEmail(reg) { return `${String(reg).toLowerCase()}@sastra.ac.in`; }
+function registerToEmail(reg) {
+  const clean = String(reg || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+  if (!clean) return '';
+  return `${clean}@sastra.ac.in`;
+}
 
 async function sendEmail({ to, subject, body }) {
   if (!EMAILJS.enabled) { console.warn('[email] disabled'); return false; }
   if (typeof emailjs === 'undefined') { console.warn('[email] library not loaded'); return false; }
-  if (!to) { console.warn('[email] no recipient'); return false; }
+  if (!to || !/^[a-z0-9]+@sastra\.ac\.in$/i.test(to)) {
+    console.error(`[email] ✗ invalid recipient: "${to}"`);
+    addAudit('notify.email.invalid', to, subject);
+    return false;
+  }
   try {
     emailjs.init({ publicKey: EMAILJS.publicKey });
     console.log(`[email] → ${to} · "${subject}"`);
     const res = await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
-      to_email: to,
-      subject,
-      message: body
+      to_email: to, subject, message: body
     });
     console.log('[email] ✓ sent', res);
     addAudit('notify.email', to, subject);
     return true;
   } catch (e) {
-    console.error('[email] ✗ FAILED', e?.status, e?.text);
+    console.error('[email] ✗ FAILED status:', e?.status, '·', e?.text);
     return false;
   }
 }
+
+/* ── Send queue — prevents EmailJS rate-limit drops ────────────── */
+const _sendQueue = [];
+let _sendQueueRunning = false;
+
+function enqueueEmail(job) {
+  _sendQueue.push({ ...job, attempts: 0 });
+  if (!_sendQueueRunning) runSendQueue();
+}
+async function runSendQueue() {
+  _sendQueueRunning = true;
+  while (_sendQueue.length) {
+    const job = _sendQueue.shift();
+    job.attempts++;
+    const ok = await sendEmail({ to: job.to, subject: job.subject, body: job.body });
+    if (!ok && job.attempts < 3) {
+      console.log(`[queue] retrying in 3s → ${job.to}`);
+      await new Promise(r => setTimeout(r, 3000));
+      _sendQueue.unshift(job);
+    } else if (!ok) {
+      console.error(`[queue] giving up on ${job.to} after ${job.attempts} attempts`);
+    }
+    if (_sendQueue.length) await new Promise(r => setTimeout(r, 1500));
+  }
+  _sendQueueRunning = false;
+}
+
 async function requestPushPermission() {
   if (!('Notification' in window)) return false;
   if (Notification.permission === 'granted') return true;
@@ -2015,57 +2048,66 @@ function pushLocal(title, body) {
 async function notifyDueSoon(loan) {
   const to = registerToEmail(loan.borrowerId);
   const body = `${loan.itemName} (${loan.serialNo || ''}) is due at ${loan.dueTimeFormatted}.`;
-  await sendEmail({ to, subject: 'BEST — component due soon', body });
+  enqueueEmail({ to, subject: 'BEST — component due soon', body });
   pushLocal('Component due soon', body);
 }
 async function notifyOverdue(loan) {
   const to = registerToEmail(loan.borrowerId);
   const body = `${loan.itemName} (${loan.serialNo || ''}) is overdue. Please return it as soon as possible.`;
-  await sendEmail({ to, subject: 'BEST — component OVERDUE', body });
+  enqueueEmail({ to, subject: 'BEST — component OVERDUE', body });
   pushLocal('Component overdue', body);
 }
 async function notifyReservationReadyFor(reg, itemName) {
   const to = registerToEmail(reg);
   const body = `Your reserved item "${itemName}" is now available at the lab. Please collect within 24 hours.`;
-  await sendEmail({ to, subject: 'BEST — reservation ready', body });
+  enqueueEmail({ to, subject: 'BEST — reservation ready', body });
   pushLocal('Reservation ready', body);
 }
 
-/* Recurring overdue reminder — every 10 minutes, per-device cache so Firebase
-   sync cannot reset the timestamp and cause a duplicate send loop. */
+/* Recurring overdue reminder — grouped by borrower, sent every 10 min.
+   Uses a per-device cache so Firebase echo can't cause duplicate sends. */
 function checkOverdueReminders() {
   if (!EMAILJS.enabled) return;
   if (!state.loans || !state.loans.length) return;
 
   const t = now();
-
-  // Throttle: only evaluate the loop every 30 seconds (tick() runs every second)
   if (t - _lastOverdueCheckAt < OVERDUE_CHECK_THROTTLE_MS) return;
   _lastOverdueCheckAt = t;
 
-  let cacheChanged = false;
-
+  const byBorrower = {};
   state.loans.forEach(loan => {
-    // Not overdue → clear cached timestamp so next overdue starts a fresh cycle
     if (!isOverdue(loan, t)) {
       if (_overdueReminderCache[loan.loanId]) {
         delete _overdueReminderCache[loan.loanId];
-        cacheChanged = true;
       }
       return;
     }
+    const key = idKey(loan.borrowerId);
+    if (!byBorrower[key]) byBorrower[key] = [];
+    byBorrower[key].push(loan);
+  });
 
-    const lastSent = _overdueReminderCache[loan.loanId] || 0;
-    const isFirstOverdue = lastSent === 0;
-    const intervalElapsed = (t - lastSent) >= OVERDUE_EMAIL_INTERVAL_MS;
+  let cacheChanged = false;
+  Object.entries(byBorrower).forEach(([key, loans]) => {
+    let earliestSent = Infinity;
+    loans.forEach(l => { const ts = _overdueReminderCache[l.loanId]; if (ts && ts < earliestSent) earliestSent = ts; });
+    const firstEver = loans.every(l => !_overdueReminderCache[l.loanId]);
+    const dueNow = firstEver || (t - earliestSent) >= OVERDUE_EMAIL_INTERVAL_MS;
+    if (!dueNow) return;
 
-    if (isFirstOverdue || intervalElapsed) {
-      _overdueReminderCache[loan.loanId] = t;
-      cacheChanged = true;
-      const n = isFirstOverdue ? 1 : Math.floor((t - lastSent) / OVERDUE_EMAIL_INTERVAL_MS) + 1;
-      console.log(`[reminder] overdue email #${n} → ${loan.loanId} → ${registerToEmail(loan.borrowerId)}`);
-      notifyOverdue(loan);
-    }
+    loans.forEach(l => { _overdueReminderCache[l.loanId] = t; });
+    cacheChanged = true;
+
+    const borrower = loans[0].borrowerId;
+    const to = registerToEmail(borrower);
+    const lines = loans.map(l => `  • ${l.itemName} (${l.serialNo || l.unitId}) — due ${l.dueTimeFormatted}`).join('\n');
+    const subject = `BEST — ${loans.length} component${loans.length===1?'':'s'} OVERDUE`;
+    const body = loans.length === 1
+      ? `${loans[0].itemName} (${loans[0].serialNo || ''}) is overdue. Please return it as soon as possible.`
+      : `You have ${loans.length} components overdue at the BEST lab:\n\n${lines}\n\nPlease return them as soon as possible.`;
+    console.log(`[reminder] grouped email (${loans.length} item${loans.length===1?'':'s'}) → ${to}`);
+    enqueueEmail({ to, subject, body });
+    pushLocal(subject, body);
   });
 
   if (cacheChanged) _saveOverdueReminderCache();
@@ -2933,6 +2975,20 @@ function checkoutCart() {
   logActivity('checkout', `${idRef} borrowed ${cartUnits.length} unit(s)`);
   addAudit('loan.checkout', idRef, `units=${cartUnits.length}`);
   saveAndPublish('loans', 'history', 'activity', 'units', 'reservations', 'auditLog');
+
+  // Send an immediate checkout confirmation (grouped per borrower)
+  try {
+    const to = registerToEmail(idRef);
+    const lines = cartUnits.map(c => {
+      const item = findItem(c.skuId) || {};
+      return `  • ${item.name} (${c.serialNo})`;
+    }).join('\n');
+    const subject = `BEST — ${cartUnits.length} component${cartUnits.length===1?'':'s'} borrowed`;
+    const body = `You have borrowed ${cartUnits.length} component${cartUnits.length===1?'':'s'} from BEST:\n\n${lines}\n\nDue: ${fmtDateTime(due)}\n\nPlease return on time.`;
+    console.log('[email] checkout confirmation →', to);
+    enqueueEmail({ to, subject, body });
+  } catch (e) { console.warn('[email] checkout confirm failed:', e); }
+
   renderAll(); closeCart();
   toast(`Checkout complete — ${cartUnits.length} unit(s).`, 'success', 4000);
   go('loans');
@@ -3247,7 +3303,6 @@ async function clearAuditLog() {
   );
   if (!ok) return;
   state.auditLog = [];
-  // Leave a single trace entry so the clear itself is auditable
   addAudit('audit.clear', 'auditLog', `cleared ${count} entries by ${session.register}`);
   saveAndPublish('auditLog');
   renderAuditLog();
@@ -4204,7 +4259,7 @@ function tick() {
   }
   if (isHeadOfBajaj()) checkMachineInspectionNotification();
 
-  // Recurring overdue email reminders — throttled internally to every 30s
+  // Recurring overdue email reminders — throttled internally to every 30s, grouped per borrower
   if (session.role) checkOverdueReminders();
 
   if (session.role === 'user') {
@@ -4325,6 +4380,7 @@ window.toggleFavorite = toggleFavorite; window.renderMyStats = renderMyStats;
 window.installPWA = installPWA;
 window.requestPushPermission = requestPushPermission;
 window.checkOverdueReminders = checkOverdueReminders;
+window.registerToEmail = registerToEmail;
 </script>
 </body>
 </html>
